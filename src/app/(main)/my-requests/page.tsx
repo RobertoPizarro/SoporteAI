@@ -12,7 +12,6 @@ import { Badge } from "@/components/ui/badge"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -106,6 +105,7 @@ export default function MyRequestsPage() {
               <TableHead>Aplicación</TableHead>
               <TableHead>Actualizado</TableHead>
               <TableHead>Estado</TableHead>
+              <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -126,6 +126,11 @@ export default function MyRequestsPage() {
                     {request.status === 'Resuelta' && <Check className="h-3 w-3" />}
                     {request.status}
                   </Badge>
+                </TableCell>
+                <TableCell className="text-right">
+                  <Link href={`/my-requests/${encodeURIComponent(request.id)}`}>
+                    <Button variant="outline" size="sm">Ver Detalle</Button>
+                  </Link>
                 </TableCell>
               </TableRow>
             ))}
