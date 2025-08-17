@@ -47,55 +47,10 @@ const openRequests = [
   { id: "#10190", subject: "Error al cargar reportes", status: "En Progreso", updated: "Actualizado hace 3 d", variant: "secondary" as const, icon: <RefreshCw className="h-3 w-3" /> },
 ]
 
-const navItems = [
-    { label: "Inicio", href: "/" },
-    { label: "Nueva Solicitud", href: "/new-request" },
-    { label: "Mis Solicitudes", href: "/my-requests" },
-]
-
 export default function HomePage() {
   return (
     <div className="flex flex-col flex-1 animate-in fade-in-50">
-        <header className="flex items-center h-20 px-4 md:px-8 bg-card border-b">
-             <Link href="/" className="flex items-center gap-2 text-lg font-semibold md:text-base">
-                <Icons.logo className="h-6 w-6 text-foreground" />
-                <span className="font-bold font-headline text-lg">Soporte</span>
-            </Link>
-            <nav className="ml-10 hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-8">
-                {navItems.map((item) => (
-                    <Link
-                        key={item.href}
-                        href={item.href}
-                        className={`transition-colors text-base font-medium ${item.href === '/' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
-                    >
-                        {item.href === '/' ? (
-                            <Button size="sm" className="px-4 py-2 h-auto">
-                                {item.label}
-                            </Button>
-                        ) : (
-                            <span>{item.label}</span>
-                        )}
-                    </Link>
-                ))}
-            </nav>
-            <div className="ml-auto">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="gap-2">
-                      <User className="h-4 w-4" />
-                      Juan Pérez
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
-                     <DropdownMenuItem>
-                        <LogOut className="mr-2 h-4 w-4 text-muted-foreground" />
-                        <span>Cerrar Sesión</span>
-                     </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
-        </header>
-        <main className="flex-1 bg-background px-4 md:px-8 py-12">
+        <main className="flex-1 bg-background">
             <div className="max-w-5xl mx-auto">
                 <div className="text-center">
                     <h1 className="text-4xl font-bold font-headline">Hola, Juan Pérez. ¿En qué te podemos ayudar?</h1>

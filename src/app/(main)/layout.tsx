@@ -1,3 +1,5 @@
+import Header from "@/components/header";
+
 export default function AppLayout({
   children,
 }: {
@@ -5,7 +7,8 @@ export default function AppLayout({
 }) {
   return (
     <div className="flex min-h-screen w-full flex-col bg-background">
-      <main className="flex flex-1 flex-col">
+      <Header />
+      <main className="flex flex-1 flex-col p-4 md:p-8">
         {children}
       </main>
     </div>
