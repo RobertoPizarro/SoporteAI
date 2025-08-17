@@ -80,9 +80,12 @@ export default function HomePage() {
                     <h2 className="text-2xl font-bold font-headline mb-4">Solicitudes abiertas</h2>
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {openRequests.map((request) => (
-                      <Link href={`/my-requests/${encodeURIComponent(request.id)}?subject=${encodeURIComponent(request.subject)}&application=${encodeURIComponent(request.application)}&status=${encodeURIComponent(request.status)}`}>
-                        <Card className="hover:border-primary transition-colors">
-                          <CardContent className="p-4 space-y-3">
+                    <Link
+                      key={request.id}
+                      href={`/my-requests/${encodeURIComponent(request.id)}?subject=${encodeURIComponent(request.subject)}&application=${encodeURIComponent(request.application)}&status=${encodeURIComponent(request.status)}`}
+                    >
+                      <Card className="hover:border-primary transition-colors">
+                        <CardContent className="p-4 space-y-3">
                             <div className="flex justify-between items-center text-sm">
                               <p className="font-semibold">{request.id}</p>
                               <Badge 
