@@ -14,92 +14,140 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
-import { ArrowRight, HelpCircle } from "lucide-react"
+import { MessageSquare, User, LogOut, CheckCircle2, RefreshCw } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Icons } from "@/components/icons"
 
 const faqItems = [
   {
-    question: "¿Cómo puedo restablecer mi contraseña?",
-    answer: "Para restablecer tu contraseña, ve a la página de inicio de sesión y haz clic en '¿Olvidaste tu contraseña?'. Sigue las instrucciones para crear una nueva.",
+    question: "¿Cómo restablezco mi contraseña?",
+    answer: "Ve a Ajustes > Seguridad y selecciona \"Olvidé mi contraseña\". Recibirás un correo para continuar.",
   },
   {
-    question: "¿Dónde puedo ver el estado de mis solicitudes?",
-    answer: "Puedes ver todas tus solicitudes y su estado actual en la sección 'Mis Solicitudes' en el menú de navegación principal.",
+    question: "Mi usuario está bloqueado",
+    answer: "Verificaremos tu identidad y podremos desbloquearlo desde el chat de soporte.",
   },
   {
-    question: "¿Cómo creo una nueva solicitud de soporte?",
-    answer: "Haz clic en 'Nueva Solicitud' en el menú principal. Completa el formulario con los detalles de tu problema y nuestro equipo se pondrá en contacto.",
+    question: "¿Dónde veo mis solicitudes?",
+    answer: "En \"Mis Solicitudes\" encontrarás el historial y estado de cada caso.",
   },
 ]
 
 const openRequests = [
-  { id: "TKT-001", subject: "Problema de acceso a la VPN", status: "In Progress" },
-  { id: "TKT-002", subject: "Fallo en la impresora de la oficina", status: "In Progress" },
-  { id: "TKT-003", subject: "No puedo acceder a mi correo electrónico", status: "New" },
+  { id: "#10234", subject: "Problemas para iniciar sesión", status: "En Progreso", updated: "Actualizado hace 2 h", variant: "secondary" as const, icon: <RefreshCw className="h-3 w-3" /> },
+  { id: "#10212", subject: "Solicitud de desbloqueo de usuario", status: "Resuelto", updated: "Actualizado ayer", variant: "default" as const, icon: <CheckCircle2 className="h-3 w-3" /> },
+  { id: "#10190", subject: "Error al cargar reportes", status: "En Progreso", updated: "Actualizado hace 3 d", variant: "secondary" as const, icon: <RefreshCw className="h-3 w-3" /> },
+]
+
+const navItems = [
+    { label: "Inicio", href: "/" },
+    { label: "Nueva Solicitud", href: "/new-request" },
+    { label: "Mis Solicitudes", href: "/my-requests" },
 ]
 
 export default function HomePage() {
   return (
-    <div className="space-y-8 animate-in fade-in-50">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold font-headline">Hola, Juan Pérez</h1>
-          <p className="text-muted-foreground">¿En qué podemos ayudarte hoy?</p>
-        </div>
-        <Link href="/new-request">
-          <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-            Start New Conversation
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-        </Link>
-      </div>
-
-      <div className="grid gap-8 lg:grid-cols-2">
-        <Card className="shadow-sm">
-          <CardHeader className="flex flex-row items-center gap-4">
-             <HelpCircle className="w-8 h-8 text-primary" />
-            <div>
-                <CardTitle>Preguntas Frecuentes</CardTitle>
-                <CardDescription>
-                Encuentra respuestas rápidas a las preguntas más comunes.
-                </CardDescription>
+    <div className="flex flex-col flex-1 animate-in fade-in-50">
+        <header className="flex items-center h-20 px-4 md:px-8 bg-card border-b">
+             <Link href="/" className="flex items-center gap-2 text-lg font-semibold md:text-base">
+                <Icons.logo className="h-6 w-6 text-foreground" />
+                <span className="font-bold font-headline text-lg">Soporte</span>
+            </Link>
+            <nav className="ml-10 hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-8">
+                {navItems.map((item) => (
+                    <Link
+                        key={item.href}
+                        href={item.href}
+                        className={`transition-colors text-base font-medium ${item.href === '/' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                        {item.href === '/' ? (
+                            <Button size="sm" className="px-4 py-2 h-auto">
+                                {item.label}
+                            </Button>
+                        ) : (
+                            <span>{item.label}</span>
+                        )}
+                    </Link>
+                ))}
+            </nav>
+            <div className="ml-auto">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="gap-2">
+                      <User className="h-4 w-4" />
+                      Juan Pérez
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                     <DropdownMenuItem>
+                        <LogOut className="mr-2 h-4 w-4 text-muted-foreground" />
+                        <span>Cerrar Sesión</span>
+                     </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
             </div>
-          </CardHeader>
-          <CardContent>
-            <Accordion type="single" collapsible className="w-full">
-              {faqItems.map((item, index) => (
-                <AccordionItem value={`item-${index}`} key={index}>
-                  <AccordionTrigger className="text-left hover:no-underline">{item.question}</AccordionTrigger>
-                  <AccordionContent>{item.answer}</AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </CardContent>
-        </Card>
+        </header>
+        <main className="flex-1 bg-background px-4 md:px-8 py-12">
+            <div className="max-w-5xl mx-auto">
+                <div className="text-center">
+                    <h1 className="text-4xl font-bold font-headline">Hola, Juan Pérez. ¿En qué te podemos ayudar?</h1>
+                    <div className="mt-6">
+                        <Link href="/new-request">
+                            <Button size="lg">
+                                <MessageSquare className="mr-2 h-5 w-5" />
+                                Iniciar Nueva Conversación
+                            </Button>
+                        </Link>
+                    </div>
+                </div>
 
-        <Card className="shadow-sm">
-          <CardHeader>
-            <CardTitle>Solicitudes Abiertas</CardTitle>
-            <CardDescription>
-              Un vistazo rápido a tus solicitudes activas.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {openRequests.map((request) => (
-                <Link href={`/my-requests/${request.id}`} key={request.id} className="block">
-                    <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
-                    <div>
-                        <p className="font-semibold">{request.subject}</p>
-                        <p className="text-sm text-muted-foreground">{request.id}</p>
+                <section className="mt-16">
+                    <h2 className="text-2xl font-bold font-headline mb-4">Preguntas Frecuentes</h2>
+                    <Accordion type="single" collapsible className="w-full space-y-3">
+                    {faqItems.map((item, index) => (
+                        <AccordionItem value={`item-${index}`} key={index} className="bg-card border rounded-lg px-4">
+                        <AccordionTrigger className="text-left hover:no-underline font-semibold">{item.question}</AccordionTrigger>
+                        <AccordionContent className="text-muted-foreground">{item.answer}</AccordionContent>
+                        </AccordionItem>
+                    ))}
+                    </Accordion>
+                </section>
+
+                <section className="mt-16">
+                    <h2 className="text-2xl font-bold font-headline mb-4">Solicitudes abiertas</h2>
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {openRequests.map((request) => (
+                         <Link href="#" key={request.id}>
+                            <Card className="hover:border-primary transition-colors">
+                                <CardContent className="p-4 space-y-3">
+                                    <div className="flex justify-between items-center text-sm">
+                                        <p className="font-semibold">{request.id}</p>
+                                        <Badge variant={request.variant} className="gap-1.5">
+                                            {request.icon}
+                                            {request.status}
+                                        </Badge>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-muted-foreground">Asunto</p>
+                                        <p className="font-semibold text-sm">{request.subject}</p>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground text-right">{request.updated}</p>
+                                </CardContent>
+                            </Card>
+                        </Link>
+                    ))}
                     </div>
-                    <Badge variant={request.status === 'New' ? 'destructive' : 'secondary'}>{request.status}</Badge>
-                    </div>
-                </Link>
-              ))}
+                </section>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+        </main>
     </div>
   )
 }
