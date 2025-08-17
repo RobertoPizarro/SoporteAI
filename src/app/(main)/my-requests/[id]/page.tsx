@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import ChatInterface from "@/components/chat-interface"
+import { Clock, MessageSquare } from "lucide-react"
 
 export default function RequestDetailPage({ params }: { params: { id: string } }) {
   // In a real app, you'd fetch request details based on params.id
@@ -8,32 +9,59 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
     number: params.id,
     subject: "Problema de acceso a la VPN",
     area: "Redes e Internet",
-    date: "2023-10-26",
+    date: "26 Oct 2023, 14:30",
     status: "In Progress",
   }
 
   return (
-    <div className="grid lg:grid-cols-2 gap-8 h-full items-start">
-      <Card className="animate-in fade-in-50">
-        <CardHeader>
-          <CardTitle className="font-headline">Detalles de la Solicitud</CardTitle>
-          <CardDescription>
-            Información detallada del Ticket N° {ticketDetails.number}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-            <div className="flex items-center text-sm"><strong className="w-40 text-muted-foreground">Ticket N°:</strong><span>{ticketDetails.number}</span></div>
-            <div className="flex items-start text-sm"><strong className="w-40 text-muted-foreground">Asunto:</strong><span className="flex-1">{ticketDetails.subject}</span></div>
-            <div className="flex items-center text-sm"><strong className="w-40 text-muted-foreground">Área:</strong><span>{ticketDetails.area}</span></div>
-            <div className="flex items-center text-sm"><strong className="w-40 text-muted-foreground">Fecha de creación:</strong><span>{ticketDetails.date}</span></div>
-            <div className="flex items-center text-sm"><strong className="w-40 text-muted-foreground">Estado:</strong>
-                <Badge variant={ticketDetails.status === 'In Progress' ? 'secondary' : 'default'} className="text-xs">{ticketDetails.status}</Badge>
-            </div>
-        </CardContent>
-      </Card>
-      <Card className="flex flex-col h-[75vh] animate-in fade-in-50 delay-150">
-        <ChatInterface />
-      </Card>
+    <div className="grid lg:grid-cols-3 gap-8 items-start animate-in fade-in-50">
+        <div className="lg:col-span-1">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline text-lg">Detalle de la solicitud</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="space-y-1 rounded-md border p-2">
+                        <p className="text-xs text-muted-foreground">N° de Ticket</p>
+                        <p className="font-semibold text-sm">{ticketDetails.number}</p>
+                    </div>
+                    <div className="space-y-1 rounded-md border p-2">
+                        <p className="text-xs text-muted-foreground">Asunto</p>
+                        <p className="font-semibold text-sm">{ticketDetails.subject}</p>
+                    </div>
+                    <div className="space-y-1 rounded-md border p-2">
+                        <p className="text-xs text-muted-foreground">Aplicación / Área</p>
+                        <p className="font-semibold text-sm">{ticketDetails.area}</p>
+                    </div>
+                    <div className="space-y-1 rounded-md border p-2">
+                        <p className="text-xs text-muted-foreground">Fecha de creación</p>
+                        <p className="font-semibold text-sm">{ticketDetails.date}</p>
+                    </div>
+                    <div className="space-y-1 rounded-md border p-2">
+                        <p className="text-xs text-muted-foreground">Estado</p>
+                        <Badge variant="secondary" className="gap-1.5 font-semibold text-sm">
+                            <Clock className="h-3 w-3" />
+                            {ticketDetails.status}
+                        </Badge>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+        <div className="lg:col-span-2">
+             <Card className="flex flex-col h-[75vh]">
+                <CardHeader className="flex-row items-center justify-between">
+                    <div>
+                        <CardTitle className="text-lg font-headline">Asistente Inteligente de Soporte</CardTitle>
+                        <CardDescription>Ticket {ticketDetails.number} • {ticketDetails.area}</CardDescription>
+                    </div>
+                    <Badge variant="secondary" className="gap-1.5 text-sm">
+                        <MessageSquare className="h-3 w-3" />
+                        Activa
+                    </Badge>
+                </CardHeader>
+                <ChatInterface />
+             </Card>
+        </div>
     </div>
   )
 }
