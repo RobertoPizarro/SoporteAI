@@ -28,10 +28,10 @@ import {
 import { Search, PlusCircle, CheckCircle2, LayoutGrid, Calendar, Clock, Check, ChevronLeft, ChevronRight } from "lucide-react"
 
 const requests = [
-  { id: "#TCK-2025-005", subject: "Error al iniciar sesión en SSO", application: "SSO", updated: "hace 2h", status: "Abierta" },
-  { id: "#TCK-2025-189", subject: "Reporte de pagos incompleto", application: "Pagos", updated: "Ayer", status: "Resuelta" },
-  { id: "#TCK-2025-188", subject: "No se cargan métricas", application: "Analytics", updated: "Hace 3 días", status: "Resuelta" },
-  { id: "#TCK-2025-085", subject: "Consulta de facturación", application: "Portal Web", updated: "Hace 5 días", status: "Abierta" },
+  { id: "TCK-2025-00005", subject: "Error al iniciar sesión en SSO", application: "SSO", updated: "hace 2h", status: "Abierta" },
+  { id: "TCK-2025-00189", subject: "Reporte de pagos incompleto", application: "Pagos", updated: "Ayer", status: "Resuelta" },
+  { id: "TCK-2025-00188", subject: "No se cargan métricas", application: "Analytics", updated: "Hace 3 días", status: "Resuelta" },
+  { id: "TCK-2025-00085", subject: "Consulta de facturación", application: "Portal Web", updated: "Hace 5 días", status: "Abierta" },
 ]
 
 export default function MyRequestsPage() {

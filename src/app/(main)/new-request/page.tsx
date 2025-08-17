@@ -51,7 +51,7 @@ export default function NewRequestPage() {
                     <CardContent className="space-y-4">
                         <div className="space-y-1 rounded-md border p-2">
                             <p className="text-xs text-muted-foreground">N° de Ticket</p>
-                            <p className="font-semibold text-sm">#{ticketDetails.number}</p>
+                            <p className="font-semibold text-sm">{ticketDetails.number}</p>
                         </div>
                         <div className="space-y-1 rounded-md border p-2">
                             <p className="text-xs text-muted-foreground">Asunto</p>
