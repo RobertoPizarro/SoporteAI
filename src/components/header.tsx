@@ -27,9 +27,10 @@ export default function Header() {
     <header className="flex items-center h-20 px-4 md:px-8 bg-card border-b">
         <Link href="/" className="flex items-center gap-2 text-lg font-semibold md:text-base">
             <Icons.logo className="h-6 w-6 text-foreground" />
-            <span className="font-bold font-headline text-lg">Soporte</span>
+            <span className="font-bold font-headline text-lg">SoporteAI</span>
         </Link>
-        <nav className="ml-10 hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-8">
+        <nav className="flex-1 flex justify-center">
+            <div className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-8">
             {navItems.map((item) => (
                 <Link
                     key={item.href}
@@ -48,6 +49,7 @@ export default function Header() {
                     )}
                 </Link>
             ))}
+            </div>
         </nav>
         <div className="ml-auto">
             <DropdownMenu>

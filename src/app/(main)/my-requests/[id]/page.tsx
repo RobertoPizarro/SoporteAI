@@ -1,17 +1,25 @@
+"use client"
+
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import ChatInterface from "@/components/chat-interface"
-import { Clock, MessageSquare } from "lucide-react"
+import { Clock, Check, MessageSquare } from "lucide-react"
+import { useSearchParams } from "next/navigation"
 
 export default function RequestDetailPage({ params }: { params: { id: string } }) {
-  // In a real app, you'd fetch request details based on params.id
-  const ticketDetails = {
-    number: params.id,
-    subject: "Problema de acceso a la VPN",
-    area: "Redes e Internet",
-    date: "26 Oct 2023, 14:30",
-    status: "In Progress",
-  }
+    const searchParams = useSearchParams()
+  
+    const subject = searchParams.get("subject") || "Sin asunto"
+    const application = searchParams.get("application") || "Sin aplicación"
+    const status = searchParams.get("status") || "Abierta"
+  
+    const ticketDetails = {
+      number: params.id,
+      subject,
+      area: application,
+      date: "26 Oct 2023, 14:30",
+      status,
+    }
 
   return (
     <div className="grid lg:grid-cols-3 gap-8 items-start animate-in fade-in-50">
@@ -39,11 +47,15 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
                     </div>
                     <div className="space-y-1 rounded-md border p-2">
                         <p className="text-xs text-muted-foreground">Estado</p>
-                        <Badge variant="secondary" className="gap-1.5 font-semibold text-sm">
-                            <Clock className="h-3 w-3" />
+                        <Badge 
+                            variant={ticketDetails.status === "Resuelta" ? "success" : "open"} 
+                            className="gap-1.5 font-semibold text-sm"
+                        >
+                            {ticketDetails.status === "Abierta" && <Clock className="h-3 w-3" />}
+                            {ticketDetails.status === "Resuelta" && <Check className="h-3 w-3" />}
                             {ticketDetails.status}
                         </Badge>
-                    </div>
+                        </div>
                 </CardContent>
             </Card>
         </div>

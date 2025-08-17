@@ -6,15 +6,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Mail, Eye, LogIn } from "lucide-react"
+import Header from "@/components/headerLogin";
 
 export default function LoginPage() {
   return (
     <div className="flex flex-col min-h-screen bg-muted/40">
-      <header className="flex items-center h-16 px-4 shrink-0 md:px-6">
-        <div className="w-full text-center">
-          <p className="text-lg font-medium font-headline">Bienvenido</p>
-        </div>
-      </header>
+        <Header />
       <main className="flex-1 flex items-center justify-center p-4">
         <Card className="w-full max-w-sm mx-auto shadow-lg rounded-xl">
           <CardHeader className="text-center">
@@ -36,9 +33,6 @@ export default function LoginPage() {
                     <Checkbox id="remember" />
                     <Label htmlFor="remember" className="font-normal">Mantener sesión iniciada</Label>
                 </div>
-                <Link href="#" className="underline text-primary">
-                    ¿Olvidaste tu contraseña?
-                </Link>
             </div>
             <Link href="/" passHref>
                 <Button className="w-full">

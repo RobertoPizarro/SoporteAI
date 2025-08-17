@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Hourglass, Clock, MessageSquare } from "lucide-react"
+import { Hourglass, Clock, Check, MessageSquare } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import ChatInterface from "@/components/chat-interface"
 
@@ -39,7 +39,7 @@ export default function NewRequestPage() {
       subject: subject,
       area: area,
       date: "17 Ago 2025, 10:24",
-      status: "Abierto",
+      status: "Abierta",
     }
     return (
         <div className="grid lg:grid-cols-3 gap-8 items-start animate-in fade-in-50">
@@ -66,11 +66,15 @@ export default function NewRequestPage() {
                             <p className="font-semibold text-sm">{ticketDetails.date}</p>
                         </div>
                         <div className="space-y-1 rounded-md border p-2">
-                            <p className="text-xs text-muted-foreground">Estado</p>
-                            <Badge variant="outline" className="gap-1.5 font-semibold text-sm">
-                                <Clock className="h-3 w-3" />
-                                {ticketDetails.status}
-                            </Badge>
+                          <p className="text-xs text-muted-foreground">Estado</p>
+                          <Badge 
+                            variant={ticketDetails.status === "Resuelta" ? "success" : "open"} 
+                            className="gap-1.5 font-semibold text-sm"
+                          >
+                            {ticketDetails.status === "Abierta" && <Clock className="h-3 w-3" />}
+                            {ticketDetails.status === "Resuelta" && <Check className="h-3 w-3" />}
+                            {ticketDetails.status}
+                          </Badge>
                         </div>
                     </CardContent>
                 </Card>

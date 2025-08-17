@@ -128,9 +128,10 @@ export default function MyRequestsPage() {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Link href={`/my-requests/${encodeURIComponent(request.id)}`}>
-                    <Button variant="outline" size="sm">Ver Detalle</Button>
-                  </Link>
+                <Link 
+                  href={`/my-requests/${encodeURIComponent(request.id)}?subject=${encodeURIComponent(request.subject)}&application=${encodeURIComponent(request.application)}&status=${encodeURIComponent(request.status)}`}>
+                  <Button variant="outline" size="sm">Ver Detalle</Button>
+                </Link>
                 </TableCell>
               </TableRow>
             ))}

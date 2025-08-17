@@ -14,7 +14,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
-import { MessageSquare, User, LogOut, CheckCircle2, RefreshCw } from "lucide-react"
+import { MessageSquare, User, LogOut, CheckCircle2, Clock, Check, RefreshCw } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,9 +42,9 @@ const faqItems = [
 ]
 
 const openRequests = [
-  { id: "#10234", subject: "Problemas para iniciar sesión", status: "En Progreso", updated: "Actualizado hace 2 h", variant: "secondary" as const, icon: <RefreshCw className="h-3 w-3" /> },
-  { id: "#10212", subject: "Solicitud de desbloqueo de usuario", status: "Resuelto", updated: "Actualizado ayer", variant: "default" as const, icon: <CheckCircle2 className="h-3 w-3" /> },
-  { id: "#10190", subject: "Error al cargar reportes", status: "En Progreso", updated: "Actualizado hace 3 d", variant: "secondary" as const, icon: <RefreshCw className="h-3 w-3" /> },
+  { id: "TCK-2025-00005", subject: "Error al iniciar sesión en SSO", application: "SSO", status: "Abierta", updated: "Actualizado hace 2h", variant: "secondary" as const, icon: <RefreshCw className="h-3 w-3" /> },
+  { id: "TCK-2025-00189", subject: "Reporte de pagos incompleto", application: "Pagos", status: "Resuelta", updated: "Actualizado ayer", variant: "default" as const, icon: <CheckCircle2 className="h-3 w-3" /> },
+  { id: "TCK-2025-00188", subject: "No se cargan métricas", application: "Analytics", status: "Resuelta", updated: "Actualizado hace 3 días", variant: "secondary" as const, icon: <RefreshCw className="h-3 w-3" /> },
 ]
 
 export default function HomePage() {
@@ -80,24 +80,28 @@ export default function HomePage() {
                     <h2 className="text-2xl font-bold font-headline mb-4">Solicitudes abiertas</h2>
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {openRequests.map((request) => (
-                         <Link href="#" key={request.id}>
-                            <Card className="hover:border-primary transition-colors">
-                                <CardContent className="p-4 space-y-3">
-                                    <div className="flex justify-between items-center text-sm">
-                                        <p className="font-semibold">{request.id}</p>
-                                        <Badge variant={request.variant} className="gap-1.5">
-                                            {request.icon}
-                                            {request.status}
-                                        </Badge>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-muted-foreground">Asunto</p>
-                                        <p className="font-semibold text-sm">{request.subject}</p>
-                                    </div>
-                                    <p className="text-xs text-muted-foreground text-right">{request.updated}</p>
-                                </CardContent>
-                            </Card>
-                        </Link>
+                      <Link href={`/my-requests/${encodeURIComponent(request.id)}?subject=${encodeURIComponent(request.subject)}&application=${encodeURIComponent(request.application)}&status=${encodeURIComponent(request.status)}`}>
+                        <Card className="hover:border-primary transition-colors">
+                          <CardContent className="p-4 space-y-3">
+                            <div className="flex justify-between items-center text-sm">
+                              <p className="font-semibold">{request.id}</p>
+                              <Badge 
+                                variant={request.status === "Resuelta" ? "success" : "open"} 
+                                className="gap-1.5"
+                              >
+                                {request.status === "Abierta" && <Clock className="h-3 w-3" />}
+                                {request.status === "Resuelta" && <Check className="h-3 w-3" />}
+                                {request.status}
+                              </Badge>
+                            </div>
+                            <div>
+                              <p className="text-xs text-muted-foreground">Asunto</p>
+                              <p className="font-semibold text-sm">{request.subject}</p>
+                            </div>
+                            <p className="text-xs text-muted-foreground text-right">{request.updated}</p>
+                          </CardContent>
+                        </Card>
+                      </Link>
                     ))}
                     </div>
                 </section>
