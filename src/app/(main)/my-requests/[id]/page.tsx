@@ -5,13 +5,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import ChatInterface from "@/components/chat-interface"
 import { Clock, Check, MessageSquare } from "lucide-react"
 import { useSearchParams } from "next/navigation"
+import { use } from "react"
 
-export default function RequestDetailPage({ params }: { params: { id: string } }) {
-    const { id } = params;
+export default function RequestDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = use(params);
     const searchParams = useSearchParams()
     const subject = searchParams.get("subject") || "Sin asunto"
     const application = searchParams.get("application") || "Sin aplicación"
-    const status = searchParams.get("status") || "Abierta"
+    const status = (searchParams.get("status") || "Abierta").split("?")[0]
   
     const ticketDetails = {
       number: id,
