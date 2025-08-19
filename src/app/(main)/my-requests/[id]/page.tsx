@@ -30,19 +30,19 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
                 <CardContent className="space-y-4">
                     <div className="space-y-1 rounded-md border p-2">
                         <p className="text-xs text-muted-foreground">N° de Ticket</p>
-                        <p className="font-semibold text-sm">{ticketDetails.number}</p>
+                        <p className="font-normal text-sm">{ticketDetails.number}</p>
                     </div>
                     <div className="space-y-1 rounded-md border p-2">
                         <p className="text-xs text-muted-foreground">Asunto</p>
-                        <p className="font-semibold text-sm">{ticketDetails.subject}</p>
+                        <p className="font-normal text-sm">{ticketDetails.subject}</p>
                     </div>
                     <div className="space-y-1 rounded-md border p-2">
                         <p className="text-xs text-muted-foreground">Aplicación / Área</p>
-                        <p className="font-semibold text-sm">{ticketDetails.area}</p>
+                        <p className="font-normal text-sm">{ticketDetails.area}</p>
                     </div>
                     <div className="space-y-1 rounded-md border p-2">
                         <p className="text-xs text-muted-foreground">Fecha de creación</p>
-                        <p className="font-semibold text-sm">{ticketDetails.date}</p>
+                        <p className="font-normal text-sm">{ticketDetails.date}</p>
                     </div>
                     <div className="space-y-1 rounded-md border p-2">
                         <p className="text-xs text-muted-foreground">Estado</p>

@@ -36,8 +36,8 @@ export default function Header() {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                        "transition-colors text-base font-medium",
-                        pathname === item.href ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                        "px-4 py-2 rounded-md transition-colors text-base font-medium inline-flex items-center",
+                        pathname === item.href ? "text-primary" : "text-muted-foreground hover:bg-blue-500 hover:text-white"
                     )}
                 >
                     {pathname === item.href ? (
@@ -54,14 +54,14 @@ export default function Header() {
         <div className="ml-auto">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="gap-2">
+                <Button variant="ghost" className="hover:bg-blue-500">
                   <User className="h-4 w-4" />
                   Juan Pérez
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                  <Link href="/login">
-                    <DropdownMenuItem>
+                    <DropdownMenuItem className="!bg-white !text-black cursor-pointer">
                         <LogOut className="mr-2 h-4 w-4 text-muted-foreground" />
                         <span>Cerrar Sesión</span>
                     </DropdownMenuItem>

@@ -51,19 +51,19 @@ export default function NewRequestPage() {
                     <CardContent className="space-y-4">
                         <div className="space-y-1 rounded-md border p-2">
                             <p className="text-xs text-muted-foreground">N° de Ticket</p>
-                            <p className="font-semibold text-sm">{ticketDetails.number}</p>
+                            <p className="font-normal text-sm">{ticketDetails.number}</p>
                         </div>
                         <div className="space-y-1 rounded-md border p-2">
                             <p className="text-xs text-muted-foreground">Asunto</p>
-                            <p className="font-semibold text-sm">{ticketDetails.subject}</p>
+                            <p className="font-normal text-sm">{ticketDetails.subject}</p>
                         </div>
                         <div className="space-y-1 rounded-md border p-2">
                             <p className="text-xs text-muted-foreground">Aplicación / Área</p>
-                            <p className="font-semibold text-sm">{ticketDetails.area}</p>
+                            <p className="font-normal text-sm">{ticketDetails.area}</p>
                         </div>
                         <div className="space-y-1 rounded-md border p-2">
                             <p className="text-xs text-muted-foreground">Fecha de creación</p>
-                            <p className="font-semibold text-sm">{ticketDetails.date}</p>
+                            <p className="font-normal text-sm">{ticketDetails.date}</p>
                         </div>
                         <div className="space-y-1 rounded-md border p-2">
                           <p className="text-xs text-muted-foreground">Estado</p>
@@ -130,24 +130,18 @@ export default function NewRequestPage() {
                   <SelectValue placeholder="Selecciona una opción" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Portal Web">Portal Web</SelectItem>
-                  <SelectItem value="SSO">SSO</SelectItem>
-                  <SelectItem value="Pagos">Pagos</SelectItem>
-                  <SelectItem value="Analytics">Analytics</SelectItem>
-                  <SelectItem value="Otro">Otro</SelectItem>
+                  <SelectItem value="Portal Web" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">Portal Web</SelectItem>
+                  <SelectItem value="SSO" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">SSO</SelectItem>
+                  <SelectItem value="Pagos" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">Pagos</SelectItem>
+                  <SelectItem value="Analytics" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">Analytics</SelectItem>
+                  <SelectItem value="Otro" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">Otro</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">
-                Ejemplos: Portal Web, SSO, Pagos, Analytics
-              </p>
             </div>
             <div className="space-y-2">
               <Button type="submit" className="w-full">
                 Crear solicitud
               </Button>
-              <p className="text-xs text-muted-foreground text-center">
-                Se creará el ticket y se abrirá el chat automáticamente.
-              </p>
             </div>
           </form>
         </CardContent>
@@ -168,7 +162,7 @@ export default function NewRequestPage() {
             <CardContent>
                 <div className="p-8 rounded-lg border bg-background text-center">
                     <p>
-                        Estamos preparando tu solicitud. Aguarda la confirmación para comenzar a chatear.
+                        Confirma la creación de la solicitud para comenzar a chatear.
                     </p>
                 </div>
             </CardContent>

@@ -20,12 +20,12 @@ export default function LoginPage() {
           <CardContent className="grid gap-6">
             <div className="grid gap-2 relative">
               <Label htmlFor="email">Correo corporativo</Label>
-              <Mail className="absolute right-3 top-9 h-5 w-5 text-muted-foreground" />
+              <Mail className="absolute right-3 top-8 h-5 w-5 text-muted-foreground" />
               <Input id="email" type="email" placeholder="nombre@empresa.com" required className="pl-4 pr-10" />
             </div>
             <div className="grid gap-2 relative">
               <Label htmlFor="password">Contraseña</Label>
-              <Eye className="absolute right-3 top-9 h-5 w-5 text-muted-foreground" />
+              <Eye className="absolute right-3 top-8 h-5 w-5 text-muted-foreground" />
               <Input id="password" type="password" required defaultValue="password" className="pl-4 pr-10" />
             </div>
             <div className="flex items-center justify-between text-sm">

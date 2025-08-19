@@ -51,7 +51,7 @@ export default function MyRequestsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
             <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Palabra clave" className="pl-8 w-full" />
+                <Input placeholder="Buscar por Asunto" className="pl-8 w-full" />
             </div>
             <Select>
                 <SelectTrigger>
@@ -61,9 +61,8 @@ export default function MyRequestsPage() {
                     </div>
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="abierta">Abierta</SelectItem>
-                    <SelectItem value="resuelta">Resuelta</SelectItem>
-                    <SelectItem value="en-progreso">En Progreso</SelectItem>
+                    <SelectItem value="abierta" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">Abierta</SelectItem>
+                    <SelectItem value="resuelta" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">Resuelta</SelectItem>
                 </SelectContent>
             </Select>
             <Select>
@@ -74,11 +73,11 @@ export default function MyRequestsPage() {
                     </div>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Portal Web">Portal Web</SelectItem>
-                  <SelectItem value="SSO">SSO</SelectItem>
-                  <SelectItem value="Pagos">Pagos</SelectItem>
-                  <SelectItem value="Analytics">Analytics</SelectItem>
-                  <SelectItem value="Otro">Otro</SelectItem>
+                  <SelectItem value="Portal Web" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">Portal Web</SelectItem>
+                  <SelectItem value="SSO" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">SSO</SelectItem>
+                  <SelectItem value="Pagos" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">Pagos</SelectItem>
+                  <SelectItem value="Analytics" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">Analytics</SelectItem>
+                  <SelectItem value="Otro" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">Otro</SelectItem>
                 </SelectContent>
             </Select>
             <Select>
@@ -89,10 +88,10 @@ export default function MyRequestsPage() {
                     </div>
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="hoy">Hoy</SelectItem>
-                    <SelectItem value="ayer">Ayer</SelectItem>
-                    <SelectItem value="last-7">Últimos 7 días</SelectItem>
-                    <SelectItem value="last-30">Últimos 30 días</SelectItem>
+                    <SelectItem value="hoy" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">Hoy</SelectItem>
+                    <SelectItem value="ayer" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">Ayer</SelectItem>
+                    <SelectItem value="last-7" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">Últimos 7 días</SelectItem>
+                    <SelectItem value="last-30" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">Últimos 30 días</SelectItem>
                 </SelectContent>
             </Select>
         </div>
@@ -130,7 +129,7 @@ export default function MyRequestsPage() {
                 <TableCell className="text-right">
                 <Link 
                   href={`/my-requests/${encodeURIComponent(request.id)}?subject=${encodeURIComponent(request.subject)}&application=${encodeURIComponent(request.application)}&status=${encodeURIComponent(request.status)}`}>
-                  <Button variant="outline" size="sm">Ver Detalle</Button>
+                  <Button variant="outline" size="sm" className="!bg-white !text-black cursor-pointer">Ver Detalle</Button>
                 </Link>
                 </TableCell>
               </TableRow>
@@ -144,11 +143,11 @@ export default function MyRequestsPage() {
             Mostrando 1-4 de 24
         </span>
         <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="!bg-white !text-black cursor-pointer">
                 <ChevronLeft className="h-4 w-4" />
                 <span className="ml-1">Anterior</span>
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="!bg-white !text-black cursor-pointer">
                 <span className="mr-1">Siguiente</span>
                 <ChevronRight className="h-4 w-4" />
             </Button>

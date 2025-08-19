@@ -29,7 +29,7 @@ import { Icons } from "@/components/icons"
 const faqItems = [
   {
     question: "¿Cómo restablezco mi contraseña?",
-    answer: "Ve a Ajustes > Seguridad y selecciona \"Olvidé mi contraseña\". Recibirás un correo para continuar.",
+    answer: "En el Portal Web, ve a Ajustes > Seguridad y selecciona \"Olvidé mi contraseña\". Recibirás un correo para continuar.",
   },
   {
     question: "Mi usuario está bloqueado",
@@ -58,7 +58,7 @@ export default function HomePage() {
                         <Link href="/new-request">
                             <Button size="lg">
                                 <MessageSquare className="mr-2 h-5 w-5" />
-                                Iniciar Nueva Conversación
+                                Iniciar Nueva Solicitud
                             </Button>
                         </Link>
                     </div>
@@ -69,7 +69,7 @@ export default function HomePage() {
                     <Accordion type="single" collapsible className="w-full space-y-3">
                     {faqItems.map((item, index) => (
                         <AccordionItem value={`item-${index}`} key={index} className="bg-card border rounded-lg px-4">
-                        <AccordionTrigger className="text-left hover:no-underline font-semibold">{item.question}</AccordionTrigger>
+                        <AccordionTrigger className="text-left hover:no-underline">{item.question}</AccordionTrigger>
                         <AccordionContent className="text-muted-foreground">{item.answer}</AccordionContent>
                         </AccordionItem>
                     ))}
@@ -99,7 +99,7 @@ export default function HomePage() {
                             </div>
                             <div>
                               <p className="text-xs text-muted-foreground">Asunto</p>
-                              <p className="font-semibold text-sm">{request.subject}</p>
+                              <p className="text-sm">{request.subject}</p>
                             </div>
                             <p className="text-xs text-muted-foreground text-right">{request.updated}</p>
                           </CardContent>
