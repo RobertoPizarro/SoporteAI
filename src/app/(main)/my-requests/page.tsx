@@ -101,10 +101,10 @@ export default function MyRequestsPage() {
             <TableRow>
               <TableHead>N° Ticket</TableHead>
               <TableHead>Asunto</TableHead>
-              <TableHead>Aplicación</TableHead>
-              <TableHead>Actualizado</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead className="text-right">Acciones</TableHead>
+              <TableHead className="text-center">Aplicación</TableHead>
+              <TableHead className="text-center">Actualizado</TableHead>
+              <TableHead className="text-center">Estado</TableHead>
+              <TableHead className="text-center">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -112,11 +112,11 @@ export default function MyRequestsPage() {
               <TableRow key={request.id}>
                 <TableCell className="font-medium">{request.id}</TableCell>
                 <TableCell>{request.subject}</TableCell>
-                <TableCell>
+                <TableCell className="text-center">
                   <Badge variant="outline" className="font-normal">{request.application}</Badge>
                 </TableCell>
-                <TableCell>{request.updated}</TableCell>
-                <TableCell>
+                <TableCell className="text-center" >{request.updated}</TableCell>
+                <TableCell className="text-center">
                   <Badge 
                     variant={request.status === 'Resuelta' ? 'success' : 'open'} 
                     className="gap-2 font-normal"
@@ -126,7 +126,7 @@ export default function MyRequestsPage() {
                     {request.status}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-center">
                 <Link 
                   href={`/my-requests/${encodeURIComponent(request.id)}?subject=${encodeURIComponent(request.subject)}&application=${encodeURIComponent(request.application)}&status=${encodeURIComponent(request.status)}`}>
                   <Button variant="outline" size="sm" className="!bg-white !text-black cursor-pointer">Ver Detalle</Button>

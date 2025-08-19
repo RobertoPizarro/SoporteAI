@@ -159,10 +159,10 @@ export default function NewRequestPage() {
                     En espera
                 </Badge>
             </CardHeader>
-            <CardContent>
+            <CardContent >
                 <div className="p-8 rounded-lg border bg-background text-center">
                     <p>
-                        Confirma la creación de la solicitud para comenzar a chatear.
+                        Esperando confirmación...
                     </p>
                 </div>
             </CardContent>
