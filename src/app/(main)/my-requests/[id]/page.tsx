@@ -7,7 +7,7 @@ import { Clock, Check, MessageSquare } from "lucide-react"
 import { useSearchParams } from "next/navigation"
 
 export default function RequestDetailPage({ params }: { params: { id: string } }) {
-    const id = params.id;
+    const { id } = params;
     const searchParams = useSearchParams()
     const subject = searchParams.get("subject") || "Sin asunto"
     const application = searchParams.get("application") || "Sin aplicación"
