@@ -16,7 +16,7 @@ interface Message {
 const initialMessages: Message[] = [
   {
     sender: "ai",
-    text: "¡Hola Juan! He detectado que tu solicitud es sobre el Portal Web y el asunto es \"Recuperación de contraseña\". ¿Podrías explicarme con más detalle qué ocurre? Por ejemplo, ¿no recibes el correo, te marca error al restablecer o no recuerdas datos de acceso?",
+    text: "¡Hola Juan! He detectado que tu solicitud es sobre el Portal Web y el asunto es \"Recuperación de contraseña\". ¿Podrías explicarme con más detalle qué ocurre?",
   },
 ]
 
@@ -27,7 +27,12 @@ export default function ChatInterface() {
 
   const handleSendMessage = () => {
     if (input.trim()) {
-      setMessages([...messages, { sender: "user", text: input.trim() }])
+      const userMessage: Message = { sender: "user", text: input.trim() }
+      const aiResponse: Message = { 
+        sender: "ai", 
+        text: "En este momento no me encuentro conectado al servicio de Azure." 
+      }
+      setMessages([...messages, userMessage, aiResponse])
       setInput("")
     }
   }
