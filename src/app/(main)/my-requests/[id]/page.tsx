@@ -12,13 +12,14 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
     const searchParams = useSearchParams()
     const subject = searchParams.get("subject") || "Sin asunto"
     const application = searchParams.get("application") || "Sin aplicación"
+    const date = (searchParams.get("date") || "Sin fecha").split("?")[0]
     const status = (searchParams.get("status") || "Abierta").split("?")[0]
   
     const ticketDetails = {
       number: id,
       subject,
       area: application,
-      date: "26 Oct 2023, 14:30",
+      date,
       status,
     }
 

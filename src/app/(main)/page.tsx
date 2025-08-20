@@ -29,9 +29,9 @@ const faqItems = [
 ]
 
 const openRequests = [
-  { id: "TCK-2025-00005", subject: "Error al iniciar sesión en SSO", application: "SSO", status: "Abierta", updated: "Actualizado hace 2h", variant: "secondary" as const, icon: <RefreshCw className="h-3 w-3" /> },
-  { id: "TCK-2025-00189", subject: "Reporte de pagos incompleto", application: "Pagos", status: "Resuelta", updated: "Actualizado ayer", variant: "default" as const, icon: <CheckCircle2 className="h-3 w-3" /> },
-  { id: "TCK-2025-00188", subject: "No se cargan métricas", application: "Analytics", status: "Resuelta", updated: "Actualizado hace 3 días", variant: "secondary" as const, icon: <RefreshCw className="h-3 w-3" /> },
+  { id: "TCK-2025-00005", subject: "Error al iniciar sesión en SSO", application: "SSO", status: "Abierta", date: "20/07/2025", variant: "secondary" as const, icon: <RefreshCw className="h-3 w-3" /> },
+  { id: "TCK-2025-00189", subject: "Reporte de pagos incompleto", application: "Pagos", status: "Resuelta", date: "30/05/2025", variant: "default" as const, icon: <CheckCircle2 className="h-3 w-3" /> },
+  { id: "TCK-2025-00188", subject: "No se cargan métricas", application: "Analytics", status: "Resuelta", date: "05/06/2025", variant: "secondary" as const, icon: <RefreshCw className="h-3 w-3" /> },
 ]
 
 export default function HomePage() {
@@ -69,7 +69,7 @@ export default function HomePage() {
                     {openRequests.map((request) => (
                     <Link
                       key={request.id}
-                      href={`/my-requests/${encodeURIComponent(request.id)}?subject=${encodeURIComponent(request.subject)}&application=${encodeURIComponent(request.application)}&status=${encodeURIComponent(request.status)}`}
+                      href={`/my-requests/${encodeURIComponent(request.id)}?subject=${encodeURIComponent(request.subject)}&application=${encodeURIComponent(request.application)}&status=${encodeURIComponent(request.status)}&date=${encodeURIComponent(request.date)}`}
                     >
                       <Card className="hover:border-primary transition-colors">
                         <CardContent className="p-4 space-y-3">
@@ -88,7 +88,7 @@ export default function HomePage() {
                               <p className="text-xs text-muted-foreground">Asunto</p>
                               <p className="text-sm">{request.subject}</p>
                             </div>
-                            <p className="text-xs text-muted-foreground text-right">{request.updated}</p>
+                            <p className="text-xs text-muted-foreground text-right">{request.date}</p>
                           </CardContent>
                         </Card>
                       </Link>

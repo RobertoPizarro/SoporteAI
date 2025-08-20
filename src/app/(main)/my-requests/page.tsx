@@ -13,8 +13,6 @@ import {
   Card,
   CardContent,
   CardFooter,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -29,10 +27,10 @@ import { Search, PlusCircle, CheckCircle2, LayoutGrid, Calendar, Clock, Check, C
 import { useState } from "react"
 
 const requests = [
-  { id: "TCK-2025-00005", subject: "Error al iniciar sesión en SSO", application: "SSO", updated: "hace 2h", status: "Abierta" },
-  { id: "TCK-2025-00189", subject: "Reporte de pagos incompleto", application: "Pagos", updated: "Ayer", status: "Resuelta" },
-  { id: "TCK-2025-00188", subject: "No se cargan métricas", application: "Analytics", updated: "Hace 3 días", status: "Resuelta" },
-  { id: "TCK-2025-00085", subject: "Consulta de facturación", application: "Portal Web", updated: "Hace 5 días", status: "Abierta" },
+  { id: "TCK-2025-00005", subject: "Error al iniciar sesión en SSO", application: "SSO", date: "20/07/2025", status: "Abierta" },
+  { id: "TCK-2025-00189", subject: "Reporte de pagos incompleto", application: "Pagos", date: "30/05/2025", status: "Resuelta" },
+  { id: "TCK-2025-00188", subject: "No se cargan métricas", application: "Analytics", date: "05/06/2025", status: "Resuelta" },
+  { id: "TCK-2025-00085", subject: "Consulta de facturación", application: "Portal Web", date: "12/07/2025", status: "Abierta" },
 ]
 
 const itemsPerPage = 4
@@ -119,7 +117,7 @@ export default function MyRequestsPage() {
               <TableHead>N° Ticket</TableHead>
               <TableHead>Asunto</TableHead>
               <TableHead className="text-center">Aplicación</TableHead>
-              <TableHead className="text-center">Actualizado</TableHead>
+              <TableHead className="text-center">Creación</TableHead>
               <TableHead className="text-center">Estado</TableHead>
               <TableHead className="text-center">Acciones</TableHead>
             </TableRow>
@@ -132,7 +130,7 @@ export default function MyRequestsPage() {
                 <TableCell className="text-center">
                   <Badge variant="outline" className="font-normal">{request.application}</Badge>
                 </TableCell>
-                <TableCell className="text-center" >{request.updated}</TableCell>
+                <TableCell className="text-center" >{request.date}</TableCell>
                 <TableCell className="text-center">
                   <Badge 
                     variant={request.status === 'Resuelta' ? 'success' : 'open'} 
@@ -145,7 +143,7 @@ export default function MyRequestsPage() {
                 </TableCell>
                 <TableCell className="text-center">
                 <Link 
-                  href={`/my-requests/${encodeURIComponent(request.id)}?subject=${encodeURIComponent(request.subject)}&application=${encodeURIComponent(request.application)}&status=${encodeURIComponent(request.status)}`}>
+                  href={`/my-requests/${encodeURIComponent(request.id)}?subject=${encodeURIComponent(request.subject)}&application=${encodeURIComponent(request.application)}&status=${encodeURIComponent(request.status)}&date=${encodeURIComponent(request.date)}`}>
                   <Button variant="outline" size="sm" className="!bg-white !text-black cursor-pointer">Ver Detalle</Button>
                 </Link>
                 </TableCell>

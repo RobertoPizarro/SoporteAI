@@ -8,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
   Select,
@@ -25,10 +24,10 @@ import ChatInterface from "@/components/chat-interface"
 export default function NewRequestPage() {
   const [isCreated, setIsCreated] = useState(false)
   const [subject, setSubject] = useState("")
-  const [area, setArea] = useState("")
+  const [application, setapplication] = useState("")
 
   const handleCreateRequest = () => {
-    if (subject && area) {
+    if (subject && application) {
       setIsCreated(true)
     }
   }
@@ -37,8 +36,8 @@ export default function NewRequestPage() {
     const ticketDetails = {
       number: "TCK-2025-00421",
       subject: subject,
-      area: area,
-      date: "17 Ago 2025, 10:24",
+      area: application,
+      date: "20/08/2025",
       status: "Abierta",
     }
     return (
@@ -125,7 +124,7 @@ export default function NewRequestPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="area">Aplicación / Área</Label>
-              <Select onValueChange={setArea} value={area} required>
+              <Select onValueChange={setapplication} value={application} required>
                 <SelectTrigger id="area">
                   <SelectValue placeholder="Selecciona una opción" />
                 </SelectTrigger>
