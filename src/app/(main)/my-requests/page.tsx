@@ -26,6 +26,7 @@ import {
   SelectValue 
 } from "@/components/ui/select"
 import { Search, PlusCircle, CheckCircle2, LayoutGrid, Calendar, Clock, Check, ChevronLeft, ChevronRight } from "lucide-react"
+import { useState } from "react"
 
 const requests = [
   { id: "TCK-2025-00005", subject: "Error al iniciar sesión en SSO", application: "SSO", updated: "hace 2h", status: "Abierta" },
@@ -34,7 +35,21 @@ const requests = [
   { id: "TCK-2025-00085", subject: "Consulta de facturación", application: "Portal Web", updated: "Hace 5 días", status: "Abierta" },
 ]
 
+const itemsPerPage = 4
+const totalItems = 24
+
 export default function MyRequestsPage() {
+  const [page, setPage] = useState(1)
+
+  const start = (page - 1) * itemsPerPage
+  const end = start + itemsPerPage
+  const paginatedRequests = requests
+
+  const totalPages = Math.ceil(totalItems / itemsPerPage)
+
+  const handlePrev = () => setPage((prev) => (prev > 1 ? prev - 1 : prev))
+  const handleNext = () => setPage((prev) => (prev < totalPages ? prev + 1 : prev))
+
   return (
     <div className="flex flex-col gap-4">
     <div className="flex items-center justify-between">
@@ -108,8 +123,8 @@ export default function MyRequestsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {requests.map((request) => (
-              <TableRow key={request.id}>
+            {paginatedRequests.map((request) => (
+              <TableRow key={`${request.id}-${page}`}>
                 <TableCell className="font-medium">{request.id}</TableCell>
                 <TableCell>{request.subject}</TableCell>
                 <TableCell className="text-center">
@@ -140,17 +155,31 @@ export default function MyRequestsPage() {
       </CardContent>
       <CardFooter className="flex items-center justify-between p-4">
         <span className="text-sm text-muted-foreground">
-            Mostrando 1-4 de 24
+          Mostrando {(page - 1) * itemsPerPage + 1}-
+          {Math.min(page * itemsPerPage, totalItems)} de {totalItems}
         </span>
         <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="!bg-white !text-black cursor-pointer">
-                <ChevronLeft className="h-4 w-4" />
-                <span className="ml-1">Anterior</span>
-            </Button>
-            <Button variant="outline" size="sm" className="!bg-white !text-black cursor-pointer">
-                <span className="mr-1">Siguiente</span>
-                <ChevronRight className="h-4 w-4" />
-            </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handlePrev}
+          disabled={page === 1}
+          className="!bg-white !text-black"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          <span className="ml-1">Anterior</span>
+        </Button>
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleNext}
+          disabled={page === totalPages}
+          className="!bg-white !text-black"
+        >
+          <span className="mr-1">Siguiente</span>
+          <ChevronRight className="h-4 w-4" />
+        </Button>
         </div>
       </CardFooter>
     </Card>
