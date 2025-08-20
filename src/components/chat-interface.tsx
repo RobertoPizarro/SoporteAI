@@ -1,8 +1,9 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Paperclip, Send } from "lucide-react"
+import { Paperclip, Send, User } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Icons } from "@/components/icons"
 
 const messages = [
   {
@@ -28,9 +29,8 @@ export default function ChatInterface() {
               }`}
             >
               {message.sender === "ai" && (
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="https://placehold.co/40x40.png" alt="AI" data-ai-hint="robot avatar" />
-                  <AvatarFallback>AI</AvatarFallback>
+                <Avatar  className="h-8 w-8 flex items-center justify-center bg-muted rounded-full">
+                  <Icons.logo className="h-5 w-5 text-foreground" />
                 </Avatar>
               )}
               <div
@@ -43,9 +43,8 @@ export default function ChatInterface() {
                 <p className="text-sm">{message.text}</p>
               </div>
               {message.sender === "user" && (
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="https://placehold.co/40x40.png" alt="User" data-ai-hint="profile person" />
-                  <AvatarFallback>JP</AvatarFallback>
+                <Avatar className="h-8 w-8 flex items-center justify-center bg-muted rounded-full">
+                  <User className="h-5 w-5 text-foreground" />
                 </Avatar>
               )}
             </div>
