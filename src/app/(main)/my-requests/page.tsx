@@ -76,6 +76,7 @@ export default function MyRequestsPage() {
                     </div>
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="Todas" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">Todas</SelectItem>
                     <SelectItem value="abierta" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">Abierta</SelectItem>
                     <SelectItem value="resuelta" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">Resuelta</SelectItem>
                 </SelectContent>
@@ -88,6 +89,7 @@ export default function MyRequestsPage() {
                     </div>
                 </SelectTrigger>
                 <SelectContent>
+                <SelectItem value="Todas" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">Todas</SelectItem>
                   <SelectItem value="Portal Web" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">Portal Web</SelectItem>
                   <SelectItem value="SSO" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">SSO</SelectItem>
                   <SelectItem value="Pagos" className="hover:bg-blue-500 hover:text-white focus:bg-blue-500 focus:text-white">Pagos</SelectItem>
