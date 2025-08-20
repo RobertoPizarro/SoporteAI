@@ -2,7 +2,8 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { User, LogOut } from "lucide-react"
+import { User, LogOut, Menu } from "lucide-react"
+import { Sheet, SheetContent, SheetTrigger, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -51,7 +52,7 @@ export default function Header() {
             ))}
             </div>
         </nav>
-        <div className="ml-auto">
+        <div className="ml-auto hidden md:block">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="hover:bg-blue-500">
@@ -61,14 +62,53 @@ export default function Header() {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                  <Link href="/login">
-                    <DropdownMenuItem className="!bg-white !text-black cursor-pointer">
-                        <LogOut className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <DropdownMenuItem className=" group!bg-white !text-black hover:!bg-white hover:!text-red-500 cursor-pointer">
+                        <LogOut className="h-4 w-4 " />
                         <span>Cerrar Sesión</span>
                     </DropdownMenuItem>
                  </Link>
               </DropdownMenuContent>
             </DropdownMenu>
         </div>
+
+      <div className="ml-auto md:hidden">
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="ghost" className="hover:bg-blue-500">
+              <Menu className="h-6 w-6" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="flex flex-col justify-between p-4 w-64">
+            <SheetHeader>
+                <SheetTitle className="sr-only">Menú de navegación</SheetTitle>
+                <SheetDescription className="sr-only">
+                Opciones de navegación y perfil de usuario
+                </SheetDescription>
+            </SheetHeader>
+            <div className="flex flex-col gap-4 mt-8">
+            {navItems.map((item) => (
+                <Link
+                    key={item.href}
+                    href={item.href}
+                    className="px-4 py-2 rounded-md text-lg font-medium text-muted-foreground hover:bg-blue-500 hover:text-white"
+                >
+                    {item.label}
+                </Link>
+              ))}
+            </div>
+            <div className="mt-auto border-t pt-4">
+                <div className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    <span>Juan Pérez</span>
+                </div>
+                <Link href="/login" className="flex items-center gap-2 mt-2 hover:text-red-500">
+                    <LogOut className="h-4 w-4" />
+                    <span>Cerrar Sesión</span>
+                </Link>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>       
     </header>
   )
 }
