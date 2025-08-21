@@ -39,8 +39,6 @@ const totalItems = 24
 export default function MyRequestsPage() {
   const [page, setPage] = useState(1)
 
-  const start = (page - 1) * itemsPerPage
-  const end = start + itemsPerPage
   const paginatedRequests = requests
 
   const totalPages = Math.ceil(totalItems / itemsPerPage)
