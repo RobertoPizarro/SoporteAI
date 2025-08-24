@@ -9,14 +9,15 @@ import { useParams } from 'next/navigation';
 
 type Ticket = {
   id: string;
-  tipo: string;
+  tipo: string;  // Incidencia o Requerimiento
   usuario: string;
+  analista: string;
   asunto: string;
-  descripcion: string;
-  servicio: string;
-  nivel: number;
-  estado: string;
-  fecha: string;
+  servicio: string; // Data Science, Cloud+Apps, Geo Solutions, etc.
+  nivel: number; // 1,2 o 3
+  estado: string; // Nuevo, En Progreso, Resuelto, Rechazado
+  fechaCreacion: string;
+  actualizacion: string;
 };
 
 
@@ -25,56 +26,61 @@ const tickets = [
     id: 'TCK-2025-00001',
     tipo: 'Incidencia',
     usuario: 'María García',
+    analista: 'Juan Pérez',
     asunto: 'Dashboard de ventas sin datos actuales',
-    descripcion: 'El dashboard principal no muestra los datos de ventas del mes actual',
     servicio: 'Data Science',
     nivel: 2,
     estado: 'En Progreso',
-    fecha: '23/08/2025',
+    fechaCreacion: '23/08/2025',
+    actualizacion: 'Hace 2 horas',
   },
   {
     id: 'TCK-2025-00002',
     tipo: 'Requerimiento',
     usuario: 'Carlos López',
+    analista: 'Juan Pérez',
     asunto: 'Nuevo reporte de métricas de marketing',
-    descripcion: 'Solicitud para crear un reporte automático de métricas de marketing digital',
     servicio: 'Big Data',
-    estado: 'Nuevo',
     nivel: 2,
-    fecha: '26/08/2025',
+    estado: 'Nuevo',
+    fechaCreacion: '26/08/2025',
+    actualizacion: 'Hace 2 horas',
   },
   {
     id: 'TCK-2025-00003',
     tipo: 'Incidencia',
     usuario: 'Ana Martínez',
+    analista: 'Juan Pérez',
     asunto: 'Error de conexión con la base de datos',
-    descripcion: 'Intermitencia en la conexión con la base de datos principal',
     servicio: 'Cloud+Apps',
-    estado: 'Resuelto',
     nivel: 2,
-    fecha: '21/08/2025',
+    estado: 'Resuelto',
+    fechaCreacion: '21/08/2025',
+    actualizacion: 'Hace 5 horas',
   },
   {
     id: 'TCK-2025-00004',
     tipo: 'Requerimiento',
     usuario: 'Roberto Silva',
+    analista: 'Juan Pérez',
     asunto: 'Análisis de sentimiento de reviews',
-    descripcion: 'Implementar análisis de sentimientos para reviews de productos',
     servicio: 'Data Science',
-    estado: 'En Progreso',
     nivel: 2,
-    fecha: '19/08/2025',
+    estado: 'En Progreso',
+    fechaCreacion: '19/08/2025',
+    actualizacion: 'Hace 3 días',
   },
   {
     id: 'TCK-2025-00005',
     tipo: 'Requerimiento',
     usuario: 'Laura Fernández',
+    analista: 'Juan Pérez',
     asunto: 'Implementar geolocalización en app móvil',
-    descripcion: 'Agregar funcionalidad de geolocalización a la aplicación móvil existente',
     servicio: 'Geo Solutions',
-    estado: 'Nuevo',
     nivel: 2,
-    fecha: '03/08/2025',
+    estado: 'Rechazado',
+    fechaCreacion: '03/08/2025',
+    actualizacion: 'Hace 6 días',
   }
 ];
 
@@ -131,11 +137,11 @@ const TicketDetailsPage = () => {
 
   const getStatusColor = (estado: string) => {
     switch (estado) {
-      case 'Nuevo': return 'bg-blue-100 text-blue-700 border-blue-200';
-      case 'En Progreso': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-      case 'Resuelto': return 'bg-green-100 text-green-700 border-green-200';
-      case 'Rechazado': return 'bg-red-100 text-red-700 border-red-200';
-      default: return 'bg-gray-100 text-gray-700 border-gray-200';
+      case 'Nuevo': return 'bg-blue-50 text-blue-700 border border-blue-200';
+      case 'En Progreso': return 'bg-amber-50 text-amber-700 border border-amber-200';
+      case 'Resuelto': return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+      case 'Rechazado': return 'bg-red-50 text-red-700 border border-red-200';
+      default: return 'bg-gray-50 text-gray-700 border border-gray-200';
     }
   };
 
@@ -219,11 +225,10 @@ const TicketDetailsPage = () => {
             <div>
               <h2 className="text-2xl font-bold text-slate-800 mb-2">{currentTicket.asunto}</h2>
               <div className="flex items-center space-x-4">
-                <span className="text-sm font-medium text-emerald-600">{currentTicket.id}</span>
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${currentTicket.tipo === 'Incidencia' ? 'bg-orange-100 text-orange-700 border-orange-200' : 'bg-blue-100 text-blue-700 border-blue-200'}`}>
-                  {currentTicket.tipo}
-                </span>
-                <span className="text-xs text-slate-500">{currentTicket.fecha}</span>
+                <span className="text-sm font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">{currentTicket.id}</span>
+                <span className="text-sm font-medium border bg-orange-100 text-orange-700 border-orange-200 px-2 py-1 rounded-full">{currentTicket.tipo}</span>
+                <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-lg">Creación: {currentTicket.fechaCreacion}</span>
+                <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-lg">Última actualización: {currentTicket.actualizacion}</span>
               </div>
             </div>
             <div className={`inline-flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium border ${getStatusColor(currentTicket.estado)}`}>
@@ -242,11 +247,6 @@ const TicketDetailsPage = () => {
               <p className="text-sm font-semibold text-slate-800 mt-1">{currentTicket.servicio}</p>
             </div>
           </div>
-        </div>
-
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg border border-white/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
-          <h3 className="text-lg font-semibold text-slate-800 mb-3">Descripción</h3>
-          <p className="text-slate-600 leading-relaxed">{currentTicket.descripcion}</p>
         </div>
 
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg border border-white/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">

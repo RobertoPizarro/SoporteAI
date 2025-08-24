@@ -1,21 +1,22 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Mic, Bot, User, CheckCircle, Clock, FileText, Hash, Calendar, Sparkles, ShieldAlert, Album, ArrowBigUp, MessageCircle } from 'lucide-react';
+import { Send, Mic, Bot, User, CheckCircle, Clock, FileText, Hash, Calendar, Sparkles, ShieldAlert, UserCog, ArrowBigUp, MessageCircle } from 'lucide-react';
 import Link from "next/link";
 import Image from "next/image";
 
 type Ticket = {
-  id: string
-  tipo: string
-  usuario: string
-  asunto: string
-  description: string
-  servicio: string
-  nivel: number
-  estado: string
-  fecha: string
-}
+    id: string;
+    tipo: string;  // Incidencia o Requerimiento
+    usuario: string;
+    analista: string;
+    asunto: string;
+    servicio: string; // Data Science, Cloud+Apps, Geo Solutions, etc.
+    nivel: number; // 1,2 o 3
+    estado: string; // Nuevo, En Progreso, Resuelto, Rechazado
+    fechaCreacion: string;
+    actualizacion: string;
+};
 
 type Message = {
   id?: number
@@ -79,12 +80,13 @@ const ChatBot = () => {
         id: 'TCK-2025-00847',
         tipo: 'Incidencia',
         usuario: 'Roberto Pizarro',
-        asunto: 'Error de Precisión en Servicio GeoPoint',
-        description: 'El servicio de GeoPoint muestra una ubicación incorrecta en el mapa.',
+        analista: 'Juan Pérez',
+        asunto: 'Error de Precisión en el Servicio GeoPoint para la Empresa Claro',
         servicio: 'Geo Solutions',
         nivel: 2,
         estado: 'Nuevo',
-        fecha: '22/08/2025',
+        fechaCreacion: '22/08/2025',
+        actualizacion: ' ',
       },
       delay: 1500
     },
@@ -178,13 +180,19 @@ const ChatBot = () => {
         <div className="flex items-center">
           <ShieldAlert className="w-4 h-4 text-gray-500 mr-2" />
           <span className="text-sm text-gray-600 w-20">Tipo:</span>
-          <span className="font-medium">{ticket.tipo}</span>
+          <span className="px-3 py-1 bg-orange-100 text-orange-700 border-orange-200 rounded-full text-sm font-medium ">{ticket.tipo}</span>
         </div>
         
         <div className="flex items-center">
           <User className="w-4 h-4 text-gray-500 mr-2" />
           <span className="text-sm text-gray-600 w-20">Usuario:</span>
-          <span className="font-medium">{ticket.usuario}</span>
+          <span className="font-sm text-gray-700">{ticket.usuario}</span>
+        </div>
+
+        <div className="flex items-center">
+          <UserCog className="w-4 h-4 text-gray-500 mr-2" />
+          <span className="text-sm text-gray-600 w-20">Analista:</span>
+          <span className="font-sm text-gray-700">{ticket.analista}</span>
         </div>
         
         <div className="flex items-start">
@@ -192,11 +200,11 @@ const ChatBot = () => {
           <span className="text-sm text-gray-600 w-20">Asunto:</span>
           <span className="font-medium">{ticket.asunto}</span>
         </div>
-        
-        <div className="flex items-start">
-          <Album className="w-4 h-4 text-gray-500 mr-2 mt-0.5" />
-          <span className="text-sm text-gray-600 w-20">Descrip:</span>
-          <span className="text-sm text-gray-700">{ticket.description}</span>
+
+        <div className="flex items-center">
+          <Sparkles className="w-4 h-4 text-gray-500 mr-2" />
+          <span className="text-sm text-gray-600 w-20">Servicio:</span>
+          <span className="px-3 py-1 bg-gradient-to-r from-green-100 to-cyan-100 text-green-700 rounded-full text-sm font-medium">{ticket.servicio}</span>
         </div>
 
         <div className="flex items-center">
@@ -204,23 +212,18 @@ const ChatBot = () => {
           <span className="text-sm text-gray-600 w-20">Nivel:</span>
           <span className="text-sm text-gray-700">{ticket.nivel}</span>
         </div>
-        
+
         <div className="flex items-center">
-          <Sparkles className="w-4 h-4 text-gray-500 mr-2" />
-          <span className="text-sm text-gray-600 w-20">Servicio:</span>
-          <span className="px-3 py-1 bg-gradient-to-r from-green-100 to-cyan-100 text-green-700 rounded-full text-sm font-medium">{ticket.servicio}</span>
+            <Clock className="w-4 h-4 text-gray-500 mr-2" />
+            <span className="text-sm text-gray-600 w-20">Estado:</span>
+            <span className="px-3 py-1 bg-gradient-to-r from-blue-100 to-blue-100 text-blue-700 rounded-full text-sm font-medium">{ticket.estado}</span>
         </div>
-        
-        <div className="flex items-center">
-          <Clock className="w-4 h-4 text-gray-500 mr-2" />
-          <span className="text-sm text-gray-600 w-20">Estado:</span>
-          <span className="px-3 py-1 bg-gradient-to-r from-blue-100 to-blue-100 text-blue-700 rounded-full text-sm font-medium">{ticket.estado}</span>
-        </div>
-        
+
+
         <div className="flex items-center">
           <Calendar className="w-4 h-4 text-gray-500 mr-2" />
           <span className="text-sm text-gray-600 w-20">Fecha:</span>
-          <span className="text-sm text-gray-700">{ticket.fecha}</span>
+          <span className="text-sm text-gray-700">{ticket.fechaCreacion}</span>
         </div>
       </div>
     </div>

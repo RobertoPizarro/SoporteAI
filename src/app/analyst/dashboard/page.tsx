@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useState } from 'react';
-import { ChevronDown, User, LogOut, Search, Filter, Eye, Settings, Bell, FileText, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import {
+    ChevronDown, User, LogOut, Search, Filter, Eye, Settings, Bell, FileText, Clock, CheckCircle, AlertCircle,
+    XCircle
+} from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -12,69 +15,75 @@ const AnalystDashboard = () => {
   const [selectedFilter, setSelectedFilter] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const tickets = [
+const tickets = [
     {
-      id: 'TCK-2025-00001',
-      tipo: 'Incidencia',
-      usuario: 'María García',
-      asunto: 'Dashboard de ventas sin datos actuales',
-      descripcion: 'El dashboard principal no muestra los datos de ventas del mes actual',
-      servicio: 'Data Science',
-      nivel: 2,
-      estado: 'En Progreso',
-      fecha: '23/08/2025',
+        id: 'TCK-2025-00001',
+        tipo: 'Incidencia',
+        usuario: 'María García',
+        analista: 'Juan Pérez',
+        asunto: 'Dashboard de ventas sin datos actuales',
+        servicio: 'Data Science',
+        nivel: 2,
+        estado: 'En Progreso',
+        fechaCreacion: '23/08/2025',
+        actualizacion: 'Hace 2 horas',
     },
     {
-      id: 'TCK-2025-00002',
-      tipo: 'Requerimiento',
-      usuario: 'Carlos López',
-      asunto: 'Nuevo reporte de métricas de marketing',
-      descripcion: 'Solicitud para crear un reporte automático de métricas de marketing digital',
-      servicio: 'Big Data',
-      estado: 'Nuevo',
-      nivel: 2,
-      fecha: '26/08/2025',
+        id: 'TCK-2025-00002',
+        tipo: 'Requerimiento',
+        usuario: 'Carlos López',
+        analista: 'Juan Pérez',
+        asunto: 'Nuevo reporte de métricas de marketing',
+        servicio: 'Big Data',
+        estado: 'Nuevo',
+        nivel: 2,
+        fechaCreacion: '26/08/2025',
+        actualizacion: 'Hace 2 horas',
     },
     {
-      id: 'TCK-2025-00003',
-      tipo: 'Incidencia',
-      usuario: 'Ana Martínez',
-      asunto: 'Error de conexión con la base de datos',
-      descripcion: 'Intermitencia en la conexión con la base de datos principal',
-      servicio: 'Cloud+Apps',
-      estado: 'Resuelto',
-      nivel: 2,
-      fecha: '21/08/2025',
+        id: 'TCK-2025-00003',
+        tipo: 'Incidencia',
+        usuario: 'Ana Martínez',
+        analista: 'Juan Pérez',
+        asunto: 'Error de conexión con la base de datos',
+        servicio: 'Cloud+Apps',
+        estado: 'Resuelto',
+        nivel: 2,
+        fechaCreacion: '21/08/2025',
+        actualizacion: 'Hace 5 horas',
     },
     {
-      id: 'TCK-2025-00004',
-      tipo: 'Requerimiento',
-      usuario: 'Roberto Silva',
-      asunto: 'Análisis de sentimiento de reviews',
-      descripcion: 'Implementar análisis de sentimientos para reviews de productos',
-      servicio: 'Data Science',
-      estado: 'En Progreso',
-      nivel: 2,
-      fecha: '19/08/2025',
+        id: 'TCK-2025-00004',
+        tipo: 'Requerimiento',
+        usuario: 'Roberto Silva',
+        analista: 'Juan Pérez',
+        asunto: 'Análisis de sentimiento de reviews',
+        servicio: 'Data Science',
+        estado: 'En Progreso',
+        nivel: 2,
+        fechaCreacion: '19/08/2025',
+        actualizacion: 'Hace 3 días',
     },
     {
-      id: 'TCK-2025-00005',
-      tipo: 'Requerimiento',
-      usuario: 'Laura Fernández',
-      asunto: 'Implementar geolocalización en app móvil',
-      descripcion: 'Agregar funcionalidad de geolocalización a la aplicación móvil existente',
-      servicio: 'Geo Solutions',
-      estado: 'Nuevo',
-      nivel: 2,
-      fecha: '03/08/2025',
+        id: 'TCK-2025-00005',
+        tipo: 'Requerimiento',
+        usuario: 'Laura Fernández',
+        analista: 'Juan Pérez',
+        asunto: 'Implementar geolocalización en app móvil',
+        servicio: 'Geo Solutions',
+        estado: 'Rechazado',
+        nivel: 2,
+        fechaCreacion: '03/08/2025',
+        actualizacion: 'Hace 6 días',
     }
-  ];
+];
 
   const getStatusBadge = (estado: string) => {
     const styles: { [key: string]: string } = {
       'Nuevo': 'bg-blue-50 text-blue-700 border border-blue-200',
       'En Progreso': 'bg-amber-50 text-amber-700 border border-amber-200',
-      'Resuelto': 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+      'Resuelto': 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+      'Rechazado': 'bg-red-50 text-red-700 border border-red-200'
     };
     return styles[estado] || 'bg-gray-50 text-gray-700 border border-gray-200';
   };
@@ -84,6 +93,7 @@ const AnalystDashboard = () => {
       case 'Nuevo': return <AlertCircle className="w-3 h-3" />;
       case 'En Progreso': return <Clock className="w-3 h-3" />;
       case 'Resuelto': return <CheckCircle className="w-3 h-3" />;
+      case 'Rechazado': return <XCircle className="w-3 h-3" />;
       default: return <AlertCircle className="w-3 h-3" />;
     }
   };
@@ -222,7 +232,7 @@ const AnalystDashboard = () => {
               
               {filterOpen && (
                 <div className="absolute right-0 mt-2 w-40 bg-white/95 backdrop-blur-md rounded-xl shadow-xl border border-gray-200/50 py-2 z-50">
-                  {['Todos', 'Nuevo', 'En Progreso', 'Resuelto'].map((filter) => (
+                  {['Todos', 'Nuevo', 'En Progreso', 'Resuelto', 'Rechazado'].map((filter) => (
                     <button
                       key={filter}
                       onClick={() => {
@@ -261,7 +271,7 @@ const AnalystDashboard = () => {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-start space-x-4 flex-1">
-                    {/* Priority Indicator */}
+
                     <div className={`w-1 h-16 ${getPriorityIndicator(ticket.nivel)} rounded-full`}></div>
 
                     <div className="flex-1 min-w-0">
@@ -287,7 +297,7 @@ const AnalystDashboard = () => {
                       <div className="flex items-center gap-4 text-sm text-slate-600">
                         <span>👤 {ticket.usuario}</span>
                         <span>🔧 {ticket.servicio}</span>
-                        <span>📅 {ticket.fecha}</span>
+                        <span>📅 {ticket.fechaCreacion}</span>
                       </div>
                     </div>
                   </div>
