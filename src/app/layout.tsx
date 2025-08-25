@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Analytics Support Hub',
+  title: 'Analytics Support',
   description: 'Your dedicated hub for analytics support.',
 };
 

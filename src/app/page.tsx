@@ -9,10 +9,10 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4 sm:p-8 overflow-hidden">
       <div className="text-center mb-12 animate-fade-in-down">
         <h1 className="font-headline text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-blue-500">
-          Analytics Support Hub
+          Analytics Support
         </h1>
         <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-          Tu solución integral para soporte basado en datos e insights. Accede a nuestras herramientas especializadas según tu rol.
+          Accede a nuestras herramientas especializadas según tu rol.
         </p>
       </div>
 
@@ -33,7 +33,7 @@ export default function Home() {
                 <ArrowRight className="h-6 w-6 text-muted-foreground group-hover:text-primary transition-transform duration-300 group-hover:translate-x-1" />
               </div>
               <p className="mb-6 text-muted-foreground text-sm">
-                Interactúa con nuestro asistente inteligente para reportar incidencias, solicitar nuevas funcionalidades o obtener ayuda con nuestros servicios de analytics.
+                Interactúa con nuestro chatbot para reportar incidencias o solicitar requerimientos en los servicios de analytics.
               </p>
               <div className="flex flex-wrap gap-2 mb-8">
                 <Badge variant="outline" className="bg-blue-100/50 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200 border-blue-200/80 dark:border-blue-500/30">Data Science</Badge>
@@ -64,13 +64,12 @@ export default function Home() {
                   <ArrowRight className="h-6 w-6 text-muted-foreground group-hover:text-secondary transition-transform duration-300 group-hover:translate-x-1" />
               </div>
               <p className="mb-6 text-muted-foreground text-sm">
-                Inicia sesión para acceder a tus tickets asignados, realizar seguimiento del estado y brindar soluciones efectivas a nuestros usuarios. Tu experiencia marca la diferencia.
+                Accede a tus tickets asignados, realiza seguimiento del estado y brinda soluciones efectivas a nuestros usuarios.
               </p>
               <div className="flex flex-wrap gap-2 mb-8">
                  <Badge variant="outline" className="bg-green-100/50 text-green-800 dark:bg-green-900/30 dark:text-green-200 border-green-200/80 dark:border-green-500/30">Gestión de Tickets</Badge>
                  <Badge variant="outline" className="bg-green-100/50 text-green-800 dark:bg-green-900/30 dark:text-green-200 border-green-200/80 dark:border-green-500/30">Seguimiento</Badge>
                  <Badge variant="outline" className="bg-green-100/50 text-green-800 dark:bg-green-900/30 dark:text-green-200 border-green-200/80 dark:border-green-500/30">Análisis</Badge>
-                 <Badge variant="outline" className="bg-green-100/50 text-green-800 dark:bg-green-900/30 dark:text-green-200 border-green-200/80 dark:border-green-500/30">Reportes</Badge>
               </div>
               <Button className="w-full font-bold text-lg py-6 bg-gradient-to-r from-green-400 to-cyan-500 text-white shadow-lg transform group-hover:scale-105 transition-transform duration-300">
                 Iniciar Sesión <ArrowRight className="ml-2 h-5 w-5" />
