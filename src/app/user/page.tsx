@@ -4,26 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Send, Mic, Bot, User, CheckCircle, Clock, FileText, Hash, Calendar, Sparkles, ShieldAlert, UserCog, ArrowBigUp, MessageCircle, Plus, Settings} from 'lucide-react';
 import Link from "next/link";
 import Image from "next/image";
-
-type Ticket = {
-    id: string;
-    tipo: string;  // Incidencia o Requerimiento
-    usuario: string;
-    analista: string;
-    asunto: string;
-    servicio: string; // Data Science, Big data, Cloud+Apps, Geo Solutions.
-    nivel: number; // 1,2 o 3
-    estado: string; // Nuevo, En Progreso, Resuelto, Rechazado
-    fechaCreacion: string;
-    actualizacion: string;
-};
-
-type Message = {
-    id?: number
-    type: "bot" | "user" | "ticket"
-    content: string | Ticket
-    delay?: number
-}
+import { Ticket, Message } from '@/types';
 
 const ChatBot = () => {
     const [messages, setMessages] = useState<Message[]>([]);

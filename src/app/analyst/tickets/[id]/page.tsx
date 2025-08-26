@@ -6,22 +6,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { speakText, copyText } from '@/lib/utils';
-
-type Ticket = {
-    id: string;
-    tipo: string;
-    usuario: string;
-    analista: string;
-    asunto: string;
-    servicio: string;
-    nivel: number;
-    estado: string;
-    fechaCreacion: string;
-    actualizacion: string;
-};
+import { Ticket } from '@/types';
 
 
-const tickets = [
+const tickets: Ticket[] = [
     {
         id: 'TCK-2025-00001',
         tipo: 'Incidencia',
