@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import {
-    ChevronDown, User, LogOut, Search, Filter, Eye, Settings, Bell, FileText, Clock, CheckCircle, AlertCircle,
+    ChevronDown, User, LogOut, Search, Filter, Eye, Settings, FileText, Clock, CheckCircle, AlertCircle,
     XCircle
 } from 'lucide-react';
 import Image from 'next/image';
@@ -134,7 +134,6 @@ const tickets = [
 
       <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200/50 sticky top-0 z-40">
         <div className="px-6 py-4 flex items-center justify-between">
-          {/* Logo */}
           <Link href="/">
               <Image src="/logo.png" alt="Logo" width={280} height={80} />
           </Link>
@@ -317,10 +316,6 @@ const tickets = [
           )}
         </div>
       </main>
-
-      <footer className="absolute bottom-4 left-0 right-0 text-center text-sm text-gray-500">
-        © 2025 Analytics. Todos los derechos reservados.
-      </footer>
     </div>
   );
 };

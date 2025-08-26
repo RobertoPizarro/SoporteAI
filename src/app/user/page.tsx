@@ -305,7 +305,7 @@ const ChatBot = () => {
     );
 
     const FrequentQuestions = () => (
-        <div className="max-w-4xl mx-auto mb-8">
+        <div className="max-w-4xl mx-auto mb-8 animate-fade-in-down">
             <div className="text-center mb-8">
                 <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Bot className="w-8 h-8 text-white" />
@@ -364,10 +364,23 @@ const ChatBot = () => {
                 .animate-slideInUp {
                     animation: slideInUp 0.4s ease-out;
                 }
+
+                .animate-fade-in-down {
+                    animation: fadeInDown 0.6s ease-out forwards;
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+
+                @keyframes fadeInDown {
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
             `}</style>
 
             <div className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200/50 flex-shrink-0">
-                <div className="px-6 py-3 flex items-center justify-between">
+                <div className="px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center">
                         <Link href="/">
                             <Image src="/logo.png" alt="Logo" width={280} height={80} />
@@ -390,7 +403,7 @@ const ChatBot = () => {
             </div>
 
             <div className="flex flex-1 min-h-0">
-                <div className="w-72 bg-white/90 backdrop-blur-sm border-r border-gray-200/50 flex flex-col flex-shrink-0">
+                <div className="w-72 bg-white/90 backdrop-blur-sm border-r border-gray-200/50 flex flex-col flex-shrink-0 animate-fade-in-down" style={{ animationDelay: '0.1s' }}>
                     <div className="flex-1 p-4 space-y-6 overflow-y-auto min-h-0">
                         <button
                             onClick={handleNewChat}
@@ -430,7 +443,7 @@ const ChatBot = () => {
 
                 <div className="flex-1 flex flex-col min-w-0">
                     <div className="flex-1 overflow-y-auto px-8 min-h-0">
-                        <div className="max-w-5xl mx-auto py-8">
+                        <div className="max-w-5xl mx-auto py-8 animate-fade-in-down" style={{ animationDelay: '0.2s' }}>
                             {showFrequentQuestions && messages.length === 0 && <FrequentQuestions />}
 
                             {messages.map((message) => (
@@ -461,7 +474,7 @@ const ChatBot = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white/80 backdrop-blur-sm border-t border-gray-200/50 p-6 flex-shrink-0">
+                    <div className="bg-white/80 backdrop-blur-sm border-t border-gray-200/50 p-6 flex-shrink-0 animate-fade-in-down" style={{ animationDelay: '0.3s' }}>
                         <div className="max-w-5xl mx-auto">
                             <div className="flex items-center space-x-4">
                                 <div className="flex-1 relative">
@@ -488,10 +501,6 @@ const ChatBot = () => {
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div className="text-center py-3 text-xs text-gray-500 bg-white/50 flex-shrink-0">
-                © 2025 Analytics. Todos los derechos reservados.
             </div>
         </div>
     );
