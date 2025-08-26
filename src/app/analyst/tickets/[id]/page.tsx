@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { User, ChevronDown, Settings, LogOut, Clock, AlertCircle, CheckCircle2, XCircle, Bot } from 'lucide-react';
+import { User, ChevronDown, Settings, LogOut, Clock, AlertCircle, CheckCircle2, XCircle, Bot, Copy, Volume2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
-
+import { speakText, copyText } from '@/lib/utils';
 
 type Ticket = {
     id: string;
@@ -202,6 +202,14 @@ const TicketDetailsPage = () => {
                         : 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white'
                 }`}>
                     <p className="text-sm leading-relaxed">{message.message}</p>
+                    <div className="flex gap-2 mt-2">
+                        <button title="Copiar mensaje" className="hover:bg-slate-200 rounded-full p-1 transition-colors">
+                            <Copy className="w-4 h-4" onClick={() => copyText(message.message)} />
+                        </button>
+                        <button title="Leer en voz alta" className="hover:bg-slate-200 rounded-full p-1 transition-colors">
+                            <Volume2 className="w-4 h-4" onClick={() => speakText(message.message)} />
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
