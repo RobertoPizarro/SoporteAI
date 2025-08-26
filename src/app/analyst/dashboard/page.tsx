@@ -88,6 +88,16 @@ const tickets = [
     return styles[estado] || 'bg-gray-50 text-gray-700 border border-gray-200';
   };
 
+  const getStatusColor = (estado: string) => {
+    const styles: { [key: string]: string } = {
+      Nuevo: "bg-blue-400 ",
+      "En Progreso": "bg-amber-400  ",
+      Resuelto: "bg-emerald-400 ",
+      Rechazado: "bg-red-400  ",
+    };
+    return styles[estado] || "bg-gray-50 text-gray-700 border border-gray-200";
+  };
+
   const getStatusIcon = (estado: string) => {
     switch(estado) {
       case 'Nuevo': return <AlertCircle className="w-3 h-3" />;
@@ -271,7 +281,7 @@ const tickets = [
                 <div className="flex items-center justify-between">
                   <div className="flex items-start space-x-4 flex-1">
 
-                    <div className={`w-1 h-16 ${getPriorityIndicator(ticket.nivel)} rounded-full`}></div>
+                    <div className={`w-1 h-16 ${getStatusColor(ticket.estado)} rounded-full`}></div>{/** Colores, cambiar si se toma en importancia el nivel de los tickets */}
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-2">
