@@ -286,7 +286,6 @@ const TicketDetailsPage = () => {
 
                         <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg border border-white/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
                             <h3 className="text-lg font-semibold text-slate-800 mb-6">Gestión de Estado</h3>
-|
                             <div>
                                 <div className="grid grid-cols-2 gap-3">
                                     {['Nuevo', 'En Progreso', 'Resuelto', 'Rechazado'].map((status) => (
