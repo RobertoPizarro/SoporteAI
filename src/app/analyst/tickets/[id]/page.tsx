@@ -1,77 +1,16 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { User, ChevronDown, Settings, LogOut, Clock, AlertCircle, CheckCircle2, XCircle} from 'lucide-react';
-import Link from 'next/link';
-import Image from 'next/image';
+import { Clock, AlertCircle, CheckCircle2, XCircle} from 'lucide-react';
 import { Message } from "@/types";
 import { useParams } from 'next/navigation';
 import ChatMessagesList from '@/components/chat/chat-messages-list';
 import { Ticket } from '@/types';
+import ChatHeader from '@/components/chat/chat-header';
+import { tickets } from '@/data/tickets';
 
 
-const tickets: Ticket[] = [
-    {
-        id: 'TCK-2025-00001',
-        tipo: 'Incidencia',
-        usuario: 'María García',
-        analista: 'Juan Pérez',
-        asunto: 'Dashboard de ventas sin datos actuales',
-        servicio: 'Data Science',
-        nivel: 2,
-        estado: 'En Progreso',
-        fechaCreacion: '23/08/2025',
-        actualizacion: 'Hace 2 horas',
-    },
-    {
-        id: 'TCK-2025-00002',
-        tipo: 'Requerimiento',
-        usuario: 'Carlos López',
-        analista: 'Juan Pérez',
-        asunto: 'Nuevo reporte de métricas de marketing',
-        servicio: 'Big Data',
-        nivel: 2,
-        estado: 'Nuevo',
-        fechaCreacion: '26/08/2025',
-        actualizacion: 'Hace 2 horas',
-    },
-    {
-        id: 'TCK-2025-00003',
-        tipo: 'Incidencia',
-        usuario: 'Ana Martínez',
-        analista: 'Juan Pérez',
-        asunto: 'Error de conexión con la base de datos',
-        servicio: 'Cloud+Apps',
-        nivel: 2,
-        estado: 'Resuelto',
-        fechaCreacion: '21/08/2025',
-        actualizacion: 'Hace 5 horas',
-    },
-    {
-        id: 'TCK-2025-00004',
-        tipo: 'Requerimiento',
-        usuario: 'Roberto Silva',
-        analista: 'Juan Pérez',
-        asunto: 'Análisis de sentimiento de reviews',
-        servicio: 'Data Science',
-        nivel: 2,
-        estado: 'En Progreso',
-        fechaCreacion: '19/08/2025',
-        actualizacion: 'Hace 3 días',
-    },
-    {
-        id: 'TCK-2025-00005',
-        tipo: 'Requerimiento',
-        usuario: 'Laura Fernández',
-        analista: 'Juan Pérez',
-        asunto: 'Implementar geolocalización en app móvil',
-        servicio: 'Geo Solutions',
-        nivel: 2,
-        estado: 'Rechazado',
-        fechaCreacion: '03/08/2025',
-        actualizacion: 'Hace 6 días',
-    }
-];
+
 
 const TicketDetailsPage = () => {
     const [currentTicket, setCurrentTicket] = useState<Ticket | null>(null);
@@ -205,49 +144,7 @@ const TicketDetailsPage = () => {
                 }
             `}</style>
 
-            <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200/50 flex-shrink-0 sticky top-0 z-40">
-                <div className="px-6 py-4 flex items-center justify-between">
-                    <div className="flex items-center">
-                        <Link href="/">
-                            <Image src="/logo.png" alt="Logo" width={280} height={80} />
-                        </Link>
-                    </div>
-
-                    <div className="relative">
-                        <button
-                            onClick={() => setDropdownOpen(!dropdownOpen)}
-                            className="flex items-center space-x-3 hover:bg-slate-50 rounded-2xl px-4 py-2.5 transition-all duration-300 group border border-transparent hover:border-slate-200"
-                        >
-                            <div className="text-right">
-                                <p className="text-sm font-semibold text-slate-700">Juan Pérez</p>
-                                <p className="text-xs text-slate-500">Analista Senior</p>
-                            </div>
-                            <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow duration-300">
-                                <User className="w-5 h-5 text-white" />
-                            </div>
-                            <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${dropdownOpen ? 'rotate-180' : ''}`} />
-                        </button>
-
-                        {dropdownOpen && (
-                            <div className="absolute right-0 mt-3 w-48 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200/50 py-2 z-50 animate-in slide-in-from-top-3 fade-in duration-200">
-                                <a href="#" className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors rounded-lg mx-2">
-                                    <User className="w-4 h-4 mr-3 text-slate-400" />
-                                    Perfil
-                                </a>
-                                <a href="#" className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors rounded-lg mx-2">
-                                    <Settings className="w-4 h-4 mr-3 text-slate-400" />
-                                    Configuración
-                                </a>
-                                <hr className="my-2 border-slate-200" />
-                                <Link href="/analyst/login" className="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors rounded-lg mx-2">
-                                    <LogOut className="w-4 h-4 mr-3" />
-                                    Cerrar sesión
-                                </Link>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </header>
+            <ChatHeader role="analyst" />
 
             <div className="flex flex-1 min-h-0 animate-fade-in-down">
                 <div className="w-[32rem] bg-white/90 backdrop-blur-sm border-r border-gray-200/50 flex flex-col flex-shrink-0 overflow-y-auto">
