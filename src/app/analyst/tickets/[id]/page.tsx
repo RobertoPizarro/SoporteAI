@@ -1,14 +1,13 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { User, ChevronDown, Settings, LogOut, Clock, AlertCircle, CheckCircle2, XCircle, Bot, Copy, Volume2 } from 'lucide-react';
+import { User, ChevronDown, Settings, LogOut, Clock, AlertCircle, CheckCircle2, XCircle} from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Message } from "@/types";
 import { useParams } from 'next/navigation';
-import { speakText, copyText } from '@/lib/utils';
+import ChatMessagesList from '@/components/chat/chat-messages-list';
 import { Ticket } from '@/types';
-import MessageBubble from '@/components/chat/message-bubble';
 
 
 const tickets: Ticket[] = [
@@ -309,19 +308,7 @@ const TicketDetailsPage = () => {
                 </div>
 
                 <div className="flex-1 flex flex-col min-w-0">
-                    <div className="flex-1 overflow-y-auto px-8 min-h-0 bg-gradient-to-b from-white/50 to-gray-50/50">
-                        <div className="max-w-5xl mx-auto py-8">
-                            {chatMessages.map((message) => (
-                                <MessageBubble
-                                    key={message.id}
-                                    message={message}
-                                    isBot={message.type === 'bot' || message.type === 'ticket'}
-                                    role={"analyst"}
-                                />
-                            ))}
-                            <div ref={chatEndRef} />
-                        </div>
-                    </div>
+                    <ChatMessagesList messages={chatMessages} messagesEndRef={chatEndRef} role="analyst"/>
 
                     <div className="p-6 border-t border-slate-200/50 bg-slate-50/50 flex-shrink-0">
                         <div className="text-center">

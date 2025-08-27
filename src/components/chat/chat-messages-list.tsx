@@ -7,8 +7,8 @@ import { frequentQuestions } from "@/data/frequent-questions";
 
 interface ChatMessagesListProps {
   messages: Message[];
-  role: string;
-  handleQuestionClick: (question: string) => void;
+  role: "client" | "analyst";
+  handleQuestionClick?: (question: string) => void;
   isTyping?: boolean;
   showFrequentQuestions?: boolean;
   messagesEndRef?: React.RefObject<HTMLDivElement>;
@@ -28,19 +28,21 @@ const ChatMessagesList = ({
         className="max-w-5xl mx-auto py-8 animate-fade-in-down"
         style={{ animationDelay: "0.2s" }}
       >
-        {showFrequentQuestions && messages.length === 0 && (
-          <FrequentQuestions
-            frequentQuestions={frequentQuestions}
-            handleQuestionClick={handleQuestionClick}
-          />
-        )}
+        {showFrequentQuestions &&
+          messages.length === 0 &&
+          handleQuestionClick && (
+            <FrequentQuestions
+              frequentQuestions={frequentQuestions}
+              handleQuestionClick={handleQuestionClick}
+            />
+          )}
 
         {messages.map((message) => (
           <MessageBubble
             key={message.id}
             message={message}
             isBot={message.type === "bot" || message.type === "ticket"}
-            role={"client"}
+            role={role}
           />
         ))}
 
