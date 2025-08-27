@@ -5,7 +5,7 @@ import { Send, Mic, Bot, User, Clock, FileText, ShieldAlert, MessageCircle, Plus
 import Link from "next/link";
 import Image from "next/image";
 import TicketCard from '@/components/user/ticket-card';
-import MessageBubble from '@/components/user/message-bubble';
+import MessageBubble from '@/components/chat/message-bubble';
 import {Message } from '@/types';
 
 const ChatBot = () => {
@@ -337,6 +337,7 @@ const ChatBot = () => {
                                     key={message.id}
                                     message={message}
                                     isBot={message.type === 'bot' || message.type === 'ticket'}
+                                    role={"client"}
                                 />
                             ))}
 
