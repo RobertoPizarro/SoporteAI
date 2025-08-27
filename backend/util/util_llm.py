@@ -3,11 +3,12 @@ from pydantic import SecretStr
 from langchain_openai import AzureChatOpenAI
 from openai import AzureOpenAI
 from backend.util.util_key import obtenerAPI
-def obtenerModelo(temperature: float = 0.7) :
+
+def obtenerModelo(temperature: float = 0.7) -> AzureChatOpenAI:
     return AzureChatOpenAI(
-      api_version = key.require("CONF_API_VERSION"),
-      azure_endpoint = key.require("CONF_AZURE_ENDPOINT"),
+      api_version = "2024-12-01-preview",
+      azure_endpoint = "https://AgenteAI-Instance.openai.azure.com/",
       api_key = SecretStr(obtenerAPI("CONF-OPENAI-API-KEY")),
-      azure_deployment = key.require("CONF_AZURE_DEPLOYMENT"),
+      azure_deployment = "gpt-4o",
       temperature= temperature
     )
