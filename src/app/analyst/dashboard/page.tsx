@@ -2,12 +2,15 @@
 
 import React, { useState } from 'react';
 import {
-    ChevronDown, User, LogOut, Search, Filter, Eye, Settings, FileText, Clock, CheckCircle, AlertCircle,
+    ChevronDown, Search, Filter, Eye,  FileText, Clock, CheckCircle, AlertCircle,
     XCircle
 } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { tickets } from '@/data/tickets';
+import ChatHeader from '@/components/chat/chat-header';
+import TicketCard from '@/components/ticket/ticket-card';
+
 
 const AnalystDashboard = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -15,68 +18,6 @@ const AnalystDashboard = () => {
   const [selectedFilter, setSelectedFilter] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
 
-const tickets = [
-    {
-        id: 'TCK-2025-00001',
-        tipo: 'Incidencia',
-        usuario: 'María García',
-        analista: 'Juan Pérez',
-        asunto: 'Dashboard de ventas sin datos actuales',
-        servicio: 'Data Science',
-        nivel: 2,
-        estado: 'En Progreso',
-        fechaCreacion: '23/08/2025',
-        actualizacion: 'Hace 2 horas',
-    },
-    {
-        id: 'TCK-2025-00002',
-        tipo: 'Requerimiento',
-        usuario: 'Carlos López',
-        analista: 'Juan Pérez',
-        asunto: 'Nuevo reporte de métricas de marketing',
-        servicio: 'Big Data',
-        estado: 'Nuevo',
-        nivel: 2,
-        fechaCreacion: '26/08/2025',
-        actualizacion: 'Hace 2 horas',
-    },
-    {
-        id: 'TCK-2025-00003',
-        tipo: 'Incidencia',
-        usuario: 'Ana Martínez',
-        analista: 'Juan Pérez',
-        asunto: 'Error de conexión con la base de datos',
-        servicio: 'Cloud+Apps',
-        estado: 'Resuelto',
-        nivel: 2,
-        fechaCreacion: '21/08/2025',
-        actualizacion: 'Hace 5 horas',
-    },
-    {
-        id: 'TCK-2025-00004',
-        tipo: 'Requerimiento',
-        usuario: 'Roberto Silva',
-        analista: 'Juan Pérez',
-        asunto: 'Análisis de sentimiento de reviews',
-        servicio: 'Data Science',
-        estado: 'En Progreso',
-        nivel: 2,
-        fechaCreacion: '19/08/2025',
-        actualizacion: 'Hace 3 días',
-    },
-    {
-        id: 'TCK-2025-00005',
-        tipo: 'Requerimiento',
-        usuario: 'Laura Fernández',
-        analista: 'Juan Pérez',
-        asunto: 'Implementar geolocalización en app móvil',
-        servicio: 'Geo Solutions',
-        estado: 'Rechazado',
-        nivel: 2,
-        fechaCreacion: '03/08/2025',
-        actualizacion: 'Hace 6 días',
-    }
-];
 
   const getStatusBadge = (estado: string) => {
     const styles: { [key: string]: string } = {
@@ -142,47 +83,7 @@ const tickets = [
         }
       `}</style>
 
-      <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200/50 sticky top-0 z-40">
-        <div className="px-6 py-4 flex items-center justify-between">
-          <Link href="/">
-              <Image src="/logo.png" alt="Logo" width={280} height={80} />
-          </Link>
-          
-          <div className="relative">
-            <button 
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center space-x-3 hover:bg-slate-50 rounded-2xl px-4 py-2.5 transition-all duration-300 group border border-transparent hover:border-slate-200"
-            >
-              <div className="text-right">
-                <p className="text-sm font-semibold text-slate-700">Juan Pérez</p>
-                <p className="text-xs text-slate-500">Analista Senior</p>
-              </div>
-              <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow duration-300">
-                <User className="w-5 h-5 text-white" />
-              </div>
-              <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${dropdownOpen ? 'rotate-180' : ''}`} />
-            </button>
-
-            {dropdownOpen && (
-              <div className="absolute right-0 mt-3 w-48 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200/50 py-2 z-50 animate-in slide-in-from-top-3 fade-in duration-200">
-                <a href="#" className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors rounded-lg mx-2">
-                  <User className="w-4 h-4 mr-3 text-slate-400" />
-                  Perfil
-                </a>
-                <a href="#" className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors rounded-lg mx-2">
-                  <Settings className="w-4 h-4 mr-3 text-slate-400" />
-                  Configuración
-                </a>
-                <hr className="my-2 border-slate-200" />
-                <Link href="/analyst/login" className="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors rounded-lg mx-2">
-                  <LogOut className="w-4 h-4 mr-3" />
-                  Cerrar sesión
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
+      <ChatHeader role="analyst"/>
 
       <main className="px-6 py-8 max-w-7xl mx-auto animate-fade-in-down">
         <div className="mb-8">
@@ -264,6 +165,7 @@ const tickets = [
         </div>
 
         <div className="space-y-6">
+          {/* Importar aacá el Ticket List */}
           {filteredTickets.length === 0 ? (
             <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 shadow-lg border border-white/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] text-center">
               <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -274,54 +176,7 @@ const tickets = [
             </div>
           ) : (
             filteredTickets.map((ticket, index) => (
-              <div
-                key={ticket.id}
-                className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg border border-white/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-start space-x-4 flex-1">
-
-                    <div className={`w-1 h-16 ${getStatusColor(ticket.estado)} rounded-full`}></div>{/** Colores, cambiar si se toma en importancia el nivel de los tickets */}
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-sm font-mono text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">
-                          {ticket.id}
-                        </span>
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium ${getStatusBadge(ticket.estado)}`}
-                        >
-                          {getStatusIcon(ticket.estado)}
-                          {ticket.estado}
-                        </span>
-                        <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-lg">
-                          {ticket.tipo}
-                        </span>
-                      </div>
-
-                      <h3 className="font-semibold text-slate-800 mb-1 line-clamp-1">
-                        {ticket.asunto}
-                      </h3>
-
-                      <div className="flex items-center gap-4 text-sm text-slate-600">
-                        <span>👤 {ticket.usuario}</span>
-                        <span>🔧 {ticket.servicio}</span>
-                        <span>📅 {ticket.fechaCreacion}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Button asChild className="ml-4" size="sm">
-                    <Link
-                      href={`/analyst/tickets/${ticket.id}`}
-                      className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-medium rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105"
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      Ver Detalles
-                    </Link>
-                  </Button>
-                </div>
-              </div>
+              <TicketCard ticket={ticket}/>
             ))
           )}
         </div>

@@ -1,76 +1,16 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { User, ChevronDown, Settings, LogOut, Clock, AlertCircle, CheckCircle2, XCircle, Bot, Copy, Volume2 } from 'lucide-react';
-import Link from 'next/link';
-import Image from 'next/image';
+import { Clock, AlertCircle, CheckCircle2, XCircle} from 'lucide-react';
+import { Message } from "@/types";
 import { useParams } from 'next/navigation';
-import { speakText, copyText } from '@/lib/utils';
+import ChatMessagesList from '@/components/chat/chat-messages-list';
 import { Ticket } from '@/types';
+import ChatHeader from '@/components/chat/chat-header';
+import { tickets } from '@/data/tickets';
 
 
-const tickets: Ticket[] = [
-    {
-        id: 'TCK-2025-00001',
-        tipo: 'Incidencia',
-        usuario: 'María García',
-        analista: 'Juan Pérez',
-        asunto: 'Dashboard de ventas sin datos actuales',
-        servicio: 'Data Science',
-        nivel: 2,
-        estado: 'En Progreso',
-        fechaCreacion: '23/08/2025',
-        actualizacion: 'Hace 2 horas',
-    },
-    {
-        id: 'TCK-2025-00002',
-        tipo: 'Requerimiento',
-        usuario: 'Carlos López',
-        analista: 'Juan Pérez',
-        asunto: 'Nuevo reporte de métricas de marketing',
-        servicio: 'Big Data',
-        nivel: 2,
-        estado: 'Nuevo',
-        fechaCreacion: '26/08/2025',
-        actualizacion: 'Hace 2 horas',
-    },
-    {
-        id: 'TCK-2025-00003',
-        tipo: 'Incidencia',
-        usuario: 'Ana Martínez',
-        analista: 'Juan Pérez',
-        asunto: 'Error de conexión con la base de datos',
-        servicio: 'Cloud+Apps',
-        nivel: 2,
-        estado: 'Resuelto',
-        fechaCreacion: '21/08/2025',
-        actualizacion: 'Hace 5 horas',
-    },
-    {
-        id: 'TCK-2025-00004',
-        tipo: 'Requerimiento',
-        usuario: 'Roberto Silva',
-        analista: 'Juan Pérez',
-        asunto: 'Análisis de sentimiento de reviews',
-        servicio: 'Data Science',
-        nivel: 2,
-        estado: 'En Progreso',
-        fechaCreacion: '19/08/2025',
-        actualizacion: 'Hace 3 días',
-    },
-    {
-        id: 'TCK-2025-00005',
-        tipo: 'Requerimiento',
-        usuario: 'Laura Fernández',
-        analista: 'Juan Pérez',
-        asunto: 'Implementar geolocalización en app móvil',
-        servicio: 'Geo Solutions',
-        nivel: 2,
-        estado: 'Rechazado',
-        fechaCreacion: '03/08/2025',
-        actualizacion: 'Hace 6 días',
-    }
-];
+
 
 const TicketDetailsPage = () => {
     const [currentTicket, setCurrentTicket] = useState<Ticket | null>(null);
@@ -84,46 +24,46 @@ const TicketDetailsPage = () => {
         }
     }, [params.id]);
 
-    const [chatMessages] = useState([
+    const [chatMessages] = useState<Message[]>([
         {
             id: 1,
-            sender: 'bot',
-            message: '¡Hola! Soy el asistente virtual de Analytics Support. Estoy aquí para ayudarte con cualquier consulta o incidencia que tengas con nuestros servicios. Por favor, describe tu problema o requerimiento.'
+            type: "bot",
+            content: "¡Hola! Soy el asistente virtual de Analytics Support. Estoy aquí para ayudarte con cualquier consulta o incidencia que tengas con nuestros servicios. Por favor, describe tu problema o requerimiento."
         },
         {
             id: 2,
-            sender: 'user',
-            message: 'Hola, soy de la empresa Claro. Tengo problemas con el servicio de GeoPoint.'
+            type: "user",
+            content: "Hola, soy de la empresa Claro. Tengo problemas con el servicio de GeoPoint."
         },
         {
             id: 3,
-            sender: 'bot',
-            message: 'Gracias por contactarnos. Para poder brindarte el mejor soporte y registrar tu consulta correctamente, necesito validar tu identidad. ¿Podrías proporcionarme tu nombre completo o tu DNI, por favor?'
+            type: "bot",
+            content: "Gracias por contactarnos. Para poder brindarte el mejor soporte y registrar tu consulta correctamente, necesito validar tu identidad. ¿Podrías proporcionarme tu nombre completo o tu DNI, por favor?"
         },
         {
             id: 4,
-            sender: 'user',
-            message: 'Mi DNI es 75311031'
+            type: "user",
+            content: "Mi DNI es 75311031"
         },
         {
             id: 5,
-            sender: 'bot',
-            message: '¡Perfecto, Roberto! He verificado tu identidad exitosamente. Veo que tienes problemas con el servicio de GeoPoint. Para poder asistirte de la mejor manera, ¿podrías proporcionarme más detalles específicos sobre el inconveniente que estás experimentando?'
+            type: "bot",
+            content: "¡Perfecto, Roberto! He verificado tu identidad exitosamente. Veo que tienes problemas con el servicio de GeoPoint. Para poder asistirte de la mejor manera, ¿podrías proporcionarme más detalles específicos sobre el inconveniente que estás experimentando?"
         },
         {
             id: 6,
-            sender: 'user',
-            message: 'El servicio de GeoPoint está mostrando mi ubicación en un lugar incorrecto en el mapa. Este problema comenzó desde ayer y no logro entender la causa. La precisión de geolocalización se ha visto comprometida.'
+            type: "user",
+            content: "El servicio de GeoPoint está mostrando mi ubicación en un lugar incorrecto en el mapa. Este problema comenzó desde ayer y no logro entender la causa. La precisión de geolocalización se ha visto comprometida."
         },
         {
             id: 7,
-            sender: 'bot',
-            message: 'Entiendo perfectamente la situación, Roberto. Los problemas de precisión en geolocalización pueden afectar significativamente las operaciones. Procederé inmediatamente a crear un ticket de soporte para que nuestro equipo técnico especializado pueda atender tu caso con la prioridad que requiere.',
+            type: "bot",
+            content: "Entiendo perfectamente la situación, Roberto. Los problemas de precisión en geolocalización pueden afectar significativamente las operaciones. Procederé inmediatamente a crear un ticket de soporte para que nuestro equipo técnico especializado pueda atender tu caso con la prioridad que requiere."
         },
         {
             id: 8,
-            sender: 'bot',
-            message: 'He generado tu ticket de soporte. A continuación te muestro los detalles para tu confirmación:',
+            type: "bot",
+            content: "He generado tu ticket de soporte. A continuación te muestro los detalles para tu confirmación:"
         }
     ]);
 
@@ -170,38 +110,7 @@ const TicketDetailsPage = () => {
         );
     }
 
-    const MessageBubble = ({ message, isBot }: { message: any; isBot: boolean }) => (
-        <div className={`flex ${isBot ? 'justify-start' : 'justify-end'} mb-6 animate-slideInUp`}>
-            <div className={`flex max-w-4xl ${isBot ? 'flex-row' : 'flex-row-reverse'} items-end`}>
-                <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${isBot ? 'mr-3' : 'ml-3'}`}>
-                    {isBot ? (
-                        <div className="w-full h-full bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full flex items-center justify-center">
-                            <Bot className="w-5 h-5 text-white" />
-                        </div>
-                    ) : (
-                        <div className="w-full h-full bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full flex items-center justify-center">
-                            <User className="w-5 h-5 text-white" />
-                        </div>
-                    )}
-                </div>
-                <div className={`px-5 py-4 rounded-2xl max-w-2xl ${
-                    isBot
-                        ? 'bg-gradient-to-r from-gray-100 to-emerald-50 border-2 border-emerald-100 text-slate-800'
-                        : 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white'
-                }`}>
-                    <p className="text-sm leading-relaxed">{message.message}</p>
-                    <div className="flex gap-2 mt-2">
-                        <button title="Copiar mensaje" className="hover:bg-slate-200 rounded-full p-1 transition-colors">
-                            <Copy className="w-4 h-4" onClick={() => copyText(message.message)} />
-                        </button>
-                        <button title="Leer en voz alta" className="hover:bg-slate-200 rounded-full p-1 transition-colors">
-                            <Volume2 className="w-4 h-4" onClick={() => speakText(message.message)} />
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+    
 
     return (
         <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 overflow-hidden">
@@ -235,49 +144,7 @@ const TicketDetailsPage = () => {
                 }
             `}</style>
 
-            <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200/50 flex-shrink-0 sticky top-0 z-40">
-                <div className="px-6 py-4 flex items-center justify-between">
-                    <div className="flex items-center">
-                        <Link href="/">
-                            <Image src="/logo.png" alt="Logo" width={280} height={80} />
-                        </Link>
-                    </div>
-
-                    <div className="relative">
-                        <button
-                            onClick={() => setDropdownOpen(!dropdownOpen)}
-                            className="flex items-center space-x-3 hover:bg-slate-50 rounded-2xl px-4 py-2.5 transition-all duration-300 group border border-transparent hover:border-slate-200"
-                        >
-                            <div className="text-right">
-                                <p className="text-sm font-semibold text-slate-700">Juan Pérez</p>
-                                <p className="text-xs text-slate-500">Analista Senior</p>
-                            </div>
-                            <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow duration-300">
-                                <User className="w-5 h-5 text-white" />
-                            </div>
-                            <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${dropdownOpen ? 'rotate-180' : ''}`} />
-                        </button>
-
-                        {dropdownOpen && (
-                            <div className="absolute right-0 mt-3 w-48 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200/50 py-2 z-50 animate-in slide-in-from-top-3 fade-in duration-200">
-                                <a href="#" className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors rounded-lg mx-2">
-                                    <User className="w-4 h-4 mr-3 text-slate-400" />
-                                    Perfil
-                                </a>
-                                <a href="#" className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors rounded-lg mx-2">
-                                    <Settings className="w-4 h-4 mr-3 text-slate-400" />
-                                    Configuración
-                                </a>
-                                <hr className="my-2 border-slate-200" />
-                                <Link href="/analyst/login" className="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors rounded-lg mx-2">
-                                    <LogOut className="w-4 h-4 mr-3" />
-                                    Cerrar sesión
-                                </Link>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </header>
+            <ChatHeader role="analyst" />
 
             <div className="flex flex-1 min-h-0 animate-fade-in-down">
                 <div className="w-[32rem] bg-white/90 backdrop-blur-sm border-r border-gray-200/50 flex flex-col flex-shrink-0 overflow-y-auto">
@@ -315,7 +182,6 @@ const TicketDetailsPage = () => {
 
                         <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg border border-white/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
                             <h3 className="text-lg font-semibold text-slate-800 mb-6">Gestión de Estado</h3>
-
                             <div>
                                 <div className="grid grid-cols-2 gap-3">
                                     {['Nuevo', 'En Progreso', 'Resuelto', 'Rechazado'].map((status) => (
@@ -339,18 +205,7 @@ const TicketDetailsPage = () => {
                 </div>
 
                 <div className="flex-1 flex flex-col min-w-0">
-                    <div className="flex-1 overflow-y-auto px-8 min-h-0 bg-gradient-to-b from-white/50 to-gray-50/50">
-                        <div className="max-w-5xl mx-auto py-8">
-                            {chatMessages.map((message) => (
-                                <MessageBubble
-                                    key={message.id}
-                                    message={message}
-                                    isBot={message.sender === 'bot'}
-                                />
-                            ))}
-                            <div ref={chatEndRef} />
-                        </div>
-                    </div>
+                    <ChatMessagesList messages={chatMessages} messagesEndRef={chatEndRef} role="analyst"/>
 
                     <div className="p-6 border-t border-slate-200/50 bg-slate-50/50 flex-shrink-0">
                         <div className="text-center">
