@@ -1,17 +1,3 @@
-## #######################################################################################################
-##
-## @copyright Big Data Academy [info@bigdataacademy.org]
-## @professor Alonso Melgarejo [alonsoraulmgs@gmail.com]
-##
-## #######################################################################################################
-
-## ################q######################################################################################
-## @section Configuración
-## #######################################################################################################
-
-# Importamos la configuración
-import src.util.util_env as key
-
 ## ################q######################################################################################
 ## @section Librerías
 ## #######################################################################################################
@@ -23,7 +9,7 @@ from langchain.chains import ConversationChain
 from langchain.memory import ConversationBufferMemory
 
 # Utilitario para crear un chat que incluya bases de conocimientos
-from langchain.chains import RetrievalQA
+from langchain.chains import ConversationalRetrievalChain
 
 ## #######################################################################################################
 ## @section Funciones
@@ -31,42 +17,34 @@ from langchain.chains import RetrievalQA
 
 
 # Abre la sesión de chat con el modelo
-def abrirSesionDeChat(llm=None, contexto: str = "", memoria = None):
+def abrirSesionDeChat(llm=None, contexto: str = "", memoria=None):
     # Creamos la memoria a corto plazo
     # Agregamos la "personalidad" a nuestra IA
     if memoria is None:
-        memoria = ConversationBufferMemory()
+        memoria = ConversationBufferMemory(memory_key="history", return_messages=True)
     memoria.chat_memory.add_ai_message(contexto)
 
-    # Creamos la conversación de chat
-    chat = ConversationChain(
-        llm=llm,
-        memory=memoria,
-        verbose=False,  # Desactivamos el log para ver sólo las respuestas del modelo
-    )
-
-    return chat
+    return ConversationChain(llm=llm, memory=memoria, verbose=False)
 
 
 # Abre una sesión de chat y adjunta una base de conocimiento
 def abrirSesionDeChatConBaseDeConocimiento(
-    llm=None, basesDeConocimiento=None, contexto: str = "", memoria = None
+    llm=None, basesDeConocimiento=None, contexto: str = "", memoria=None
 ):
     if memoria is None:
-        memoria = ConversationBufferMemory()
+        memoria = ConversationBufferMemory(
+            memory_key="chat_history", return_messages=True
+        )
     # Agregamos la "personalidad" a nuestra IA
     memoria.chat_memory.add_ai_message(contexto)
 
-    # Creación del chat avanzado
-    chat = RetrievalQA.from_chain_type(
-        llm=llm, chain_type="stuff", retriever=basesDeConocimiento, memory=memoria
+    return ConversationalRetrievalChain.from_llm(
+        llm=llm, retriever=basesDeConocimiento, memory=memoria, verbose=False
     )
-
-    return chat
 
 
 # Envía un mensaje a un chat
-def enviarMensaje(chat: RetrievalQA.from_chain_type = None, mensaje=None):
+def enviarMensaje(chat: ConversationChain = None, mensaje: str = ""):
     # Enviamos el mensaje
     respuesta = chat.predict(input=mensaje)
 
@@ -75,10 +53,10 @@ def enviarMensaje(chat: RetrievalQA.from_chain_type = None, mensaje=None):
 
 # Envía un mensaje a un chat que tiene una base de conocimiento asociada
 def enviarMensajeEnChatConBaseDeConocimiento(
-    chat: RetrievalQA.from_chain_type = None, mensaje=None
+    chat: ConversationalRetrievalChain = None, mensaje: str = ""
 ):
     # Enviamos el mensaje
-    respuesta = chat.invoke(mensaje)
+    respuesta = chat.invoke({"question": mensaje})
 
     # Extraemos el mensaje
-    return respuesta["result"]
+    return respuesta.get("answer", respuesta)

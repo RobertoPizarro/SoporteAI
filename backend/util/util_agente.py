@@ -9,9 +9,6 @@
 ## @section Configuración
 ## #######################################################################################################
 
-#Importamos la configuración
-import src.util.util_env as key
-
 ## ################q######################################################################################
 ## @section Librerías
 ## #######################################################################################################
@@ -28,6 +25,7 @@ from langchain.agents import initialize_agent
 #Utilitario para crear la memoria a corto plazo del modelo
 from langchain.memory import ConversationBufferMemory
 
+from langgraph.prebuilt import create_react_agent
 ## #######################################################################################################
 ## @section Funciones
 ## #######################################################################################################
@@ -42,6 +40,17 @@ def parsearParametrosDeConsulta(
 
   #Retornamos los parámetros
   return parametros
+
+def crearAgente(
+  llm = None,
+  tools = None,
+  contexto = "",
+):
+  agente = create_react_agent(
+    model = llm,
+    tools = tools,
+    )
+
 
 #Función utilitaria para crear un agente
 def crearAgenteSinMemoria(
@@ -78,7 +87,7 @@ def crearAgenteConMemoria(
     llm = llm,
     memory = memoria, #Colocamos la memoria a corto plazo
     tools = tools,
-    agent = AgentType.CONVERSATIONAL_REACT_DESCRIPTION, #Tipo de agente que soporta memoria a corto plazo
+    agent = AgentType.CONVERSATIONAL_REACT_DESCRIPTION,  #Tipo de agente que soporta memoria a corto plazo
     handle_parsing_errors = True,
     verbose = True
   )
