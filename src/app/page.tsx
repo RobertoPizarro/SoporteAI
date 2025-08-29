@@ -17,7 +17,7 @@ export default function Home() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl">
-        <Link href="/user" className="group block">
+        <Link href="/user/login" className="group block">
           <Card className="h-full rounded-2xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border-gray-200/50 dark:border-zinc-800/50 shadow-lg hover:shadow-2xl hover:border-purple-200/80 dark:hover:border-purple-900/50 transition-all duration-300 ease-in-out transform hover:-translate-y-1">
             <CardContent className="p-8">
               <div className="flex justify-between items-start mb-4">

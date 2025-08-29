@@ -176,7 +176,7 @@ const AnalystDashboard = () => {
             </div>
           ) : (
             filteredTickets.map((ticket, index) => (
-              <TicketCard ticket={ticket}/>
+                <TicketCard key={ticket.id} ticket={ticket}/>
             ))
           )}
         </div>
