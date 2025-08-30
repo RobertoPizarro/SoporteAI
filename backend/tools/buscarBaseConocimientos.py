@@ -5,21 +5,36 @@ import json
 
 retriever = obtenerBaseDeConocimientos()
 
-
 def buscarBaseConocimientos(query: str = "", searchables: int = 3) -> str:
+    """
+    Realiza una búsqueda en la base de conocimientos utilizando Azure Cognitive Search.
+    Args:
+        query (str, optional): Consulta de búsqueda. Defaults to "".
+        searchables (int, optional): Número máximo de resultados a devolver. Defaults to 3.
+
+    Returns:
+        str: Resultados de la búsqueda en formato JSON.
+    """
     try:
+        # Realizar la búsqueda en la base de conocimientos
         docs: list[Document] = retriever.get_relevant_documents(query)
 
     except Exception as e:
         return json.dumps(
             {"status": "ERROR", "message": str(e), "query": query}, ensure_ascii=False
         )
+    
+    # Limitar el número de resultados a 'searchables'
     docs = docs[:searchables]
 
     lineas = []
 
     for doc in docs:
+        
+        # Limpiar y preparar el texto para mostrar
         texto = doc.page_content.replace("\n", " ").strip()
+        
+        # Agregar el documento a la lista de resultados
         lineas.append(
             {
                 "id": doc.metadata.get("id"),
