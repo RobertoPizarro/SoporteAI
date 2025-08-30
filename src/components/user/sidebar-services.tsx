@@ -1,5 +1,6 @@
 import React from "react";
-import { Plus } from "lucide-react";
+import { Plus, LogOut } from "lucide-react";
+import { signOut } from "next-auth/react";
 
 interface SidebarServicesProps {
     handleNewChat: () => void;
@@ -56,6 +57,15 @@ const SidebarServices = ({ handleNewChat }: SidebarServicesProps) => {
                         </div>
                     </div>
                 </div>
+            </div>
+            <div className="p-4">
+                <button
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                    className="w-full p-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl transition-all duration-300 hover:shadow-xl hover:scale-[1.02] flex items-center justify-center gap-3 mt-4"
+                >
+                    <LogOut className="w-5 h-5" />
+                    <span className="font-semibold">Cerrar sesión</span>
+                </button>
             </div>
         </div>
     );

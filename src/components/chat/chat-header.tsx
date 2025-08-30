@@ -8,6 +8,7 @@ import {
   Settings,
   LogOut,
 } from "lucide-react";
+import { signOut } from "next-auth/react";
 
 const ChatHeader = ({ role }: { role: "client" | "analyst" }) => {
   const [dropdownOpen, setDropdownOpen] = React.useState(false); /// Borrar
@@ -60,26 +61,26 @@ const ChatHeader = ({ role }: { role: "client" | "analyst" }) => {
               <div className="absolute right-0 mt-3 w-48 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200/50 py-2 z-50 animate-in slide-in-from-top-3 fade-in duration-200">
                 <a
                   href="#"
-                  className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors rounded-lg mx-2"
+                  className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-100 transition-colors rounded-lg mx-2"
                 >
                   <User className="w-4 h-4 mr-3 text-slate-400" />
                   Perfil
                 </a>
                 <a
                   href="#"
-                  className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors rounded-lg mx-2"
+                  className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-100 transition-colors rounded-lg mx-2"
                 >
                   <Settings className="w-4 h-4 mr-3 text-slate-400" />
                   Configuración
                 </a>
                 <hr className="my-2 border-slate-200" />
-                <Link
-                  href="/analyst/login"
-                  className="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors rounded-lg mx-2"
+                <button
+                  onClick={() => signOut({ callbackUrl: "/analyst/login" })}
+                  className="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-100 transition-colors rounded-lg mx-2 w-full text-left"
                 >
                   <LogOut className="w-4 h-4 mr-3" />
                   Cerrar sesión
-                </Link>
+                </button>
               </div>
             )}
           </div>

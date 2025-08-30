@@ -4,26 +4,18 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
+import { signIn } from "next-auth/react";
 import { User, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import GoogleIcon from "../icons/google-icon"
 
 export function LoginForm() {
-    const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
 
     const handleGoogleLogin = async () => {
         setIsLoading(true);
         try {
-
-
-
-            // Aca va la logica?
-
-
-
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            router.push("/user/dashboard");
+            await signIn("google", {prompt: "select_account", callbackUrl: "/user/dashboard"});
         } catch (error) {
             console.error("Error al iniciar sesión con Google:", error);
         } finally {
