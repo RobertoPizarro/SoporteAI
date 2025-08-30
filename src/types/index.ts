@@ -16,4 +16,12 @@ export type Message = {
     type: "bot" | "user" | "ticket"
     content: string | Ticket
     delay?: number
+};
+
+export type Colaborador = {
+  id: number;
+  cliente_id: number;
+  nombre: string;
+  correo: string;
 }
+
