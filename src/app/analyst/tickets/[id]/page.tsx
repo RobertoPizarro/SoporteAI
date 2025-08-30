@@ -10,8 +10,6 @@ import ChatHeader from '@/components/chat/chat-header';
 import { tickets } from '@/data/tickets';
 
 
-
-
 const TicketDetailsPage = () => {
     const [currentTicket, setCurrentTicket] = useState<Ticket | null>(null);
     const [dropdownOpen, setDropdownOpen] = useState(false);

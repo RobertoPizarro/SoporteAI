@@ -64,6 +64,9 @@ const ChatBot = () => {
             messages={messages}
             role={"client"}
             handleQuestionClick={handleQuestionClick}
+            isTyping={isTyping}
+            showFrequentQuestions={showFrequentQuestions}
+            messagesEndRef={messagesEndRef}
           />
 
           <ChatInput
