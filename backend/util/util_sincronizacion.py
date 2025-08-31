@@ -15,7 +15,6 @@ from backend.util.util_documentos import conectarDocumentIntelligence
 from backend.util.util_base_de_conocimientos import conectarBaseDeConocimientos
 from backend.util.util_key import obtenerAPI
 
-
 # -------------------------------
 # Utilitarios
 # -------------------------------
@@ -28,7 +27,6 @@ def obtenerArchivos(ruta: str = "") -> List[str]:
         if os.path.isfile(ruta_completa):
             archivos.append(ruta_completa)
     return archivos
-
 
 def _file_sha256(path: str) -> str:
     h = hashlib.sha256()
@@ -46,6 +44,53 @@ def _split_text(texto: str, max_chars: int = 1000, overlap: int = 100) -> List[s
     )
     return splitter.split_text(texto)
 
+def _extraer_iterable_resultados(resultados: Any):
+    """
+    Devuelve un iterable de resultados individuales (IndexingResult)
+    soportando:
+      - IndexDocumentsResult.results (SDK Azure)
+      - Lista de dicts con claves como 'succeeded', 'key', 'errorMessage'
+    """
+    if hasattr(resultados, "results"):
+        return resultados.results
+    if isinstance(resultados, list):
+        return resultados
+    return None  # estructura desconocida
+
+def _resumen_subida(resultados: Any) -> Dict[str, Any] | None:
+    """
+    Calcula totales OK/FAIL. Si la estructura es desconocida, devuelve None.
+    """
+    it = _extraer_iterable_resultados(resultados)
+    if it is None:
+        return None
+
+    total = 0
+    ok = 0
+    fail = 0
+    detalles = []
+    for r in it:
+        # soporta objeto o dict
+        succeeded = (
+            getattr(r, "succeeded", None)
+            if not isinstance(r, dict)
+            else r.get("succeeded")
+        )
+        key = getattr(r, "key", None) if not isinstance(r, dict) else r.get("key")
+        err = (
+            getattr(r, "error_message", None)
+            if not isinstance(r, dict)
+            else r.get("errorMessage") or r.get("error_message")
+        )
+
+        total += 1
+        if succeeded is True:
+            ok += 1
+        else:
+            fail += 1
+            detalles.append({"key": key, "error": err})
+
+    return {"total": total, "ok": ok, "fail": fail, "detalles": detalles}
 
 # -------------------------------
 # 1) Lectura del documento (orden lógico + páginas)
@@ -69,7 +114,7 @@ def leerContenidoDeDocumento(rutaArchivo: str):
         if not getattr(p, "spans", None):
             continue
         span = p.spans[0]
-        texto = full_text[span.offset: span.offset + span.length].strip()
+        texto = full_text[span.offset : span.offset + span.length].strip()
         if not texto:
             continue
         page = None
@@ -88,20 +133,23 @@ def leerContenidoDeDocumento(rutaArchivo: str):
 
     return full_text, parrafos
 
-
 # -------------------------------
 # 2) Chunking con metadatos
 # -------------------------------
-def obtenerChunksDesdeParrafos(parrafos: List[Dict[str, Any]],
-                               rutaArchivo: str,
-                               title: str | None = None,
-                               tags: List[str] | None = None) -> List[Dict[str, Any]]:
+def obtenerChunksDesdeParrafos(
+    parrafos: List[Dict[str, Any]],
+    rutaArchivo: str,
+    title: str | None = None,
+    tags: List[str] | None = None,
+) -> List[Dict[str, Any]]:
     """
     Devuelve lista de dicts listos para indexar en AI Search con:
     id, parent_id, chunk_index, page, title, updated_at, tags, content
     """
     parent_id = _file_sha256(rutaArchivo)[:16]  # id estable por documento
-    updated_at = datetime.fromtimestamp(os.path.getmtime(rutaArchivo), tz=timezone.utc).isoformat()
+    updated_at = datetime.fromtimestamp(
+        os.path.getmtime(rutaArchivo), tz=timezone.utc
+    ).isoformat()
     title = title or os.path.basename(rutaArchivo)
     tags = tags or []
 
@@ -114,20 +162,21 @@ def obtenerChunksDesdeParrafos(parrafos: List[Dict[str, Any]],
             continue
         page = p.get("page")
         for parte in _split_text(p_text):
-            chunks.append({
-                "id": f"{parent_id}-{chunk_index}",   # único y reproducible
-                "parent_id": parent_id,
-                "chunk_index": chunk_index,
-                "page": page,
-                "title": title,
-                "updated_at": updated_at,
-                "tags": tags,
-                "content": parte,
-            })
+            chunks.append(
+                {
+                    "id": f"{parent_id}-{chunk_index}",
+                    "parent_id": parent_id,
+                    "chunk_index": chunk_index,
+                    "page": page,
+                    "title": title,
+                    "updated_at": updated_at,
+                    "tags": tags,
+                    "content": parte,
+                }
+            )
             chunk_index += 1
 
     return chunks
-
 
 # -------------------------------
 # 3) Carga en la base de conocimiento
@@ -135,7 +184,7 @@ def obtenerChunksDesdeParrafos(parrafos: List[Dict[str, Any]],
 def cargarArchivo(rutaDeArchivo: str = "", tags: List[str] | None = None):
     """
     Lee el PDF, genera chunks con metadatos y los sube.
-    Args:   
+    Args:
         rutaDeArchivo (str): Ruta del archivo a procesar.
         tags (List[str], optional): Lista de tags a asociar al documento. Defaults to None.
     Returns: Resultados de la operación de subida.
@@ -148,59 +197,13 @@ def cargarArchivo(rutaDeArchivo: str = "", tags: List[str] | None = None):
 
     # 3) Conectar a AI Search
     baseDeConocimiento = conectarBaseDeConocimientos()
-    
+
     # 4) Subir
     resultados = baseDeConocimiento.upload_documents(chunks)
     return resultados
 
-def _extraer_iterable_resultados(resultados: Any):
-    """
-    Devuelve un iterable de resultados individuales (IndexingResult)
-    soportando:
-      - IndexDocumentsResult.results (SDK Azure)
-      - Lista de dicts con claves como 'succeeded', 'key', 'errorMessage'
-    """
-    if hasattr(resultados, "results"):
-        return resultados.results
-    if isinstance(resultados, list):
-        return resultados
-    return None  # estructura desconocida
-
-
-def _resumen_subida(resultados: Any) -> Dict[str, Any] | None:
-    """
-    Calcula totales OK/FAIL. Si la estructura es desconocida, devuelve None.
-    """
-    it = _extraer_iterable_resultados(resultados)
-    if it is None:
-        return None
-
-    total = 0
-    ok = 0
-    fail = 0
-    detalles = []
-    for r in it:
-        # soporta objeto o dict
-        succeeded = getattr(r, "succeeded", None) if not isinstance(r, dict) else r.get("succeeded")
-        key = getattr(r, "key", None) if not isinstance(r, dict) else r.get("key")
-        err = (
-            getattr(r, "error_message", None)
-            if not isinstance(r, dict)
-            else r.get("errorMessage") or r.get("error_message")
-        )
-
-        total += 1
-        if succeeded is True:
-            ok += 1
-        else:
-            fail += 1
-            detalles.append({"key": key, "error": err})
-
-    return {"total": total, "ok": ok, "fail": fail, "detalles": detalles}
-
-
 # -------------------------------
-# 3b) Procesar carpeta (borra o mueve según resultado)
+# 4) Procesar carpeta (borra o mueve según resultado)
 # -------------------------------
 def cargarArchivoDeCarpeta(
     rutaDeCarpeta: str = "",
@@ -218,9 +221,7 @@ def cargarArchivoDeCarpeta(
         return {"status": "ERROR", "message": f"Carpeta inválida: {rutaDeCarpeta}"}
 
     errores_dir = (
-        carpetaErrores
-        if carpetaErrores
-        else os.path.join(rutaDeCarpeta, "_errores")
+        carpetaErrores if carpetaErrores else os.path.join(rutaDeCarpeta, "_errores")
     )
     os.makedirs(errores_dir, exist_ok=True)
 
@@ -250,7 +251,11 @@ def cargarArchivoDeCarpeta(
             resultados_totales[archivo] = {
                 "status": "OK" if subida_exitosa else "PARTIAL_OR_FAIL",
                 "accion": accion,
-                "resumen": resumen if resumen is not None else "estructura_resultado_desconocida",
+                "resumen": (
+                    resumen
+                    if resumen is not None
+                    else "estructura_resultado_desconocida"
+                ),
             }
             print(f"[{resultados_totales[archivo]['status']}] {archivo} → {accion}")
 
