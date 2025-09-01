@@ -1,5 +1,5 @@
 from azure.core.credentials import AzureKeyCredential
-from langchain.retrievers import AzureCognitiveSearchRetriever
+from langchain_community.retrievers import AzureCognitiveSearchRetriever
 from azure.search.documents import SearchClient
 from backend.util.util_key import obtenerAPI
 
