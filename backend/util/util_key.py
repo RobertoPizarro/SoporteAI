@@ -1,4 +1,7 @@
+# Credenciales Azure
 from azure.identity import DefaultAzureCredential
+
+# Manejo de secretos en Key Vault
 from azure.keyvault.secrets import SecretClient
 
 # nombre del vault (sin https://)

@@ -1,15 +1,12 @@
-"""Utilidades de conexión a base de datos para memoria de LangGraph.
-
-Evita fallar si psycopg/libpq no están instalados; usa memoria en RAM por defecto.
-"""
-from backend.util.util_key import obtenerAPI
+# Utilitario para manejar la conexión a la base de datos PostgreSQL
 from langgraph.checkpoint.postgres import PostgresSaver
 
-db_url = obtenerAPI("CONF-DATABASE-URL")
-    
+# Helpers propios
+from backend.util.util_key import obtenerAPI
+
 def obtenerConexionBaseDeDatos():
     try:
-        conn = PostgresSaver.from_conn_string(db_url)
+        conn = PostgresSaver.from_conn_string(obtenerAPI("CONF-DATABASE-URL"))
         saver = conn.__enter__()
         saver.setup()
         print("Conexión a la base de datos establecida.")

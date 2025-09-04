@@ -1,10 +1,11 @@
-from langgraph.checkpoint.memory import InMemorySaver
+# Utilitario para crear y ejecutar agentes
 from langgraph.prebuilt import create_react_agent
+
+# Utilitario para el modelo de lenguaje
 from langchain_openai import AzureChatOpenAI
 
-## #######################################################################################################
-## @section Funciones
-## #######################################################################################################
+# Manejo de memoria del agente
+from langgraph.checkpoint.memory import InMemorySaver
 
 def crearAgente(
     llm: AzureChatOpenAI, tools: list | None = None, contexto: str = "", memoria=None
@@ -14,7 +15,7 @@ def crearAgente(
     if memoria is None:
         memoria = InMemorySaver()
     agente = create_react_agent(
-        model=llm, tools=tools, checkpointer=memoria, prompt=contexto
+        model=llm, tools=tools, checkpointer=memoria, prompt=contexto,
     )
     return agente
 

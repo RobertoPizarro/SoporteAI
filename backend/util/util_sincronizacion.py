@@ -167,9 +167,9 @@ def obtenerChunksDesdeParrafos(
                     "id": f"{parent_id}-{chunk_index}",
                     "parent_id": parent_id,
                     "chunk_index": chunk_index,
-                    "page": page,
+                    "page": page, 
                     "title": title,
-                    "updated_at": updated_at,
+                    "updated_at": updated_at, 
                     "tags": tags,
                     "content": parte,
                 }

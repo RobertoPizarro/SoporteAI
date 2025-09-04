@@ -1,4 +1,3 @@
-"""Agente orquestador que crea y ejecuta un agente LangGraph."""
 # Utilitario para crear un agente conversacional
 from backend.util.util_agente import crearAgente, ejecutar
 

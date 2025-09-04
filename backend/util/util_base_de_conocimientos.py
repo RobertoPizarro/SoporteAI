@@ -1,6 +1,11 @@
-from azure.core.credentials import AzureKeyCredential
+# Cliente para Azure Cognitive Search
 from langchain_community.retrievers import AzureCognitiveSearchRetriever
 from azure.search.documents import SearchClient
+
+# Credenciales Azure
+from azure.core.credentials import AzureKeyCredential
+
+# Helpers propios
 from backend.util.util_key import obtenerAPI
 
 nombre_servicio = "foundrysoporteia"
