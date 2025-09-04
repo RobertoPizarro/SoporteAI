@@ -85,7 +85,7 @@ const TicketCard = ({ticket}: {ticket: Ticket}) => {
         <Button asChild className="ml-4" size="sm">
           <Link
             href={`/analyst/tickets/${ticket.id}`}
-            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-medium rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105"
+            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-medium rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105"
           >
             <Eye className="w-4 h-4 mr-2" />
             Ver Detalles

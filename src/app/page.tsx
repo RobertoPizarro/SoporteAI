@@ -53,7 +53,7 @@ export default function Home() {
             <CardContent className="p-8">
                <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-4">
-                    <div className="p-3 bg-gradient-to-br from-green-400 to-cyan-500 rounded-lg text-white shadow-md">
+                    <div className="p-3 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg text-white shadow-md">
                       <BarChart className="h-8 w-8" />
                     </div>
                     <div>
@@ -71,7 +71,7 @@ export default function Home() {
                  <Badge variant="outline" className="bg-green-100/50 text-green-800 dark:bg-green-900/30 dark:text-green-200 border-green-200/80 dark:border-green-500/30">Seguimiento</Badge>
                  <Badge variant="outline" className="bg-green-100/50 text-green-800 dark:bg-green-900/30 dark:text-green-200 border-green-200/80 dark:border-green-500/30">Análisis</Badge>
               </div>
-              <Button className="w-full font-bold text-lg py-6 bg-gradient-to-r from-green-400 to-cyan-500 text-white shadow-lg transform group-hover:scale-105 transition-transform duration-300">
+              <Button className="w-full font-bold text-lg py-6 bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg transform group-hover:scale-105 transition-transform duration-300">
                 Iniciar Sesión <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </CardContent>

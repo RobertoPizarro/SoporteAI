@@ -61,7 +61,7 @@ const SidebarServices = ({ handleNewChat }: SidebarServicesProps) => {
             <div className="p-4">
                 <button
                     onClick={() => signOut({ callbackUrl: "/" })}
-                    className="w-full p-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl transition-all duration-300 hover:shadow-xl hover:scale-[1.02] flex items-center justify-center gap-3 mt-4"
+                    className="w-full p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl transition-all duration-300 hover:shadow-xl hover:scale-[1.02] flex items-center justify-center gap-3 mt-4"
                 >
                     <LogOut className="w-5 h-5" />
                     <span className="font-semibold">Cerrar sesión</span>

@@ -35,7 +35,7 @@ export function LoginForm() {
     return (
         <div className="transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
             <Card className="w-full max-w-sm shadow-2xl rounded-3xl overflow-hidden animate-fade-in-down border-none bg-white/80 backdrop-blur-sm">
-                <div className="bg-gradient-to-br from-emerald-400 to-cyan-500 p-8 text-center text-white">
+                <div className="bg-gradient-to-r from-emerald-500 to-teal-600 p-8 text-center text-white">
                     <div className="mx-auto w-20 h-20 mb-4 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
                         <User className="h-10 w-10 text-white" />
                     </div>
@@ -68,7 +68,7 @@ export function LoginForm() {
                             </div>
                         </div>
                         
-                        <Button type="submit" className="w-full h-14 text-lg font-bold rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white hover:shadow-lg hover:opacity-90 transition-all duration-300 transform hover:-translate-y-1">
+                        <Button type="submit" className="w-full h-14 text-lg font-bold rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:shadow-lg hover:opacity-90 transition-all duration-300 transform hover:-translate-y-1">
                             Iniciar Sesión <ArrowRight className="ml-2 h-5 w-5" />
                         </Button>
 

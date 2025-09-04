@@ -5,11 +5,10 @@ import {
     ChevronDown, Search, Filter, Eye,  FileText, Clock, CheckCircle, AlertCircle,
     XCircle
 } from 'lucide-react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { tickets } from '@/data/tickets';
 import ChatHeader from '@/components/chat/chat-header';
 import TicketCard from '@/components/ticket/ticket-card';
+import PageAnimations from "@/components/ui/page-animations";
 
 
 const AnalystDashboard = () => {
@@ -68,21 +67,7 @@ const AnalystDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 relative pb-16">
-      <style jsx>{`
-        .animate-fade-in-down {
-          animation: fadeInDown 0.6s ease-out forwards;
-          opacity: 0;
-          transform: translateY(-20px);
-        }
-        
-        @keyframes fadeInDown {
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
-
+      <PageAnimations />
       <ChatHeader role="analyst"/>
 
       <main className="px-6 py-8 max-w-7xl mx-auto animate-fade-in-down">

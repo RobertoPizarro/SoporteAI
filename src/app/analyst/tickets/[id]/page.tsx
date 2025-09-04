@@ -8,6 +8,9 @@ import ChatMessagesList from "@/components/chat/chat-messages-list";
 import { Ticket, Colaborador } from "@/types";
 import ChatHeader from "@/components/chat/chat-header";
 import { tickets } from "@/data/tickets";
+import ConfirmChange from "@/components/analyst/confirm-change";
+import PageAnimations from "@/components/ui/page-animations";
+
 
 const TicketDetailsPage = () => {
   const [currentTicket, setCurrentTicket] = useState<Ticket | null>(null);
@@ -15,6 +18,8 @@ const TicketDetailsPage = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const params = useParams();
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState<string | null>(null);
 
   async function handleFindUser(userId: string): Promise<Colaborador | null> {
     try {
@@ -133,13 +138,27 @@ const TicketDetailsPage = () => {
     }
   };
 
-  const handleStatusChange = (newStatus: string) => {
-    if (currentTicket) {
-      setCurrentTicket({ ...currentTicket, estado: newStatus });
-    }
-  };
+    const handleStatusChange = (newStatus: string) => {
+        if (currentTicket && newStatus !== currentTicket.estado) {
+            setPendingStatus(newStatus);
+            setShowStatusModal(true);
+        }
+    };
 
-  if (isLoading) {
+    const handleConfirmStatusChange = () => {
+        if (currentTicket && pendingStatus) {
+            setCurrentTicket({ ...currentTicket, estado: pendingStatus });
+            setShowStatusModal(false);
+            setPendingStatus(null);
+        }
+    };
+
+    const handleCancelStatusChange = () => {
+        setShowStatusModal(false);
+        setPendingStatus(null);
+    };
+
+    if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
@@ -166,38 +185,8 @@ const TicketDetailsPage = () => {
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 overflow-hidden">
-      <style jsx>{`
-        .animate-fade-in-down {
-          animation: fadeInDown 0.6s ease-out forwards;
-          opacity: 0;
-          transform: translateY(-20px);
-        }
-
-        @keyframes fadeInDown {
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes slideInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-slideInUp {
-          animation: slideInUp 0.4s ease-out;
-        }
-      `}</style>
-
+      <PageAnimations />
       <ChatHeader role="analyst" />
-
       <div className="flex flex-1 min-h-0 animate-fade-in-down">
         <div className="w-[32rem] bg-white/90 backdrop-blur-sm border-r border-gray-200/50 flex flex-col flex-shrink-0 overflow-y-auto">
           <div className="p-8 space-y-8">
@@ -302,6 +291,13 @@ const TicketDetailsPage = () => {
           </div>
         </div>
       </div>
+        <ConfirmChange
+            isOpen={showStatusModal}
+            currentStatus={currentTicket?.estado || ""}
+            newStatus={pendingStatus || ""}
+            onConfirm={handleConfirmStatusChange}
+            onCancel={handleCancelStatusChange}
+        />
     </div>
   );
 };
