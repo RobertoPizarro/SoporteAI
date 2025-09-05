@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, {useRef, useEffect } from "react";
 import { useParams } from "next/navigation";
 import ChatMessagesList from "@/components/chat/chat-messages-list";
-import { Ticket, Colaborador } from "@/types";
 import ChatHeader from "@/components/chat/chat-header";
-import { tickets } from "@/data/tickets";
 import ConfirmChange from "@/components/analyst/confirm-change";
 import EscalateTicketModal from "@/components/analyst/escalate-ticket-modal";
 import PageAnimations from "@/components/ui/page-animations";
