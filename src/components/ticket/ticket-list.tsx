@@ -3,7 +3,7 @@ import React from "react";
 import { Search } from "lucide-react";
 import TicketCard from "./ticket-card";
 
-const TicketList = ({filteredTickets} : {filteredTickets : Ticket}) => {
+const TicketList = ({filteredTickets} : {filteredTickets : Ticket[]}) => {
   return (
     <div className="space-y-6">
       {filteredTickets.length === 0 ? (

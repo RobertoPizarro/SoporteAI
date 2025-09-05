@@ -2,44 +2,14 @@ import React from "react";
 import { Ticket } from "@/types";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { Eye, AlertCircle, Clock, CheckCircle, XCircle } from "lucide-react";
+import { Eye} from "lucide-react";
+import {
+  getStatusIcon,
+  getStatusBadge,
+  getStatusColorBG,
+} from "@/lib/colorUtils";
 
-const TicketCard = ({ticket}: {ticket: Ticket}) => {
-  const getStatusColor = (estado: string) => {
-    const styles: { [key: string]: string } = {
-      Nuevo: "bg-blue-400 ",
-      "En Progreso": "bg-amber-400  ",
-      Resuelto: "bg-emerald-400 ",
-      Rechazado: "bg-red-400  ",
-    };
-    return styles[estado] || "bg-gray-50 text-gray-700 border border-gray-200";
-  };
-
-  const getStatusIcon = (estado: string) => {
-    switch (estado) {
-      case "Nuevo":
-        return <AlertCircle className="w-3 h-3" />;
-      case "En Progreso":
-        return <Clock className="w-3 h-3" />;
-      case "Resuelto":
-        return <CheckCircle className="w-3 h-3" />;
-      case "Rechazado":
-        return <XCircle className="w-3 h-3" />;
-      default:
-        return <AlertCircle className="w-3 h-3" />;
-    }
-  };
-
-  const getStatusBadge = (estado: string) => {
-    const styles: { [key: string]: string } = {
-      'Nuevo': 'bg-blue-50 text-blue-700 border border-blue-200',
-      'En Progreso': 'bg-amber-50 text-amber-700 border border-amber-200',
-      'Resuelto': 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-      'Rechazado': 'bg-red-50 text-red-700 border border-red-200'
-    };
-    return styles[estado] || 'bg-gray-50 text-gray-700 border border-gray-200';
-  };
-
+const TicketCard = ({ ticket }: { ticket: Ticket }) => {
   return (
     <div
       key={ticket.id}
@@ -48,9 +18,10 @@ const TicketCard = ({ticket}: {ticket: Ticket}) => {
       <div className="flex items-center justify-between">
         <div className="flex items-start space-x-4 flex-1">
           <div
-            className={`w-1 h-16 ${getStatusColor(ticket.estado)} rounded-full`}
+            className={`w-1 h-16 ${getStatusColorBG(
+              ticket.estado
+            )} rounded-full`}
           ></div>
-          {/** Colores, cambiar si se toma en importancia el nivel de los tickets */}
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 mb-2">

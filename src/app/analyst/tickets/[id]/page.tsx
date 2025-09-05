@@ -11,72 +11,27 @@ import PageAnimations from "@/components/ui/page-animations";
 import TicketDetail from "@/components/ticket/ticket-detail";
 import TicketManagement from "@/components/ticket/ticket-management";
 import { conversationFlow } from "@/data/conversation-flow";
+import useTicket from "@/hooks/use-ticket";
 
 const TicketDetailsPage = () => {
-  const [currentTicket, setCurrentTicket] = useState<Ticket | null>(null);
-  const [user, setUser] = useState<Colaborador | null>(null);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const params = useParams();
-  const [showStatusModal, setShowStatusModal] = useState(false);
-  const [pendingStatus, setPendingStatus] = useState<string | null>(null);
 
-  async function handleFindUser(userId: string): Promise<Colaborador | null> {
-    try {
-      const res = await fetch(`/api/users/${userId}`);
-      if (!res.ok) {
-        return null;
-      }
-      return (await res.json()) as Colaborador;
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      return null;
-    }
-  }
-
-  useEffect(() => {
-    const loadTicketData = async () => {
-      if (params.id) {
-        const foundTicket = tickets.find((t) => t.id === params.id) || null;
-        setCurrentTicket(foundTicket);
-
-        if (foundTicket) {
-          const userData = await handleFindUser(foundTicket.usuario);
-          setUser(userData);
-        }
-
-        setIsLoading(false);
-      }
-    };
-
-    loadTicketData();
-  }, [params.id]);
+  const {
+    currentTicket,
+    user,
+    isLoading,
+    showStatusModal,
+    pendingStatus,
+    handleStatusChange,
+    handleConfirmStatusChange,
+    handleCancelStatusChange
+  } = useTicket(params.id as string);
 
   const chatEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
-
-  const handleStatusChange = (newStatus: string) => {
-    if (currentTicket && newStatus !== currentTicket.estado) {
-      setPendingStatus(newStatus);
-      setShowStatusModal(true);
-    }
-  };
-
-  const handleConfirmStatusChange = () => {
-    if (currentTicket && pendingStatus) {
-      setCurrentTicket({ ...currentTicket, estado: pendingStatus });
-      setShowStatusModal(false);
-      setPendingStatus(null);
-    }
-  };
-
-  const handleCancelStatusChange = () => {
-    setShowStatusModal(false);
-    setPendingStatus(null);
-  };
 
   if (isLoading) {
     return (
