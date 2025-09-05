@@ -5,9 +5,11 @@ import { getStatusIcon, getStatusColor } from "@/lib/colorUtils";
 const TicketManagement = ({
   currentTicket,
   handleStatusChange,
+  onEscalateTicket,
 }: {
   currentTicket: Ticket;
   handleStatusChange: (status: string) => void;
+  onEscalateTicket: () => void;
 }) => {
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg border border-white/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
@@ -32,7 +34,10 @@ const TicketManagement = ({
           ))}
         </div>
       </div>
-      <button className="w-full py-3 px-4 mt-6 bg-gradient-to-r from-emerald-500 to-green-500 text-white font-semibold rounded-xl shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2">
+      <button 
+        onClick={onEscalateTicket}
+        className="w-full py-3 px-4 mt-6 bg-gradient-to-r from-emerald-500 to-green-500 text-white font-semibold rounded-xl shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+      >
         Escalar ticket
       </button>
     </div>

@@ -8,6 +8,7 @@ export default function useTicket(id: string) {
   const [isLoading, setIsLoading] = useState(true);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<string | null>(null);
+  const [showEscalateModal, setShowEscalateModal] = useState(false);
 
   async function handleFindUser(userId: string): Promise<Colaborador | null> {
     try {
@@ -42,6 +43,21 @@ export default function useTicket(id: string) {
     setPendingStatus(null);
   };
 
+  const handleEscalateTicket = () => {
+    setShowEscalateModal(true);
+  };
+
+  const handleConfirmEscalateTicket = (reason: string) => {
+    console.log(`Escalando ticket ${currentTicket?.id} con razón: ${reason}`);
+    // Aquí puedes agregar la lógica para escalar el ticket
+    // Por ejemplo, llamar a una API o actualizar el estado del ticket
+    setShowEscalateModal(false);
+  };
+
+  const handleCancelEscalateTicket = () => {
+    setShowEscalateModal(false);
+  };
+
   // Lógica para cargar el ticket y el usuario asociado, habría que reemplazar por llamada a un service o aun endpoint
   useEffect(() => {
     const loadTicketData = async () => {
@@ -67,8 +83,12 @@ export default function useTicket(id: string) {
     isLoading,
     showStatusModal,
     pendingStatus,
+    showEscalateModal,
     handleStatusChange,
     handleConfirmStatusChange,
-    handleCancelStatusChange
+    handleCancelStatusChange,
+    handleEscalateTicket,
+    handleConfirmEscalateTicket,
+    handleCancelEscalateTicket
   };
 }

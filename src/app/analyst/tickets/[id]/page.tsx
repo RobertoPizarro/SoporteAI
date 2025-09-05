@@ -7,6 +7,7 @@ import { Ticket, Colaborador } from "@/types";
 import ChatHeader from "@/components/chat/chat-header";
 import { tickets } from "@/data/tickets";
 import ConfirmChange from "@/components/analyst/confirm-change";
+import EscalateTicketModal from "@/components/analyst/escalate-ticket-modal";
 import PageAnimations from "@/components/ui/page-animations";
 import TicketDetail from "@/components/ticket/ticket-detail";
 import TicketManagement from "@/components/ticket/ticket-management";
@@ -22,9 +23,13 @@ const TicketDetailsPage = () => {
     isLoading,
     showStatusModal,
     pendingStatus,
+    showEscalateModal,
     handleStatusChange,
     handleConfirmStatusChange,
-    handleCancelStatusChange
+    handleCancelStatusChange,
+    handleEscalateTicket,
+    handleConfirmEscalateTicket,
+    handleCancelEscalateTicket
   } = useTicket(params.id as string);
 
   const chatEndRef = useRef<HTMLDivElement | null>(null);
@@ -70,6 +75,7 @@ const TicketDetailsPage = () => {
             <TicketManagement
               currentTicket={currentTicket}
               handleStatusChange={handleStatusChange}
+              onEscalateTicket={handleEscalateTicket}
             />
           </div>
         </div>
@@ -96,6 +102,12 @@ const TicketDetailsPage = () => {
         newStatus={pendingStatus || ""}
         onConfirm={handleConfirmStatusChange}
         onCancel={handleCancelStatusChange}
+      />
+      <EscalateTicketModal
+        isOpen={showEscalateModal}
+        ticketId={currentTicket?.id || ""}
+        onConfirm={handleConfirmEscalateTicket}
+        onCancel={handleCancelEscalateTicket}
       />
     </div>
   );

@@ -1,12 +1,13 @@
 
-import React from 'react';
-import { AlertCircle, CheckCircle2, Clock, XCircle, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, AlertCircle } from 'lucide-react';
+import { getStatusIcon, getStatusColor } from '@/lib/colorUtils';
 
 interface ConfirmChangeProps {
     isOpen: boolean;
     currentStatus: string;
     newStatus: string;
-    onConfirm: () => void;
+    onConfirm: (summary?: string) => void;
     onCancel: () => void;
 }
 
@@ -17,33 +18,16 @@ const ConfirmChange: React.FC<ConfirmChangeProps> = ({
      onConfirm,
      onCancel,
  }) => {
-    const getStatusIcon = (estado: string) => {
-        switch (estado) {
-            case "Nuevo":
-                return <AlertCircle className="w-5 h-5" />;
-            case "En Progreso":
-                return <Clock className="w-5 h-5" />;
-            case "Resuelto":
-                return <CheckCircle2 className="w-5 h-5" />;
-            case "Rechazado":
-                return <XCircle className="w-5 h-5" />;
-            default:
-                return <Clock className="w-5 h-5" />;
-        }
-    };
+    const [summary, setSummary] = useState('');
 
-    const getStatusColor = (estado: string) => {
-        switch (estado) {
-            case "Nuevo":
-                return "text-blue-700";
-            case "En Progreso":
-                return "text-amber-700";
-            case "Resuelto":
-                return "text-emerald-700";
-            case "Rechazado":
-                return "text-red-700";
-            default:
-                return "text-gray-700";
+    const handleConfirm = () => {
+        if (newStatus === 'Resuelto') {
+            if (!summary.trim()) {
+                return; // No permite confirmar sin resumen
+            }
+            onConfirm(summary);
+        } else {
+            onConfirm();
         }
     };
 
@@ -96,6 +80,30 @@ const ConfirmChange: React.FC<ConfirmChangeProps> = ({
                         </div>
                     </div>
 
+                    {newStatus === 'Resuelto' && (
+                        <div className="space-y-3">
+                            <label className="text-sm font-medium text-slate-700">
+                                Resumen de la solución <span className="text-red-500">*</span>
+                            </label>
+                            <textarea
+                                value={summary}
+                                onChange={(e) => setSummary(e.target.value)}
+                                placeholder="Describe brevemente cómo se resolvió el ticket..."
+                                className={`w-full h-24 p-4 bg-slate-50 border-2 rounded-xl text-sm resize-none focus:outline-none focus:bg-white transition-all duration-300 ${
+                                    newStatus === 'Resuelto' && !summary.trim() 
+                                        ? 'border-red-300 focus:border-red-500' 
+                                        : 'border-slate-200 focus:border-emerald-500'
+                                }`}
+                                required
+                            />
+                            {newStatus === 'Resuelto' && !summary.trim() && (
+                                <p className="text-xs text-red-500 mt-1">
+                                    El resumen de la solución es obligatorio
+                                </p>
+                            )}
+                        </div>
+                    )}
+
                     <div className="flex space-x-4">
                         <button
                             onClick={onCancel}
@@ -104,8 +112,13 @@ const ConfirmChange: React.FC<ConfirmChangeProps> = ({
                             Cancelar
                         </button>
                         <button
-                            onClick={onConfirm}
-                            className="flex-1 py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:opacity-90 transform hover:-translate-y-1"
+                            onClick={handleConfirm}
+                            disabled={newStatus === 'Resuelto' && !summary.trim()}
+                            className={`flex-1 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 transform hover:-translate-y-1 ${
+                                newStatus === 'Resuelto' && !summary.trim()
+                                    ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                                    : 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:shadow-lg hover:opacity-90'
+                            }`}
                         >
                             Confirmar
                         </button>
