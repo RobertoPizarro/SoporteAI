@@ -7,6 +7,6 @@ from backend.util.util_key import obtenerAPI
 
 def conectarDocumentIntelligence():
     return DocumentAnalysisClient(
-        endpoint="https://lector-documentos-bda-fabri.cognitiveservices.azure.com/",
+        endpoint="https://sopport-di.cognitiveservices.azure.com/",
         credential=AzureKeyCredential(obtenerAPI("CONF-AZURE-FORM-RECOGNIZER-KEY")),
     )

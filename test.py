@@ -5,5 +5,8 @@ from backend.flow.AgentAsTools import AgentsAsTools
 
 orq = AgentsAsTools()
 
-print(orq.enviarMensaje("¿Cómo puedo crear un ticket?"))
+# FastAPI - Flask
+
+# Dentro de las comillas agregar el prompt
+print(orq.enviarMensaje(""))
 

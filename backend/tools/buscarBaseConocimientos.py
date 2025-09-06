@@ -1,22 +1,19 @@
-# Cliente para Azure Cognitive Search
-from langchain_community.retrievers import AzureCognitiveSearchRetriever
-
 # Utilitario para crear tool de base de conocimientos
 from langchain.tools.retriever import create_retriever_tool
 
 # Manejo de herramientas y agentes
 from langchain_core.tools import Tool
-from langchain.schema import Document
-import json
+# from langchain.schema import Document
+# import json
 
 # Helpers propios
 from backend.util.util_base_de_conocimientos import obtenerBaseDeConocimientos
 
 retriever = obtenerBaseDeConocimientos()
 
-
+"""
 def buscarBaseConocimientos(query: str = "", searchables: int = 3) -> str:
-    """
+    "" "
     Realiza una búsqueda en la base de conocimientos utilizando Azure Cognitive Search.
     Args:
         query (str, optional): Consulta de búsqueda. Defaults to "".
@@ -24,7 +21,7 @@ def buscarBaseConocimientos(query: str = "", searchables: int = 3) -> str:
 
     Returns:
         str: Resultados de la búsqueda en formato JSON.
-    """
+    "" "
     try:
         # Realizar la búsqueda en la base de conocimientos
         docs: list[Document] = retriever.get_relevant_documents(query)
@@ -65,7 +62,7 @@ def buscarBaseConocimientos(query: str = "", searchables: int = 3) -> str:
     return json.dumps(
         {"status": "OK", "query": query, "resultados": lineas}, ensure_ascii=False
     )
-
+"""
 
 def BC_Tool() -> Tool:
     return create_retriever_tool(

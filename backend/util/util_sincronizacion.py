@@ -102,7 +102,6 @@ def leerContenidoDeDocumento(rutaArchivo: str):
       - parrafos (List[Dict]): [{'text': str, 'page': int|None}, ...]
     """
     servicio: DocumentAnalysisClient = conectarDocumentIntelligence()
-
     with open(rutaArchivo, "rb") as archivo:
         poller = servicio.begin_analyze_document("prebuilt-read", archivo)
         resultado = poller.result()
@@ -190,16 +189,23 @@ def cargarArchivo(rutaDeArchivo: str = "", tags: List[str] | None = None):
     Returns: Resultados de la operación de subida.
     """
     # 1) Leer (orden lógico + páginas)
-    _, parrafos = leerContenidoDeDocumento(rutaDeArchivo)
-
+    try:
+        _, parrafos = leerContenidoDeDocumento(rutaDeArchivo)
+    except Exception as e:
+        raise Exception(f"Error en Document Intelligence: {e}")
     # 2) Chunkear con metadatos
     chunks = obtenerChunksDesdeParrafos(parrafos, rutaDeArchivo, tags=tags)
 
     # 3) Conectar a AI Search
-    baseDeConocimiento = conectarBaseDeConocimientos()
-
+    try: 
+        baseDeConocimiento = conectarBaseDeConocimientos()
+    except Exception as e:
+        raise Exception(f"Error conectando a Azure Cognitive Search: {e}")
     # 4) Subir
-    resultados = baseDeConocimiento.upload_documents(chunks)
+    try:
+        resultados = baseDeConocimiento.upload_documents(chunks)
+    except Exception as e:
+        raise Exception(f"Error subiendo a Azure Cognitive Search: {e}")
     return resultados
 
 # -------------------------------
@@ -226,6 +232,8 @@ def cargarArchivoDeCarpeta(
     os.makedirs(errores_dir, exist_ok=True)
 
     archivos = obtenerArchivos(rutaDeCarpeta)
+    if not archivos:
+        return {"status": "OK", "message": "No hay archivos para procesar."}
     for archivo in archivos:
         try:
             resultados = cargarArchivo(archivo, tags=tags)
