@@ -2,7 +2,6 @@
 
 import React from "react";
 import ChatHeader from "@/components/chat/chat-header";
-import { conversationFlow } from "@/data/conversation-flow";
 import ChatMessagesList from "@/components/chat/chat-messages-list";
 import ChatInput from "@/components/chat/chat-input";
 import useChatBot from "@/hooks/use-chat-bot";
@@ -20,7 +19,7 @@ const ChatBot = () => {
     handleNewChat,
     handleQuestionClick,
     messagesEndRef,
-  } = useChatBot(conversationFlow);
+  } = useChatBot();
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 overflow-hidden">
