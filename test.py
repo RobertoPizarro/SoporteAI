@@ -9,9 +9,16 @@ orq = AgentsAsTools()
 app = Flask(__name__)
 CORS(app)  # Permitir conexión desde Next.js
 
+<<<<<<< HEAD
 @app.route("/", methods=["GET"])
 def home():
     return "API de IA activa. Usa POST /user/login para enviar preguntas."
+=======
+# FastAPI - Flask
+
+# Dentro de las comillas agregar el prompt
+print(orq.enviarMensaje(""))
+>>>>>>> 17577a473fb6355e106849db226ce92cf0932bae
 
 @app.route("/user/login", methods=["POST"])
 def chat():
