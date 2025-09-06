@@ -1,98 +1,54 @@
-## #######################################################################################################
-##
-## @copyright Big Data Academy [info@bigdataacademy.org]
-## @professor Alonso Melgarejo [alonsoraulmgs@gmail.com]
-##
-## #######################################################################################################
+# Utilitario para crear y ejecutar agentes
+from langgraph.prebuilt import create_react_agent
 
-## ################q######################################################################################
-## @section Configuración
-## #######################################################################################################
+# Utilitario para el modelo de lenguaje
+from langchain_openai import AzureChatOpenAI
 
-#Importamos la configuración
-import src.util.util_env as key
+# Manejo de memoria del agente
+from langgraph.checkpoint.memory import InMemorySaver
 
-## ################q######################################################################################
-## @section Librerías
-## #######################################################################################################
+# Para extraer el contenido de la respuesta 
+from langchain.schema import AIMessage
 
-#Utilitario para convertir la estructura string a json
-import json
+def _extraerContenido(respuesta):
+    if isinstance(respuesta, dict) and "output" in respuesta:
+        return respuesta["AIMessage"]
+    return respuesta
 
-#Utilitario para definir el tipo de agente
-from langchain.agents.agent_types import AgentType
-
-#Utilitario para crear agentes
-from langchain.agents import initialize_agent
-
-#Utilitario para crear la memoria a corto plazo del modelo
-from langchain.memory import ConversationBufferMemory
-
-## #######################################################################################################
-## @section Funciones
-## #######################################################################################################
-
-#Función utilitaria para parsear
-def parsearParametrosDeConsulta(
-    input = None,
-    parametrosNecesarios = None
+def crearAgente(
+    llm: AzureChatOpenAI, tools: list | None = None, contexto: str = "", memoria=None
 ):
-  #Convertimos el input a un json navegable
-  parametros = json.loads(input.replace("```json", "").replace("```", ""))
+    if tools is None:
+        tools = []
+    if memoria is None:
+        memoria = InMemorySaver()
+    agente = create_react_agent(
+        model=llm, tools=tools, checkpointer=memoria, prompt=contexto,
+    )
+    return agente
 
-  #Retornamos los parámetros
-  return parametros
 
-#Función utilitaria para crear un agente
-def crearAgenteSinMemoria(
-    llm = None,
-    tools = None
-):
+def ejecutar(agente, consulta: str = "", config=None, verbose: bool = True):
+    try:
+        respuesta = agente.invoke(
+                {"messages": [{"role": "user", "content": consulta}]}, config=config
+            )
+        if not verbose:            
+            return respuesta
+        else:
+            mensajes = respuesta.get("messages", [])
 
-  #Creamos el agente
-  agente = initialize_agent(
-    llm = llm,
-    tools = tools,
-    agent = AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-    handle_parsing_errors = True,
-    verbose = True
-  )
+            for m in reversed(mensajes):
+                if isinstance(m, AIMessage):
+                    tool_calls = (m.additional_kwargs or {}).get("tool_calls") or []
+                    if not tool_calls:
+                        return (m.content or "").strip()
 
-  #Lo devolvemos
-  return agente
-
-#Función utilitaria para crear un agente
-def crearAgenteConMemoria(
-    llm = None,
-    tools = None
-):
-
-  #Creamos una memoria a corto plazo
-  memoria = ConversationBufferMemory(
-    memory_key = "chat_history", #En el JSON, se creará siempre un parámetro con este nombre para guardar el historial del chat
-    return_messages = True
-  )
-
-  #Creamos el agente
-  agente = initialize_agent(
-    llm = llm,
-    memory = memoria, #Colocamos la memoria a corto plazo
-    tools = tools,
-    agent = AgentType.CONVERSATIONAL_REACT_DESCRIPTION, #Tipo de agente que soporta memoria a corto plazo
-    handle_parsing_errors = True,
-    verbose = True
-  )
-
-  #Lo devolvemos
-  return agente
-
-#Utilitario para ejecutar un agente
-def ejecutarAgente(
-    prompt = None,
-    agente = None
-):
-  #Ejecutamos el agente
-  respuesta = agente.run(prompt)
-
-  #Lo devolvemos
-  return respuesta
+            for m in reversed(mensajes):
+                if isinstance(m, AIMessage):
+                    return (m.content or "").strip()
+                return respuesta
+            
+    except Exception as e:
+        print("Error en la ejecución del agente: ", e)
+        return None

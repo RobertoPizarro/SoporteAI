@@ -1,12 +1,11 @@
+openai
+langchain
+langchain-community
+langchain-openai
+langgraph
+langgraph-checkpoint-postgres
+psycopg[binary]
 azure-identity 
 azure-keyvault-secrets
-#Librería para implementar la arquitectura RAG
-langchain
-
-#Librería de utilitarios de langchain
-langchain-community
-
-#Librería plugin para que Langchain pueda usar OpenAI
-langchain-openai
-
-openai
+azure-search-documents
+azure-ai-formrecognizer

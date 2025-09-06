@@ -5,10 +5,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function speakText(text: string, lang: string = "es-ES") {
+export function speakText(text: string, lang: string = "es-ES", onEnd?: () => void) {
   if ('speechSynthesis' in window) {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
+    if (onEnd) utterance.onend = onEnd;
     window.speechSynthesis.speak(utterance);
   }
 }
