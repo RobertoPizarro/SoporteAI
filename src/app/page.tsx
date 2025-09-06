@@ -1,4 +1,6 @@
+'use client'
 import Link from 'next/link';
+import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, BarChart, Users, Zap } from 'lucide-react';
