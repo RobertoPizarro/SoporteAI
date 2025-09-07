@@ -1,76 +1,72 @@
 import { useState, useRef, useEffect } from "react";
 import { Message } from "@/types";
 
-export default function useChatBot(conversationFlow: Message[]) {
+export default function useChatBot() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [showFrequentQuestions, setShowFrequentQuestions] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  // Función para hacer scroll al final del chat
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Scroll automático al final
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  // Flujo de conversación automatizado (opcional)
-  useEffect(() => {
-    if (messages.length > 0) return;
-    let step = 0;
-    let mounted = true;
-    const showNextMessage = () => {
-      if (!mounted) return;
-      if (step < conversationFlow.length) {
-        const nextMessage = conversationFlow[step];
-        if (step === 0) {
-          setTimeout(() => {
-            if (!mounted) return;
-            setShowFrequentQuestions(false);
-          }, 2000);
-        }
-        if (nextMessage.type === "bot" || nextMessage.type === "ticket") {
-          setIsTyping(true);
-          setTimeout(() => {
-            if (!mounted) return;
-            setIsTyping(false);
-            addMessage(nextMessage);
-            step++;
-            setTimeout(showNextMessage, nextMessage.delay || 1000);
-          }, nextMessage.delay || 1000);
-        } else {
-          addMessage(nextMessage);
-          step++;
-          setTimeout(showNextMessage, 500);
-        }
-      }
-    };
-    setTimeout(showNextMessage, 3000);
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
   const addMessage = (message: Message) => {
-    setMessages(prev => [...prev, { ...message, id: Date.now() + Math.random() }]);
+    setMessages((prev) => [
+      ...prev,
+      { ...message, id: Date.now() + Math.random() },
+    ]);
     setShowFrequentQuestions(false);
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (inputValue.trim()) {
       const userMessage: Message = {
         type: "user",
         content: inputValue,
-        id: Date.now()
+        id: Date.now(),
       };
-      setMessages(prev => [...prev, userMessage]);
+      addMessage(userMessage);
       setInputValue("");
-      setIsTyping(false);
+      setIsTyping(true);
       setShowFrequentQuestions(false);
+
+      try {
+        const response = await fetch("http://127.0.0.1:5000/user/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ mensaje: inputValue }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Error en la respuesta del servidor");
+        }
+
+        const data = await response.json();
+
+        const botMessage: Message = {
+          type: "bot",
+          content: data.respuesta,
+        };
+        addMessage(botMessage);
+      } catch (error) {
+        console.error("Error al conectar con el backend:", error);
+        const errorMessage: Message = {
+          type: "bot",
+          content:
+            "Lo siento, tuve un problema para conectarme. Por favor, intenta de nuevo más tarde.",
+        };
+        addMessage(errorMessage);
+      } finally {
+        setIsTyping(false);
+      }
     }
   };
 
@@ -82,10 +78,16 @@ export default function useChatBot(conversationFlow: Message[]) {
   };
 
   const handleQuestionClick = (question: string) => {
+    const userMessage: Message = {
+        type: "user",
+        content: question,
+        id: Date.now()
+    };
+    addMessage(userMessage);
     setInputValue(question);
-    setTimeout(() => {
-      handleSendMessage();
-    }, 100);
+     setTimeout(() => {
+       handleSendMessage();
+     }, 100);
   };
 
   return {
@@ -98,6 +100,5 @@ export default function useChatBot(conversationFlow: Message[]) {
     handleNewChat,
     handleQuestionClick,
     messagesEndRef,
-    scrollToBottom,
   };
 }
