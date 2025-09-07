@@ -4,6 +4,7 @@ from backend.agents.AgenteOrquestador import AgenteOrquestador
 # from backend.util.util_base_de_datos import obtenerConexionBaseDeDatos
 
 from backend.tools.buscarBaseConocimientos import BC_Tool
+from backend.tools.AgenteBD import AgenteBD
 
 # conn, saver = obtenerConexionBaseDeDatos()
 
@@ -62,7 +63,10 @@ class AgentsAsTools:
         self.agenteOrquestador = AgenteOrquestador(
             llm=self.llm,
             # memoria = saver,
-            tools=[BC_Tool()],
+            tools=[BC_Tool(), AgenteBD(llm= self.llm, contexto= """ 
+                                       Eres un agente especializado en operaciones de base de datos para tickets: 
+                                        crear, consultar estado, actualizar, asignar, escalar, obtener panel de analista y mis tickets.
+                                       """)],
             contexto=f""" Eres un asistente autónomo de soporte especializado en Analytics para empresas que trabajan en conjunto  con nuestra organización. 
             Al responder debes seguir las siguientes reglas ESTRICTAMENTE: 
             {reglas}

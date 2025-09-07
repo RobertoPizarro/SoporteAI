@@ -1,6 +1,5 @@
 # Utilitario para crear y ejecutar agentes
 from langgraph.prebuilt import create_react_agent
-
 # Utilitario para el modelo de lenguaje
 from langchain_openai import AzureChatOpenAI
 
@@ -26,6 +25,7 @@ def crearAgente(
         model=llm, tools=tools, checkpointer=memoria, prompt=contexto,
     )
     return agente
+
 
 
 def ejecutar(agente, consulta: str = "", config=None, verbose: bool = True):
