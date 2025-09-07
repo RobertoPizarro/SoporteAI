@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { Bot } from "lucide-react";
 import FrequentQuestions from "./frequent-questions";
@@ -16,13 +15,13 @@ interface ChatMessagesListProps {
 }
 
 const ChatMessagesList = ({
-  messages,
-  role,
-  handleQuestionClick,
-  isTyping,
-  showFrequentQuestions,
-  messagesEndRef,
-}: ChatMessagesListProps) => {
+                              messages,
+                              role,
+                              handleQuestionClick,
+                              isTyping,
+                              showFrequentQuestions,
+                              messagesEndRef,
+                          }: ChatMessagesListProps) => {
     return (
         <div className="flex-1 overflow-y-auto px-8 min-h-0">
             <div className="max-w-5xl mx-auto py-8">
@@ -35,9 +34,9 @@ const ChatMessagesList = ({
                         />
                     )}
 
-                {messages.map((message) => (
+                {messages.map((message, index) => (
                     <MessageBubble
-                        key={message.id}
+                        key={message.id || `message-${index}`}
                         message={message}
                         isBot={message.type === "bot" || message.type === "ticket"}
                         role={role}
@@ -45,7 +44,7 @@ const ChatMessagesList = ({
                 ))}
 
                 {isTyping && (
-                    <div className="flex justify-start mb-6 animate-slideInUp">
+                    <div key="typing-indicator" className="flex justify-start mb-6 animate-slideInUp">
                         <div className="flex items-end">
                             <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-3 animate-pulse">
                                 <Bot className="w-5 h-5 text-white" />
