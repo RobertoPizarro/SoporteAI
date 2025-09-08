@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Mic, Send } from "lucide-react";
 
 interface ChatInput {
-    handleSendMessage: () => void;
+    handleSendMessage: (message: string) => void;
     inputValue: string;
     setInputValue: (value: string) => void;
 }
@@ -21,7 +21,7 @@ const ChatInput = ({
                             type="text"
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
-                            onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                            onKeyPress={(e) => e.key === "Enter" && handleSendMessage(inputValue)}
                             placeholder="Escribe tu mensaje..."
                             className="w-full px-5 py-4 bg-white border border-gray-300 rounded-2xl focus:border-blue-500 focus:outline-none transition-all duration-300 pr-14 text-sm"
                         />
@@ -30,7 +30,7 @@ const ChatInput = ({
                         </button>
                     </div>
                     <button
-                        onClick={handleSendMessage}
+                        onClick={() => handleSendMessage(inputValue)}
                         className="px-6 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl hover:shadow-lg transition-all duration-300 hover:scale-105 hover:from-blue-600 hover:to-purple-700 flex items-center space-x-2"
                     >
                         <Send className="w-5 h-5" />
