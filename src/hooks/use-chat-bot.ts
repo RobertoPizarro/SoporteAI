@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Message } from "@/types";
+import { sendMessage } from "@/services/chat.service";
 
 export default function useChatBot() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -38,23 +39,11 @@ export default function useChatBot() {
       setShowFrequentQuestions(false);
 
       try {
-        const response = await fetch("http://127.0.0.1:5000/user/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ mensaje: textToSend }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Error en la respuesta del servidor");
-        }
-
-        const data = await response.json();
+        const response = await sendMessage(textToSend);
 
         const botMessage: Message = {
           type: "bot",
-          content: data.respuesta,
+          content: response,
         };
         addMessage(botMessage);
       } catch (error) {
