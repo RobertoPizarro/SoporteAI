@@ -24,11 +24,12 @@ export default function useChatBot() {
     setShowFrequentQuestions(false);
   };
 
-  const handleSendMessage = async () => {
-    if (inputValue.trim()) {
+  const handleSendMessage = async (messageText?: string) => {
+    const textToSend = messageText || inputValue.trim();
+    if (textToSend) {
       const userMessage: Message = {
         type: "user",
-        content: inputValue,
+        content: textToSend,
         id: Date.now(),
       };
       addMessage(userMessage);
@@ -42,7 +43,7 @@ export default function useChatBot() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ mensaje: inputValue }),
+          body: JSON.stringify({ mensaje: textToSend }),
         });
 
         if (!response.ok) {
@@ -79,15 +80,11 @@ export default function useChatBot() {
 
   const handleQuestionClick = (question: string) => {
     const userMessage: Message = {
-        type: "user",
-        content: question,
-        id: Date.now()
+      type: "user",
+      content: question,
+      id: Date.now(),
     };
-    addMessage(userMessage);
-    setInputValue(question);
-     setTimeout(() => {
-       handleSendMessage();
-     }, 100);
+    handleSendMessage(userMessage.content as string);
   };
 
   return {
