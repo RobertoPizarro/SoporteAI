@@ -28,6 +28,8 @@ export const ENDPOINTS = {
   // Tickets
   TICKETS: "/tickets",
   TICKET_BY_ID: (id: string) => `/tickets/${id}`,
+  UPDATE_TICKET_STATUS: (id: string) => `/tickets/${id}/status`,
+  ESCALATE_TICKET: (id: string) => `/tickets/${id}/escalate`,
   
   // Usuarios
   USERS: "/users",

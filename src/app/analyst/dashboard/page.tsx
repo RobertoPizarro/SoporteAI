@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ChevronDown,
   Search,
@@ -10,7 +10,8 @@ import {
   CheckCircle,
   AlertCircle,
 } from "lucide-react";
-import { tickets } from "@/data/tickets";
+import { Ticket } from "@/types";
+import { getTickets } from "@/services/ticket.service";
 import ChatHeader from "@/components/chat/chat-header";
 import PageAnimations from "@/components/ui/page-animations";
 import TicketList from "@/components/ticket/ticket-list";
@@ -20,6 +21,27 @@ const AnalystDashboard = () => {
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("Todos");
   const [searchTerm, setSearchTerm] = useState("");
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Cargar tickets al montar el componente
+  useEffect(() => {
+    const loadTickets = async () => {
+      try {
+        setIsLoading(true);
+        const ticketsData = await getTickets();
+        if (ticketsData) {
+          setTickets(ticketsData);
+        }
+      } catch (error) {
+        console.error("Error cargando tickets:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadTickets();
+  }, []);
 
   const filteredTickets = tickets.filter((ticket) => {
     const matchesFilter =
@@ -30,6 +52,22 @@ const AnalystDashboard = () => {
       ticket.usuario.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
   });
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
+        <ChatHeader role="analyst" />
+        <div className="flex items-center justify-center pt-20">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent mx-auto mb-4"></div>
+            <h2 className="text-xl font-semibold text-slate-700">Cargando tickets...</h2>
+            <p className="text-slate-500">Un momento por favor</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 relative pb-16">

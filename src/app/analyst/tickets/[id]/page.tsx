@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { useParams } from "next/navigation";
 import ChatMessagesList from "@/components/chat/chat-messages-list";
 import ChatHeader from "@/components/chat/chat-header";
@@ -27,7 +27,7 @@ const TicketDetailsPage = () => {
     handleCancelStatusChange,
     handleEscalateTicket,
     handleConfirmEscalateTicket,
-    handleCancelEscalateTicket
+    handleCancelEscalateTicket,
   } = useTicket(params.id as string);
 
   const chatEndRef = useRef<HTMLDivElement | null>(null);
@@ -40,9 +40,11 @@ const TicketDetailsPage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-slate-700">
-            Cargando ticket...
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-slate-700">
+            Cargando información del ticket...
           </h2>
+          <p className="text-slate-500">Un momento por favor</p>
         </div>
       </div>
     );

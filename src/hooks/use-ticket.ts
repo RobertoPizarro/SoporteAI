@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Ticket, Colaborador } from "@/types";
-import { tickets } from "@/data/tickets";
+import { getTicketById, getUserById } from "@/services/ticket.service"; // updateTicketStatus, escalateTicket
 
 export default function useTicket(id: string) {
   const [currentTicket, setCurrentTicket] = useState<Ticket | null>(null);
@@ -11,16 +11,8 @@ export default function useTicket(id: string) {
   const [showEscalateModal, setShowEscalateModal] = useState(false);
 
   async function handleFindUser(userId: string): Promise<Colaborador | null> {
-    try {
-      const res = await fetch(`/api/users/${userId}`);
-      if (!res.ok) {
-        return null;
-      }
-      return (await res.json()) as Colaborador;
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      return null;
-    }
+    const user = await getUserById(userId);
+    return user;
   }
 
   const handleStatusChange = (newStatus: string) => {
@@ -62,13 +54,14 @@ export default function useTicket(id: string) {
   useEffect(() => {
     const loadTicketData = async () => {
       if (id) {
-        const foundTicket = tickets.find((t) => t.id === id) || null;
+        // Usar service en lugar de datos locales directos
+        const foundTicket = await getTicketById(id);
         setCurrentTicket(foundTicket);
 
         if (foundTicket) {
           const userData = await handleFindUser(foundTicket.usuario);
           setUser(userData);
-        }
+        } 
 
         setIsLoading(false);
       }
