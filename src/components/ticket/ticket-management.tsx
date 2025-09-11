@@ -47,7 +47,7 @@ const TicketManagement = ({
   // Función para obtener el mensaje y estilo del aviso
   const getClosedTicketAlert = () => {
     const currentStatus = currentTicket.estado;
-    
+
     switch (currentStatus) {
       case TicketStatus.RESUELTO:
         return {
@@ -55,15 +55,16 @@ const TicketManagement = ({
           message: "Este ticket ya ha sido resuelto satisfactoriamente",
           bgColor: "bg-emerald-50 border-emerald-200",
           textColor: "text-emerald-800",
-          accentColor: "border-l-emerald-500"
+          accentColor: "border-l-emerald-500",
         };
       case TicketStatus.RECHAZADO:
         return {
           icon: <XCircle className="w-5 h-5 text-red-600" />,
-          message: "Este ticket ha sido rechazado y no requiere acciones adicionales",
+          message:
+            "Este ticket ha sido rechazado y no requiere acciones adicionales",
           bgColor: "bg-red-50 border-red-200",
           textColor: "text-red-800",
-          accentColor: "border-l-red-500"
+          accentColor: "border-l-red-500",
         };
       default:
         return null;
@@ -75,15 +76,19 @@ const TicketManagement = ({
       <h3 className="text-lg font-semibold text-slate-800 mb-6">
         Gestión de Estado
       </h3>
-      
+
       {/* Aviso para tickets en estado final */}
       {isTicketClosed() && (
-        <div className={`
-          ${getClosedTicketAlert()?.bgColor} ${getClosedTicketAlert()?.textColor}
+        <div
+          className={`
+          ${getClosedTicketAlert()?.bgColor} ${
+            getClosedTicketAlert()?.textColor
+          }
           border ${getClosedTicketAlert()?.accentColor} border-l-4
           rounded-lg p-4 mb-6 backdrop-blur-sm
           animate-in slide-in-from-top-2 duration-300
-        `}>
+        `}
+        >
           <div className="flex items-start space-x-3">
             <div className="flex-shrink-0 mt-0.5">
               {getClosedTicketAlert()?.icon}
@@ -93,7 +98,8 @@ const TicketManagement = ({
                 {getClosedTicketAlert()?.message}
               </p>
               <p className="text-xs opacity-75 mt-1">
-                Los botones de cambio de estado están deshabilitados para este ticket.
+                Los botones de cambio de estado están deshabilitados para este
+                ticket.
               </p>
             </div>
           </div>
@@ -134,8 +140,13 @@ const TicketManagement = ({
         </div>
       </div>
       <button
+        disabled={isTicketClosed()}
         onClick={onEscalateTicket}
-        className="w-full py-3 px-4 mt-6 bg-gradient-to-r from-emerald-500 to-green-500 text-white font-semibold rounded-xl shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+        className={`w-full py-3 px-4 mt-6 font-semibold rounded-xl shadow-md transition-all duration-300 flex items-center justify-center gap-2 ${
+          isTicketClosed()
+            ? "bg-gray-300 text-gray-500 cursor-not-allowed opacity-60 shadow-none"
+            : "bg-gradient-to-r from-emerald-500 to-green-500 text-white hover:shadow-xl hover:scale-105"
+        }`}
       >
         Escalar ticket
       </button>

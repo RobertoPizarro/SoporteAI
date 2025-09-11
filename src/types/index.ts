@@ -7,11 +7,33 @@ export enum TicketStatus {
 
 export const CLOSING_STATUSES = [TicketStatus.RESUELTO, TicketStatus.RECHAZADO];
 
+// Lista de clientes disponibles
+export const CLIENTES = [
+  "Entel",
+  "Claro", 
+  "BCP",
+  "Movistar",
+  "Izipay",
+  "Ripley"
+] as const;
+
+// Lista de servicios disponibles  
+export const SERVICIOS = [
+  "Data Science",
+  "Big Data",
+  "Cloud+Apps", 
+  "Geo Solutions",
+] as const;
+
+export type Cliente = typeof CLIENTES[number];
+export type Servicio = typeof SERVICIOS[number];
+
 export type Ticket = {
   id: string;
   usuario: string; // Colaborador
   analista: string; // Analista asignado
-  servicio: string; // Cliente servicio asociado
+  cliente: string; // Cliente asociado
+  servicio: string; // Servicio del cliente asociado
   fechaCreacion: string;
   fechaActualizacion: string;
   fechaCierre: string;
