@@ -63,26 +63,8 @@ class AgentsAsTools:
         self.agenteOrquestador = AgenteOrquestador(
             llm=self.llm,
             # memoria = saver,
-            tools=[BC_Tool(), AgenteBD(llm= self.llm, contexto= """ 
-                                       Eres un agente especializado en operaciones de base de datos para tickets: 
-                                        crear, consultar estado, actualizar, asignar, escalar, obtener panel de analista y mis tickets.
-                                       """)],
-            contexto=f""" Eres un asistente autónomo de soporte especializado en Analytics para empresas que trabajan en conjunto  con nuestra organización. 
-            Al responder debes seguir las siguientes reglas ESTRICTAMENTE: 
-            {reglas}
-            
-            POLÍTICAS DE ENRUTAMIENTO:
-            {politicas}
-            
-            IMPORTANTE PARA INTERPRETACIÓN:
-            - "Analytics" se refiere al ecosistema de reportes, métricas y soporte de datos de las empresas.
-            - Preguntas como "¿cómo reviso mis tickets?" buscan información sobre el sistema de gestión de incidencias.
-            - Preguntas como "¿qué puede hacer el agente inteligente?" buscan capacidades descritas en los requisitos (chat, tickets, escalamiento, notificaciones).
-            - Si encuentras información en la base de conocimiento o mediante las herramientas, úsala para responder de manera directa.
-            
-            Tu función es ser un asistente especializado ÚNICAMENTE en este sistema de soporte de Analytics para empresas.
-            Si alguien pregunta sobre otros temas, siempre responde: "Lo siento, no puedo responder esto".
-            """,
+            tools=[BC_Tool(), ]
+                   
             #También considera esta información del usuario:
             #{informacionDelUsuario}
         )

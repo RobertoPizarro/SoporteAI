@@ -2,6 +2,7 @@ from langchain_core.tools import Tool, BaseTool
 from langchain_openai import AzureChatOpenAI
 from backend.util.util_agente import crearAgente, ejecutar
 from .BD_tools import BD_tools
+from typing import Optional
 
 class AgenteBD(BaseTool) :
     
@@ -13,10 +14,14 @@ class AgenteBD(BaseTool) :
         """
     )
     
+    llm: Optional[AzureChatOpenAI] = None
+    tools: Optional[list] = None
+    contexto: Optional[str] = None
+    
     def __init__(self, llm : AzureChatOpenAI, contexto = None ):
         super().__init__()
-        self.llm = llm,
-        self.tools = BD_tools.devolver_tools(),
+        self.llm = llm
+        self.tools = BD_tools.devolver_tools()
         self.contexto = contexto
         self.agente = crearAgente(
             llm = self.llm,

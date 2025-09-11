@@ -27,13 +27,15 @@ class BD_tools:
             self.tool_panel_analista(),
             self.tool_mis_tickets(),
         ]
+        
     def tool_crear_ticket(self):
         @tool
-        def tool_crear_ticket(self, input: str) -> str:
+        def tool_crear_ticket(input: str) -> str:
             """
             Crea un nuevo ticket en la base de datos (dummy).
             """
             return crear_ticket_BD()
+        return tool_crear_ticket
 
     def tool_estado_ticket(self):
         @tool
@@ -42,6 +44,7 @@ class BD_tools:
             Obtiene el estado de un ticket (dummy).
             """
             return estado_ticket_BD()
+        return tool_estado_ticket
         
     def tool_actualizar_ticket(self):
         @tool
@@ -50,6 +53,7 @@ class BD_tools:
             Actualiza un ticket en la base de datos (dummy).
             """
             return actualizar_ticket_BD()
+        return tool_actualizar_ticket
 
     def tool_asignacion(self):
         @tool
@@ -58,6 +62,8 @@ class BD_tools:
             Asigna un ticket a un analista (dummy).
             """
             return asignacion_BD()
+        
+        return tool_asignacion
 
     def tool_escalamiento(self):
         @tool
@@ -66,6 +72,7 @@ class BD_tools:
             Escala un ticket al nivel superior (dummy).
             """
             return escalamiento_BD()
+        return tool_escalamiento 
 
     def tool_panel_analista(self):
         @tool
@@ -74,6 +81,7 @@ class BD_tools:
             Muestra el panel del analista con sus tickets asignados (dummy).
             """
             return panel_analista_BD()
+        return tool_panel_analista
         
     def tool_mis_tickets(self) :
         @tool
@@ -82,3 +90,4 @@ class BD_tools:
             Lista todos los tickets del usuario (dummy).
             """
             return mis_tickets_BD()
+        return tool_mis_tickets
