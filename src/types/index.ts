@@ -1,6 +1,15 @@
+export enum TicketStatus {
+  NUEVO = "Nuevo",
+  EN_PROGRESO = "En Progreso",
+  RESUELTO = "Resuelto",
+  RECHAZADO = "Rechazado",
+}
+
+export const CLOSING_STATUSES = [TicketStatus.RESUELTO, TicketStatus.RECHAZADO];
+
 export type Ticket = {
   id: string;
-  tipo: string;
+  tipo: TicketStatus;
   usuario: string;
   analista: string;
   asunto: string;
@@ -12,10 +21,10 @@ export type Ticket = {
 };
 
 export type Message = {
-    id?: number
-    type: "bot" | "user" | "ticket"
-    content: string | Ticket
-    delay?: number
+  id?: number;
+  type: "bot" | "user" | "ticket";
+  content: string | Ticket;
+  delay?: number;
 };
 
 export type Colaborador = {
@@ -23,5 +32,4 @@ export type Colaborador = {
   cliente_id: number;
   nombre: string;
   correo: string;
-}
-
+};

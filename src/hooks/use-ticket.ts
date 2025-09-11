@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Ticket, Colaborador } from "@/types";
-import { getTicketById, getUserById } from "@/services/ticket.service"; // updateTicketStatus, escalateTicket
+import { getTicketById, getUserById, updateTicketStatus } from "@/services/ticket.service";
 
 export default function useTicket(id: string) {
   const [currentTicket, setCurrentTicket] = useState<Ticket | null>(null);
@@ -22,11 +22,27 @@ export default function useTicket(id: string) {
     }
   };
 
-  const handleConfirmStatusChange = () => {
+  const handleConfirmStatusChange = async (solution?: string) => {
     if (currentTicket && pendingStatus) {
-      setCurrentTicket({ ...currentTicket, estado: pendingStatus });
-      setShowStatusModal(false);
-      setPendingStatus(null);
+      try {
+        // Usar el service para actualizar el ticket
+        const updatedTicket = await updateTicketStatus(
+          currentTicket.id,
+          pendingStatus,
+          solution
+        );
+        
+        if (updatedTicket) {
+          setCurrentTicket(updatedTicket);
+        }
+        
+        setShowStatusModal(false);
+        setPendingStatus(null);
+      } catch (error) {
+        console.error("Error al actualizar ticket:", error);
+        // Aquí podrías mostrar un toast/alert con el error
+        alert(error instanceof Error ? error.message : "Error al actualizar el ticket");
+      }
     }
   };
 
