@@ -9,15 +9,17 @@ export const CLOSING_STATUSES = [TicketStatus.RESUELTO, TicketStatus.RECHAZADO];
 
 export type Ticket = {
   id: string;
-  tipo: TicketStatus;
-  usuario: string;
-  analista: string;
+  usuario: string; // Colaborador
+  analista: string; // Analista asignado
+  servicio: string; // Cliente servicio asociado
+  fechaCreacion: string;
+  fechaActualizacion: string;
+  fechaCierre: string;
   asunto: string;
-  servicio: string;
   nivel: number;
   estado: string;
-  fechaCreacion: string;
-  actualizacion: string;
+  diagnostico: string;
+  tipo: string;
 };
 
 export type Message = {
