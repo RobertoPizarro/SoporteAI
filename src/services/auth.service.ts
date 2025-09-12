@@ -1,10 +1,14 @@
 // services/auth-service.ts
 "use server";
 
+import { API_CONFIG, buildUrl, ENDPOINTS } from "./api.config";
+
 type UpsertResponse = { user_id: string; is_new: boolean };
 
 export async function upsertUserWithGoogleIdToken(params: { idToken: string }) {
-  const resp = await fetch(`${process.env.BACKEND_URL}/auth/google/upsert`, {
+  const url = buildUrl(ENDPOINTS.AUTH_GOOGLE_UPSERT);
+  
+  const resp = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -17,7 +21,12 @@ export async function upsertUserWithGoogleIdToken(params: { idToken: string }) {
   if (!resp.ok) {
     // aquí caerán los 401/403/etc que aplique el backend (incluida la whitelist)
     let detail = "";
-    try { detail = JSON.stringify(await resp.json()); } catch {}
+    try { 
+      const errorData = await resp.json();
+      detail = JSON.stringify(errorData);
+    } catch (parseError) {
+      // Error parsing response
+    }
     throw new Error(`Backend upsert failed: ${resp.status} ${detail}`);
   }
 

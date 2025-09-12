@@ -1,19 +1,13 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { upsertUserWithGoogleIdToken } from "@/services/auth.service";
+import { API_CONFIG } from "@/services/api.config";
 
 const handler = NextAuth({
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      authorization: {
-        params: {
-          prompt: "consent", // fuerza la pantalla de consentimiento SIEMPRE
-          access_type: "offline", // opcional: para obtener refresh_token si lo usas
-          response_type: "code",
-        },
-      },
     }),
   ],
   callbacks: {
@@ -33,16 +27,22 @@ const handler = NextAuth({
         (allowedDomains &&
           allowedDomains.some((domain) => email.endsWith("@" + domain)));
 
-      if (!emailAllowed) return false;
+      if (!emailAllowed) {
+        return false;
+      }
 
       // opcional: exigir email verificado si Google lo envía
       // @ts-ignore
-      if (profile?.email_verified === false) return false;
+      if (profile?.email_verified === false) {
+        return false;
+      }
 
       // --- 2) Delegar al backend (upsert + verificación dura) ---
       const idToken = account?.id_token;
-      if (!idToken) return false;
-
+      if (!idToken) {
+        return false;
+      }
+      
       try {
         const data = await upsertUserWithGoogleIdToken({ idToken });
         (account as any).__backendUser = {
@@ -50,8 +50,8 @@ const handler = NextAuth({
           isNewUser: data?.is_new,
         };
         return true;
-      } catch {
-        // si el backend rechaza (incluye whitelist), se bloquea el login
+      } catch (error) {
+        // Si el backend rechaza (incluye whitelist), se bloquea el login
         return false;
       }
     },

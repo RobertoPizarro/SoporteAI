@@ -22,6 +22,9 @@ export const API_CONFIG = {
 
 // Endpoints disponibles
 export const ENDPOINTS = {
+  // Authentication
+  AUTH_GOOGLE_UPSERT: "/auth/google/upsert",
+  
   // Chat
   CHAT_MESSAGE: "/user/chat",
   
