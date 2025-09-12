@@ -22,12 +22,17 @@ export const API_CONFIG = {
 
 // Endpoints disponibles
 export const ENDPOINTS = {
+  // Authentication
+  AUTH_GOOGLE_UPSERT: "/auth/google/upsert",
+  
   // Chat
-  CHAT_MESSAGE: "/user/login",
+  CHAT_MESSAGE: "/user/chat",
   
   // Tickets
   TICKETS: "/tickets",
   TICKET_BY_ID: (id: string) => `/tickets/${id}`,
+  UPDATE_TICKET_STATUS: (id: string) => `/tickets/${id}/status`,
+  ESCALATE_TICKET: (id: string) => `/tickets/${id}/escalate`,
   
   // Usuarios
   USERS: "/users",

@@ -1,21 +1,54 @@
+export enum TicketStatus {
+  NUEVO = "Nuevo",
+  EN_PROGRESO = "En Progreso",
+  RESUELTO = "Finalizado",
+  RECHAZADO = "Rechazado",
+}
+
+export const CLOSING_STATUSES = [TicketStatus.RESUELTO, TicketStatus.RECHAZADO];
+
+// Lista de clientes disponibles
+export const CLIENTES = [
+  "Entel",
+  "Claro", 
+  "BCP",
+  "Movistar",
+  "Izipay",
+  "Ripley"
+] as const;
+
+// Lista de servicios disponibles  
+export const SERVICIOS = [
+  "Data Science",
+  "Big Data",
+  "Cloud+Apps", 
+  "Geo Solutions",
+] as const;
+
+export type Cliente = typeof CLIENTES[number];
+export type Servicio = typeof SERVICIOS[number];
+
 export type Ticket = {
   id: string;
-  tipo: string;
-  usuario: string;
-  analista: string;
+  usuario: string; // Colaborador
+  analista: string; // Analista asignado
+  cliente: string; // Cliente asociado
+  servicio: string; // Servicio del cliente asociado
+  fechaCreacion: string;
+  fechaActualizacion: string;
+  fechaCierre: string;
   asunto: string;
-  servicio: string;
   nivel: number;
   estado: string;
-  fechaCreacion: string;
-  actualizacion: string;
+  diagnostico: string;
+  tipo: string;
 };
 
 export type Message = {
-    id?: number
-    type: "bot" | "user" | "ticket"
-    content: string | Ticket
-    delay?: number
+  id?: number;
+  type: "bot" | "user" | "ticket";
+  content: string | Ticket;
+  delay?: number;
 };
 
 export type Colaborador = {
@@ -23,5 +56,4 @@ export type Colaborador = {
   cliente_id: number;
   nombre: string;
   correo: string;
-}
-
+};
