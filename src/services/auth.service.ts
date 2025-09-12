@@ -12,7 +12,6 @@ export async function upsertUserWithGoogleIdToken(params: { idToken: string }) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-Internal-Auth": process.env.INTERNAL_SHARED_SECRET as string,
     },
     body: JSON.stringify({ id_token: params.idToken }),
     cache: "no-store",

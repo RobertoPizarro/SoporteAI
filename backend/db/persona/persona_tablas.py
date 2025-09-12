@@ -6,7 +6,8 @@ from typing import Optional, List
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import String, Text, ForeignKey, UniqueConstraint, Index, Integer, text
 from sqlalchemy.dialects.postgresql import UUID
-
+from datetime import datetime
+from sqlalchemy import DateTime, func
 
 # ---------------------------
 # Base declarativa
@@ -94,8 +95,10 @@ class External(Base):
     correo: Mapped[Optional[str]] = mapped_column(Text)
     nombre: Mapped[Optional[str]] = mapped_column(Text)
     hd: Mapped[Optional[str]] = mapped_column(Text)                   # dominio org (si viene)
-    created_at: Mapped[Optional[str]] = mapped_column(                # si prefieres timestamptz, añade Column(TIMESTAMP(timezone=True), server_default=func.now())
-        Text, nullable=True
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),   # ← lo genera Postgres
+        nullable=False,
     )
 
     persona: Mapped[Persona] = relationship(back_populates="externals")
