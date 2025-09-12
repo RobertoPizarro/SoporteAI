@@ -1,4 +1,4 @@
-from persona_tablas import Persona, External, ClienteDominio, Colaborador
+from backend.db.persona.persona_tablas import Persona, External, ClienteDominio, Colaborador
 from sqlalchemy import select
 from typing import Optional
 
