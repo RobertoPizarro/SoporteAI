@@ -23,7 +23,7 @@ export const API_CONFIG = {
 // Endpoints disponibles
 export const ENDPOINTS = {
   // Chat
-  CHAT_MESSAGE: "/user/login",
+  CHAT_MESSAGE: "/user/chat",
   
   // Tickets
   TICKETS: "/tickets",
