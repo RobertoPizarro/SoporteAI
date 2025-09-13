@@ -10,29 +10,10 @@ def insertar_analista(db, sub: str, email: str | None, name: str | None, hd: str
         )
     ).scalars().first()
 
-    if ext:
-        # actualizar datos no críticos
-        ext.correo = email
-        ext.nombre = name
-        ext.hd = hd
-        persona_id = ext.id_persona
-    else:
-        # crear persona
-        persona = Persona()
-        db.add(persona); db.flush()              # ahora persona.id_persona existe
-        persona_id = persona.id_persona
-
-        # crear external
-        ext = External(
-            id_persona=persona_id,
-            provider="google",
-            id_provider=sub,
-            correo=email,
-            nombre=name,
-            hd=hd
-        )
-        db.add(ext)
+    if not ext:
+        return {"error": "external_not_found"}, 404
     
+    persona_id = ext.id_persona
     # 2) Crear analista si no existe
     from backend.db.database import Analista  # Importar aquí para evitar ciclos
 
@@ -41,12 +22,10 @@ def insertar_analista(db, sub: str, email: str | None, name: str | None, hd: str
     ).scalars().first()
 
     if not analista:
-        analista = Analista(id_persona=persona_id)
-        db.add(analista); db.flush()
+        return {"error": "analista_not_found"}, 404
     
     analista_id = str(analista.id_analista)
 
-    # No olvides: commit lo maneja quien llama (session_scope)
     return {
         "persona_id": str(persona_id),
         "analista_id": analista_id

@@ -21,7 +21,7 @@ def _peek_id_token_aud(id_token_str: str):
         iss = payload.get("iss")
         sub = payload.get("sub")
         email = payload.get("email")
-        return {"aud": aud, "iss": iss, "sub": sub[:6] + "…", "email": email}
+        return {"aud": aud, "iss": iss, "sub": sub[:6] + "...", "email": email}
     except Exception:
         return None
     
@@ -70,8 +70,6 @@ def google_analista():
     name  = info.get("name")
     hd    = info.get("hd")
 
-    # with conectarORM() as db:
-    #    result = insertar_analista(db, sub, email, name, hd)
-    #    db.commit()
-    
-    return jsonify({"sub": sub, "email": email}), 200
+    with conectarORM() as db:
+        out = insertar_analista(db, sub, email, name, hd)
+    return jsonify(out), 200
