@@ -20,9 +20,9 @@ export async function upsertAnalistaWithGoogleIdToken(params: { idToken: string 
 async function doUpsert(url: string, idToken: string) {
     const resp = await fetch(url, {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id_token: idToken }),
-        cache: "no-store",
     });
 
     if (!resp.ok) {

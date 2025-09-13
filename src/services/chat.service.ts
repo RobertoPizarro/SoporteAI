@@ -4,6 +4,8 @@ export const sendMessage = async (message: string) => {
   try {
     const data = await apiRequest(ENDPOINTS.CHAT_MESSAGE, {
       method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mensaje: message }),
     });
 

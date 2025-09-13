@@ -3,7 +3,7 @@
  */
 
 // URLs base para diferentes entornos
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://0.0.0.0:5000";
 
 // Configuración de headers por defecto
 const DEFAULT_HEADERS = {
