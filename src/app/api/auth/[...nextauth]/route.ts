@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { upsertUserWithGoogleIdToken } from "@/services/auth.service";
+import { upsertColaboradorWithGoogleIdToken, upsertAnalistaWithGoogleIdToken } from "@/services/auth.service";
 import { API_CONFIG } from "@/services/api.config";
 
 const handler = NextAuth({
@@ -42,18 +42,27 @@ const handler = NextAuth({
       if (!idToken) {
         return false;
       }
-      
-      try {
-        const data = await upsertUserWithGoogleIdToken({ idToken });
-        (account as any).__backendUser = {
-          userId: data?.user_id,
-          isNewUser: data?.is_new,
-        };
-        return true;
-      } catch (error) {
-        // Si el backend rechaza (incluye whitelist), se bloquea el login
-        return false;
-      }
+
+        try {
+            let data;
+
+            if (email.endsWith("@gmail.com")) {
+                // analista
+                data = await upsertAnalistaWithGoogleIdToken({ idToken });
+            } else {
+                // colaborador
+                data = await upsertColaboradorWithGoogleIdToken({ idToken });
+            }
+
+            (account as any).__backendUser = {
+                userId: data?.user_id,
+                isNewUser: data?.is_new,
+            };
+
+            return true;
+        } catch (error) {
+            return false;
+        }
     },
 
     async jwt({ token, account }) {

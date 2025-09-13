@@ -15,7 +15,7 @@ export function LoginForm() {
     const handleGoogleLogin = async () => {
         setIsLoading(true);
         try {
-            await signIn("google", {prompt: "select_account", callbackUrl: "/user/dashboard"});
+            await signIn("google", { prompt: "select_account", callbackUrl: "/user/dashboard" });
         } catch (error) {
             console.error("Error al iniciar sesión con Google:", error);
         } finally {

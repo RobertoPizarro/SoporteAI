@@ -1,33 +1,38 @@
 // services/auth-service.ts
 "use server";
 
-import { API_CONFIG, buildUrl, ENDPOINTS } from "./api.config";
+import { buildUrl, ENDPOINTS } from "./api.config";
 
 type UpsertResponse = { user_id: string; is_new: boolean };
 
-export async function upsertUserWithGoogleIdToken(params: { idToken: string }) {
-  const url = buildUrl(ENDPOINTS.AUTH_GOOGLE_COLABORADOR);
-  
-  const resp = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ id_token: params.idToken }),
-    cache: "no-store",
-  });
+// Login para colaboradores
+export async function upsertColaboradorWithGoogleIdToken(params: { idToken: string }) {
+    const url = buildUrl(ENDPOINTS.AUTH_GOOGLE_COLABORADOR);
+    return await doUpsert(url, params.idToken);
+}
 
-  if (!resp.ok) {
-    // aquí caerán los 401/403/etc que aplique el backend (incluida la whitelist)
-    let detail = "";
-    try { 
-      const errorData = await resp.json();
-      detail = JSON.stringify(errorData);
-    } catch (parseError) {
-      // Error parsing response
+// Login para analistas
+export async function upsertAnalistaWithGoogleIdToken(params: { idToken: string }) {
+    const url = buildUrl(ENDPOINTS.AUTH_GOOGLE_ANALISTA);
+    return await doUpsert(url, params.idToken);
+}
+
+async function doUpsert(url: string, idToken: string) {
+    const resp = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id_token: idToken }),
+        cache: "no-store",
+    });
+
+    if (!resp.ok) {
+        let detail = "";
+        try {
+            const errorData = await resp.json();
+            detail = JSON.stringify(errorData);
+        } catch {}
+        throw new Error(`Backend upsert failed: ${resp.status} ${detail}`);
     }
-    throw new Error(`Backend upsert failed: ${resp.status} ${detail}`);
-  }
 
-  return (await resp.json()) as UpsertResponse;
+    return (await resp.json()) as UpsertResponse;
 }
