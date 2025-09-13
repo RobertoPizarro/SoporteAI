@@ -1,7 +1,7 @@
 from langchain_core.tools import Tool, BaseTool
 from langchain_openai import AzureChatOpenAI
 from backend.util.util_agente import crearAgente, ejecutar
-from .BD_tools import BD_tools
+from backend.tools.BD_tools import BD_tools
 from typing import Optional,Any
 from langgraph.checkpoint.memory import InMemorySaver
 
@@ -21,7 +21,7 @@ class AgenteBD(BaseTool) :
     contexto: Optional[str] = None
     agente : Optional[Any] = None
     
-    def __init__(self, llm : AzureChatOpenAI, contexto = None ):
+    def __init__(self, llm : AzureChatOpenAI, contexto: str = "" ):
         super().__init__()
         self.llm = llm
         self.tools = BD_tools().devolver_tools()

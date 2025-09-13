@@ -77,6 +77,14 @@ class BD_tools:
                     except json.JSONDecodeError:
                         return "❌ Error: se esperaba un JSON válido con los parámetros del ticket"
 
+                # Validar que input sea un dict con claves str
+                if not isinstance(input, dict) or not all(isinstance(k, str) for k in input.keys()):
+                    return "❌ Error: el input debe ser un diccionario con claves de tipo str"
+
+                # Validar que los parámetros requeridos estén presentes
+                if "id_ticket" not in input or "estado" not in input:
+                    return "❌ Error: faltan los parámetros requeridos 'id_ticket' y/o 'estado'"
+
                 ticket = crud_ticket.actualizar_ticket(**input)  # <- kwargs
                 if not ticket:
                     return f"⚠️ No existe un ticket con ID {input.get('id_ticket')}"

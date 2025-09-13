@@ -3,7 +3,7 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 import os
 from dotenv import load_dotenv
-
+from backend.util.util_key import obtenerAPI
 # Cargar .env de la raíz del proyecto
 load_dotenv()
 
@@ -13,9 +13,9 @@ HOST = os.getenv("PGHOST")
 PORT = os.getenv("PGPORT", "5432")
 DB_NAME = os.getenv("PGDATABASE")
 
-
+DATABASE_URL = obtenerAPI("CONF-DATABASE-ANALYTICS-URL")
 # Crear engine (solo aquí)
-engine = create_engine(f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/analyticsdb?sslmode=require")
+engine = create_engine(obtenerAPI("CONF-DATABASE-ANALYTICS-URL"))
 
 # Automap
 Base = automap_base()

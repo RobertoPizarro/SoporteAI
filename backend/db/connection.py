@@ -1,20 +1,9 @@
-import os
-from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
-
+from backend.util.util_key import obtenerAPI
 # Cargar .env de la raíz del proyecto
-load_dotenv()
 
-USER = os.getenv("PGUSER")
-PASSWORD = os.getenv("PGPASSWORD")
-HOST = os.getenv("PGHOST")
-PORT = os.getenv("PGPORT", "5432")
-DB_NAME = os.getenv("PGDATABASE")
-
-DATABASE_URL = (
-    f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/analyticsdb?sslmode=require"
-)
+DATABASE_URL = obtenerAPI("CONF-DATABASE-ANALYTICS-URL")
 #print(DATABASE_URL)
 engine = create_engine(DATABASE_URL, echo=True)
 
