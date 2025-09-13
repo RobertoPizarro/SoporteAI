@@ -6,7 +6,7 @@ import { API_CONFIG, buildUrl, ENDPOINTS } from "./api.config";
 type UpsertResponse = { user_id: string; is_new: boolean };
 
 export async function upsertUserWithGoogleIdToken(params: { idToken: string }) {
-  const url = buildUrl(ENDPOINTS.AUTH_GOOGLE_UPSERT);
+  const url = buildUrl(ENDPOINTS.AUTH_GOOGLE_COLABORADOR);
   
   const resp = await fetch(url, {
     method: "POST",

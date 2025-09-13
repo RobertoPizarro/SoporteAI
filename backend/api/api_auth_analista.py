@@ -1,16 +1,15 @@
-# backend/api/auth.py
 from flask import Blueprint, request, jsonify, current_app
 from google.oauth2 import id_token
 from google.auth.transport import requests as grequests
 
 from backend.util.util_conectar_orm import conectarORM
-from backend.db.persona.create_persona import insertar_colaborador
+from backend.db.persona.create_analista import insertar_analista
 from flask import current_app
 import base64, json
 import os
-from dotenv import load_dotenv
 
-auth_bp = Blueprint("auth", __name__)
+auth_analista_bp = Blueprint("auth_analista", __name__)
+
 
 def _peek_id_token_aud(id_token_str: str):
     try:
@@ -25,9 +24,9 @@ def _peek_id_token_aud(id_token_str: str):
         return {"aud": aud, "iss": iss, "sub": sub[:6] + "…", "email": email}
     except Exception:
         return None
-
-@auth_bp.post("/google/upsert")
-def google_upsert():
+    
+@auth_analista_bp.post("/google/analista")
+def google_analista():
     payload = request.get_json() or {}
     id_token_str = payload.get("id_token")
     if not id_token_str:
@@ -54,12 +53,25 @@ def google_upsert():
 
     if not info.get("email_verified", True):
         return jsonify({"error": "email_not_verified"}), 403
-
-    sub = info["sub"]
+    
     email = info.get("email")
+    if not email or "@" not in email:
+        return jsonify({"error": "email_missing_in_token"}), 401
+
+    domain = email.split("@")[-1].lower()
+    if domain != "gmail.com":
+        current_app.logger.warning("Access denied for non-gmail domain: %s (email=%s)", domain, email)
+        return jsonify({
+            "error": "forbidden_domain",
+            "detail": f"solo se permite acceso con cuentas @gmail.com (email: {email})"
+        }), 403
+    
+    sub = info["sub"]
     name  = info.get("name")
     hd    = info.get("hd")
 
-    with conectarORM() as db:
-        out = insertar_colaborador(db, sub=sub, email=email, name=name, hd=hd)
-        return jsonify(out), 200
+    # with conectarORM() as db:
+    #    result = insertar_analista(db, sub, email, name, hd)
+    #    db.commit()
+    
+    return jsonify({"sub": sub, "email": email}), 200
