@@ -63,7 +63,10 @@ class AgentsAsTools:
         self.agenteOrquestador = AgenteOrquestador(
             llm=self.llm,
             # memoria = saver,
-            tools=[BC_Tool(), ]
+            tools=[BC_Tool(), AgenteBD(llm=obtenerModelo(), contexto= """
+                                        Eres un agente de base de datos que puede realizar las acciones de las tools definidas
+                                        un agente orquestador te dara el pase y el contexto y debes elegir la mejor tool para la ocasion
+                                       """) ]
                    
             #También considera esta información del usuario:
             #{informacionDelUsuario}
