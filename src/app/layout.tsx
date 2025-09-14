@@ -2,6 +2,7 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AuthSessionProvider } from "@/components/providers/session-provider";
+import HandshakeClient from "@/components/handshake/handshake";
 
 export const metadata: Metadata = {
   title: 'Analytics Support',
@@ -23,8 +24,10 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <AuthSessionProvider>
+          <HandshakeClient>
           {children}
           <Toaster />
+          </HandshakeClient>
         </AuthSessionProvider>
       </body>
     </html>

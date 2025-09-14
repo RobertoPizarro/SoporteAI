@@ -1,4 +1,5 @@
 # app.py
+from logging import debug
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
@@ -26,10 +27,18 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="IAnalytics API", lifespan=lifespan)
 
+ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:9002",
+]
+
 # CORS (ajusta origins a tu front real)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],  # tu front
+    allow_origins=ALLOWED_ORIGINS,  # tu front
     allow_credentials=True,   # cookies
     allow_methods=["*"],
     allow_headers=["*"],
@@ -39,7 +48,7 @@ app.add_middleware(
 app.add_middleware(
     SessionMiddleware,
     secret_key="cambia-esto-en-prod",
-    same_site="none",   # si el front está en otro origen
+    same_site="lax",   # si el front está en otro origen
     https_only=False,   # pon True en producción HTTPS
     # session_cookie="malcriados_session",
 )
@@ -54,4 +63,4 @@ def home():
     return {"ok": True, "msg": "API de IA activa. Usa POST /user/chat"}
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=5000, reload=True)
+    uvicorn.run("app:app", host="0.0.0.0", port=5000, reload=True, log_level="debug")

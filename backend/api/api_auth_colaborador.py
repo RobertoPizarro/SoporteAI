@@ -43,7 +43,6 @@ def google_upsert(req: Request, body: LoginIn):
 
     with conectarORM() as db:
         out = insertar_colaborador(db, sub=sub, email=email, name=name, hd=hd)
-
     # guarda sesión mínima
     req.session["user"] = {
         "email": email,

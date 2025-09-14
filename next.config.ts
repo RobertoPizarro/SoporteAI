@@ -18,6 +18,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/backend/:path*',
+        destination: 'http://localhost:5000/:path*', // tu backend FastAPI
+      },
+    ];
+  },
 };
 
 export default nextConfig;

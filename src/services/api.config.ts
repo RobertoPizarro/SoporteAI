@@ -3,7 +3,7 @@
  */
 
 // URLs base para diferentes entornos
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://0.0.0.0:5000";
+const API_BASE_URL = "";
 
 // Configuración de headers por defecto
 const DEFAULT_HEADERS = {
@@ -23,10 +23,10 @@ export const API_CONFIG = {
 // Endpoints disponibles
 export const ENDPOINTS = {
   // Authentication
-  AUTH_GOOGLE_COLABORADOR: "/auth/google/colaborador",
-  AUTH_GOOGLE_ANALISTA: "/auth/google/analista",
+  AUTH_GOOGLE_COLABORADOR: "/api/backend/auth/google/colaborador",
+  AUTH_GOOGLE_ANALISTA: "/api/backend/auth/google/analista",
   // Chat
-  CHAT_MESSAGE: "/user/chat",
+  CHAT_MESSAGE: "/api/backend/user/chat",
   
   // Tickets
   TICKETS: "/tickets",

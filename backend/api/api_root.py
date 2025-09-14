@@ -11,6 +11,7 @@ class ChatIn(BaseModel):
 @chat_router.post("/user/chat")
 def chat(req: Request, body: ChatIn):
     user = req.session.get("user") or {}
+    print ("User in session:", user)
     if not user or not user.get("persona_id"):
         raise HTTPException(401, "unauthorized")
 

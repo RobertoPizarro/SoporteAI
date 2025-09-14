@@ -1,7 +1,5 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { upsertColaboradorWithGoogleIdToken, upsertAnalistaWithGoogleIdToken } from "@/services/auth.service";
-import { API_CONFIG } from "@/services/api.config";
 
 const handler = NextAuth({
   providers: [
@@ -42,45 +40,17 @@ const handler = NextAuth({
       if (!idToken) {
         return false;
       }
-
-        try {
-            let data;
-
-            if (email.endsWith("@gmail.com")) {
-                // analista
-                data = await upsertAnalistaWithGoogleIdToken({ idToken });
-            } else {
-                // colaborador
-                data = await upsertColaboradorWithGoogleIdToken({ idToken });
-            }
-
-            (account as any).__backendUser = {
-                userId: data?.user_id,
-                isNewUser: data?.is_new,
-            };
-
-            return true;
-        } catch (error) {
-            return false;
-        }
+      return true;
     },
 
     async jwt({ token, account }) {
-      if (account && (account as any).__backendUser) {
-        token.userId = (account as any).__backendUser.userId;
-        token.isNewUser = (account as any).__backendUser.isNewUser;
-      }
+      if (account?.id_token) (token as any).idToken = account.id_token;
       return token;
     },
-
     async session({ session, token }) {
-      (session as any).userId = (token as any).userId;
-      (session as any).isNewUser = (token as any).isNewUser;
+      (session as any).idToken = (token as any).idToken; // <- expone id_token al cliente
       return session;
     },
   },
-  // opcional: páginas personalizadas
-  // pages: { signIn: "/login", error: "/login?error=AccessDenied" },
 });
-
 export { handler as GET, handler as POST };
