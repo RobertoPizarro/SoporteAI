@@ -2,13 +2,16 @@
 from langchain_openai import AzureChatOpenAI
 from backend.util.util_llm import obtenerModelo
 from backend.util.util_agente import crearAgente, ejecutar
-
+from backend.tools.buscarTicket import make_buscar_tools
 
 class AgenteBuscador:
-    def __init__(self, llm: AzureChatOpenAI, tools, contexto: str = "", user: dict = {}):
-        self.llm = obtenerModelo()
+    def __init__(self, llm: AzureChatOpenAI, user: dict = {}):
+        self.llm = llm
         self.user = user
-        self.tools = tools
+        def get_user():
+            return self.user
+        buscar_tools = make_buscar_tools(get_user)
+        self.tools = buscar_tools
         self.contexto = """
         Eres un asistente especializado en búsqueda de tickets.
         Debes decidir si el usuario quiere:
@@ -20,3 +23,6 @@ class AgenteBuscador:
         self.agente = crearAgente(
             llm=self.llm, tools=self.tools, contexto=self.contexto
         )
+        
+    def enviarMensaje(self, consulta: str = ""):
+        return ejecutar(self.agente, consulta=consulta, verbose=False)

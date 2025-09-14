@@ -21,9 +21,16 @@ class TicketCreatePublic(BaseModel):
     tipo: TicketTipoEnum
     servicio: str
 
-def obtener_tickets(db):
-    tickets = db.execute(select(Ticket)).scalars().all()
-    return tickets
+def revisarUsuario(user):
+    rol = ""
+    try:
+        if user["rol"] == "analista":
+            rol = "analista_id"
+        elif user["rol"] == "colaborador":
+            rol = "colaborador_id"
+        return rol
+    except Exception as e:
+        raise ValueError(f"Error al revisar usuario: {str(e)}")
 
 def crear_ticket(db, payload: TicketCreatePublic, user: dict):
     servicios = user.get("servicios", [])
@@ -42,10 +49,36 @@ def crear_ticket(db, payload: TicketCreatePublic, user: dict):
     db.flush()
     return nuevo
 
-def obtener_ticket_especifico(db, id_ticket : int,) :
-    ticket = db.query(Ticket).filter(Ticket.id_ticket == id_ticket).first()
-    db.close()
-    return ticket
+def obtener_tickets(db, user):
+    try:
+        rol = revisarUsuario(user)
+        return db.execute(select(Ticket).where(Ticket.id_colaborador == user[rol])).scalars().all()
+    except Exception as e:
+        raise ValueError(f"Error al obtener tickets: {str(e)}")
+
+def obtener_ticket_especifico(db, id_ticket : int, user):
+    try:
+        rol = revisarUsuario(user)
+        ticket = db.execute(select(Ticket).where(Ticket.id_ticket == id_ticket, Ticket.id_colaborador == user[rol])).first()
+        return ticket
+    except Exception as e:
+        raise ValueError(f"Error al obtener ticket específico: {str(e)}")
+
+def obtener_ticket_asunto(db, asunto : str, user):
+    try:
+        rol = revisarUsuario(user)
+        ticket = db.execute(select(Ticket)).filter(Ticket.asunto.ilike(f"%{asunto}%"), Ticket.id_colaborador == user[rol]).scalars().all()
+        return ticket
+    except Exception as e:
+        raise ValueError(f"Error al obtener ticket por asunto: {str(e)}")
+
+def obtener_tickets_abiertos(db, user):
+    try:
+        rol = revisarUsuario(user)
+        tickets = db.execute(select(Ticket).where(Ticket.estado != "cerrado", Ticket.id_colaborador == user[rol])).scalars().all()
+        return tickets
+    except Exception as e:
+        raise ValueError(f"Error al obtener tickets abiertos: {str(e)}")
 
 def actualizar_ticket(db, id_ticket: int, estado: str | None, nivel: str | None = None, id_analista: UUID | None = None) -> Ticket | None:
         ticket = db.query(Ticket).filter(Ticket.id_ticket == id_ticket).first()
