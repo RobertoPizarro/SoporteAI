@@ -12,16 +12,16 @@ from backend.util.util_base_de_datos import obtenerConexionBaseDeDatos  # -> (co
 # Lifespan: abre PostgresSaver al inicio y ciérralo al final
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    conn_cm, saver = obtenerConexionBaseDeDatos()  # context manager + PostgresSaver real
-    app.state.conn_cm = conn_cm
+    conn, saver = obtenerConexionBaseDeDatos()  # context manager + PostgresSaver real
+    app.state.conn = conn
     app.state.checkpointer = saver
     print("Checkpointer listo:", type(saver).__name__ if saver else None)
     try:
         yield
     finally:
         try:
-            if getattr(app.state, "conn_cm", None) is not None:
-                app.state.conn_cm.__exit__(None, None, None)  # cerrar UNA vez
+            if getattr(app.state, "conn", None) is not None:
+                app.state.conn.__exit__(None, None, None)  # #type: ignore
         except Exception:
             pass
 
@@ -38,8 +38,8 @@ ALLOWED_ORIGINS = [
 # CORS (ajusta origins a tu front real)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,  # tu front
-    allow_credentials=True,   # cookies
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -48,9 +48,9 @@ app.add_middleware(
 app.add_middleware(
     SessionMiddleware,
     secret_key="cambia-esto-en-prod",
-    same_site="lax",   # si el front está en otro origen
+    same_site="lax",  
     https_only=False,   # pon True en producción HTTPS
-    # session_cookie="malcriados_session",
+    # session_cookie="support_session",
 )
 
 # Routers

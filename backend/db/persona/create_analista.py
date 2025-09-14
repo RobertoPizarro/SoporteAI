@@ -1,4 +1,4 @@
-from backend.db.persona.persona_tablas import Persona, External
+from backend.db.models import External
 from sqlalchemy import select
 
 def insertar_analista(db, sub: str, email: str | None, name: str | None, hd: str | None):

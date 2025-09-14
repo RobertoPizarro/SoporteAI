@@ -5,7 +5,6 @@ from google.oauth2 import id_token
 from google.auth.transport import requests as grequests
 import os
 from dotenv import load_dotenv
-from pydantic_settings import BaseSettings
 from backend.util.util_conectar_orm import conectarORM
 from backend.db.persona.create_persona import insertar_colaborador
 

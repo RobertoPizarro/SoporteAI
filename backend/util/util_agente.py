@@ -42,11 +42,11 @@ def ejecutar(agente, consulta: str = "", config=None, verbose: bool = True):
                 if isinstance(m, AIMessage):
                     tool_calls = (m.additional_kwargs or {}).get("tool_calls") or []
                     if not tool_calls:
-                        return (m.content or "").strip()
+                        return (m.content or "").strip() #type: ignore
 
             for m in reversed(mensajes):
                 if isinstance(m, AIMessage):
-                    return (m.content or "").strip()
+                    return (m.content or "").strip() #type: ignore
                 return respuesta
             
     except Exception as e:

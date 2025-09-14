@@ -3,7 +3,7 @@ from contextlib import contextmanager
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from backend.util.util_key import obtenerAPI
-from flask import session
+from flask import Request, session
 from backend.db.crud.crud_cliente import obtener_cliente_nombre
 
 
@@ -24,13 +24,14 @@ def conectarORM():
     finally:
         session.close()
 
+from fastapi import Request
 
-def obtenerSesion():
-    user = session.get("user")
+def obtenerSesion(req: Request):
+    user = req.session.get("user")
     if user:
         cliente_id = user.get("cliente_id")
         user["cliente_nombre"] = obtener_cliente_nombre(cliente_id)
-        session["user"] = user
-    return session.get("user")
+        req.session["user"] = user
+    return req.session.get("user")
     
         
