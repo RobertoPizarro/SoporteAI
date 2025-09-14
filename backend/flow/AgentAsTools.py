@@ -60,28 +60,36 @@ def PromptSistema(user: dict) -> str:
       - ¿Lo que el usuario pide está fuera de alcance o viola privacidad? → Usar plantilla de negativa/derivación.
     """.strip()
 
+  
+  
   flujo_obligatorio = """
     FLUJO DE TRABAJO OBLIGATORIO
-    1) FUENTE ÚNICA (Conocimiento):
-      - Use exclusivamente BC_Tool para servicios, guías o procedimientos.
-      - Solo responda con lo devuelto por BC_Tool (sin invención). Si no hay cobertura útil → escale creando ticket.
+    A. DETECCIÓN DE INTENCIÓN
+      - Si el usuario pide explícitamente crear/abrir/levantar un ticket, o dice “quiero crear una incidencia/solicitud”:
+        → IR DIRECTO a CrearTicket_Tool (no usar BC_Tool antes, no pedir confirmación si los campos están).
+      - Si NO pide ticket y la consulta es de uso/guía → usar BC_Tool.
 
-    2) ESCALAMIENTO OBLIGATORIO (Creación de tickets):
-      - Escale si:
-          a) BC_Tool no cubre la consulta,
-          b) el cliente pide humano,
-          c) falla alguna tool.
-      - Antes de CrearTicket_Tool infiera:
-          • "asunto": título corto (ej. "Error al exportar reporte PDF").
-          • "tipo": "incidencia" o "solicitud".
-          • "nivel": "bajo", "medio", "alto" o "crítico" (si no está claro, use "bajo").
-          • "servicio": uno de los servicios del usuario (si no está claro, use el primero).
-      - Si falta "asunto" o "tipo", solicítelos mínimamente
-      - Luego CrearTicket_Tool con payload {"asunto": "...", "tipo": "incidencia|solicitud", "nivel": "bajo|medio|alto|critico", "servicio": "..."}.
-      - Tras crear el ticket: usar plantilla de cierre.
+    B. EXTRACCIÓN Y RELLENO DE CAMPOS (slot-filling)
+      - Extraer de la última solicitud del usuario:
+        • asunto: texto corto; si aparece "asunto es ..." usar eso; si comienza con “no puedo…/error…/falla…”, úsalo tal cual capitalizado.
+        • tipo: si contiene “incidencia”, “falla”, “error”, “no puedo”, “caído” → "incidencia".
+                si contiene “acceso”, “habilitar”, “crear usuario”, “alta”, “solicito” → "solicitud".
+        • nivel: si menciona “bajo/medio/alto/crítico/critico” → usar ese valor (minúsculas).
+                si no menciona → "bajo".
+        • servicio: hacer match por nombre dentro de los servicios del usuario; si no hay match claro → usar el primer servicio del usuario.
 
-    4) COBERTURA / ALCANCE:
-      - Si el tema no es soporte de Analytics: use la plantilla "Fuera de alcance".
+    C. CUÁNDO PREGUNTAR
+      - Solo preguntar si FALTAN simultáneamente asunto y tipo.
+      - Si faltan cero o uno (y puede inferirse con las reglas de arriba) → NO preguntar; completar e ir a CrearTicket_Tool.
+
+    D. LLAMADA A LA TOOL
+      - Llamar a CrearTicket_Tool con:
+        {"asunto": str, "tipo": "incidencia|solicitud", "nivel": "bajo|medio|alto|crítico", "servicio": str}
+      - Tras crear el ticket, responder con la plantilla de cierre.
+
+    E. NORMAS
+      - No exponer IDs internos.
+      - Responder en una sola interacción cuando sea posible.
     """.strip()
 
   reglas_operativas = """
@@ -94,19 +102,37 @@ def PromptSistema(user: dict) -> str:
   """.strip() 
 
   mapeo_tools = """
-  HERRAMIENTAS Y USO ESPERADO
+    HERRAMIENTAS Y USO ESPERADO
     - BC_Tool (intents: faq, procedimiento, como_hacer)
       • Uso: buscar y citar guías oficiales. Si no hay resultado útil → escalar (crear ticket).
-      • Al citar, no incluir datos sensibles ni ejemplos con PII; reescribir ejemplos para usar valores ficticios.
+      • No incluir PII en citas; reescribir ejemplos.
 
     - CrearTicket_Tool (intents: crear_ticket)
-      • Uso: crear tickets de soporte o solicitudes.
-      • Usar solo si el usuario lo pide explícitamente o si BC_Tool no cubre.
+      • Se usa cuando el usuario pide explícitamente crear ticket o cuando BC_Tool no resuelve.
       • Requiere {"asunto": str, "nivel": "bajo"|"medio"|"alto"|"crítico", "tipo": "incidencia"|"solicitud", "servicio": str}.
-      • Si falta "asunto" o "tipo", solicítelos mínimamente sin pedir PII.
-    
+      • Si ya puedes inferir los campos → invoca directamente (no pidas confirmación).
+      • Si falta simultáneamente asunto y tipo → pedirlos brevemente; en cualquier otro caso, completar e invocar.
   """.strip()
 
+  ejemplos_extraccion_toolcall = """
+  EJEMPLOS DE EXTRACCIÓN Y TOOL CALL
+
+  Usuario: "quiero crear un ticket, el asunto es no me puedo conectar al servicio de big data, esto es una incidencia, de nivel medio"
+  Acción: CrearTicket_Tool({
+    "asunto": "No me puedo conectar al servicio de Big Data",
+    "tipo": "incidencia",
+    "nivel": "medio",
+    "servicio": <primer servicio del usuario si no hay match exacto, p.ej. "DATA SCIENCE">
+  })
+
+  Usuario: "quiero crear una incidencia: no me puedo conectar al servicio de big data"
+  Acción: tipo="incidencia", nivel="bajo" (por defecto), servicio=match/fallback → CrearTicket_Tool({...})
+
+  Usuario: "necesito acceso a BigQuery"
+  Acción: tipo="solicitud", nivel="bajo", asunto="Acceso a BigQuery", servicio=match/fallback → CrearTicket_Tool({...})
+  """.strip()
+
+  
   plantillas = """
 PLANTILLAS
 - Negativa por privacidad (usuario pide PII/IDs internos):
@@ -148,6 +174,7 @@ ESTILO
         reglas_operativas,
         mapeo_tools,
         plantillas,
+        ejemplos_extraccion_toolcall,
         ejemplos_rapidos,
         estilo,
     ])
@@ -168,7 +195,7 @@ class AgentsAsTools:
             llm=self.llm,
             user = self.user,
             memoria=saver,
-            thread= f"persona:{self.user.get('persona_id') or 'anon'}-9",
+            thread= f"persona:{self.user.get('persona_id') or 'anon'}-10",
             checkpoint_ns= f"cliente:{self.user.get('cliente_id')}",
             tools=[
                 BC_Tool(),
