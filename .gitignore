@@ -39,8 +39,14 @@ next-env.d.ts
 
 .genkit/*
 .env*
+.vscode/*
+*.vscode/*
+*.vscode/
 .vscode/
-.idea/
+.vscode*
+*.vscode
+
+.idea/*
 # firebase
 firebase-debug.log
 firestore-debug.log

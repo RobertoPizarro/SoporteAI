@@ -1,20 +1,40 @@
-from backend.db.database import get_session, Ticket
+from sqlalchemy import select
+from backend.db.models import Ticket
 from datetime import datetime, timezone
 from uuid import UUID
-def obtener_tickets():
-    session = get_session()
-    tickets = session.query(Ticket).all()
-    session.close()
+from pydantic import BaseModel, Field
+from typing import Optional
+import enum
+from backend.db.crud.crud_analista import obtener_analista_nivel
+
+class TicketNivelEnum(str, enum.Enum):
+    bajo = "bajo"
+    medio = "medio"
+    alto = "alto"
+    critico = "crítico" 
+class TicketTipoEnum(str, enum.Enum):
+    incidencia = "incidencia"
+    solicitud = "solicitud"
+class TicketCreatePublic(BaseModel):
+    asunto: str = Field(min_length=3, max_length=200)
+    nivel: TicketNivelEnum
+    tipo: TicketTipoEnum
+
+def obtener_tickets(db):
+    tickets = db.execute(select(Ticket)).scalars().all()
     return tickets
 
-def crear_ticket(data):
-    session = get_session()
-    nuevo = Ticket(**data)
-    session.add(nuevo)
-    session.commit()
-    session.refresh(nuevo)
-    session.close()
-    return nuevo
+def crear_ticket(db, payload: TicketCreatePublic, user):
+    analista = obtener_analista_nivel(db, payload.nivel)
+    nuevo = Ticket(
+        id_colaborador=user.id_colaborador,
+        id_analista= analista.id if analista else None,
+        asunto=payload.asunto,
+        nivel=payload.nivel,
+        tipo=payload.tipo,
+        
+        )
+    db.add(nuevo)
 
 def obtener_ticket_especifico(id_ticket : int, ) :
     session = get_session()

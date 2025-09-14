@@ -188,6 +188,12 @@ TicketNivelEnum = PGEnum(
     create_type=False
 )
 
+TicketTipoEnum = PGEnum(
+    "incidencia", "solicitud",
+    name="ticket_tipo",
+    create_type=False
+)
+
 class Ticket(Base, CreateTimestampMixin, UpdateTimestampMixin):
     __tablename__ = "ticket"
     __table_args__ = (
@@ -222,7 +228,7 @@ class Ticket(Base, CreateTimestampMixin, UpdateTimestampMixin):
     escalados: Mapped[List["Escalado"]] = relationship(
         back_populates="ticket", cascade="all, delete-orphan"
     )
-
+    tipo: Mapped[str] = mapped_column(TicketTipoEnum, nullable=False)
     def __repr__(self) -> str:
         return f"<Ticket id={self.id_ticket} estado={self.estado} nivel={self.nivel}>"
 
