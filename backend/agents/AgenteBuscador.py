@@ -5,8 +5,9 @@ from backend.util.util_agente import crearAgente, ejecutar
 
 
 class AgenteBuscador:
-    def __init__(self, llm: AzureChatOpenAI, tools, contexto: str = ""):
+    def __init__(self, llm: AzureChatOpenAI, tools, contexto: str = "", user: dict = {}):
         self.llm = obtenerModelo()
+        self.user = user
         self.tools = tools
         self.contexto = """
         Eres un asistente especializado en búsqueda de tickets.

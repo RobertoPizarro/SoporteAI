@@ -19,33 +19,36 @@ class TicketCreatePublic(BaseModel):
     asunto: str = Field(min_length=3, max_length=200)
     nivel: TicketNivelEnum
     tipo: TicketTipoEnum
+    servicio: str
 
 def obtener_tickets(db):
     tickets = db.execute(select(Ticket)).scalars().all()
     return tickets
 
-def crear_ticket(db, payload: TicketCreatePublic, user):
-    analista = obtener_analista_nivel(db, payload.nivel)
+def crear_ticket(db, payload: TicketCreatePublic, user: dict):
+    servicios = user.get("servicios", [])
+    analista = obtener_analista_nivel(db, str(payload.nivel))
+    id_cliente_servicio = next((s.get("id_cliente_servicio") or s.get("id") for s in servicios if s.get("nombre") == payload.servicio),None)
+    
     nuevo = Ticket(
-        id_colaborador=user.id_colaborador,
+        id_colaborador=user["colaborador_id"],
         id_analista= analista.id if analista else None,
-        id_cliente_servicio=user.id_cliente_servicio,
+        id_cliente_servicio=id_cliente_servicio,
         asunto=payload.asunto,
         nivel=payload.nivel,
         tipo=payload.tipo,
-        
         )
     db.add(nuevo)
+    db.flush()
+    return nuevo
 
-def obtener_ticket_especifico(id_ticket : int, ) :
-    session = get_session()
-    ticket = session.query(Ticket).filter(Ticket.id_ticket == id_ticket).first()
-    session.close()
+def obtener_ticket_especifico(db, id_ticket : int,) :
+    ticket = db.query(Ticket).filter(Ticket.id_ticket == id_ticket).first()
+    db.close()
     return ticket
 
-def actualizar_ticket(id_ticket: int, estado: str | None, nivel: str | None = None, id_analista: UUID | None = None) -> Ticket | None:
-    with get_session() as session:
-        ticket = session.query(Ticket).filter(Ticket.id_ticket == id_ticket).first()
+def actualizar_ticket(db, id_ticket: int, estado: str | None, nivel: str | None = None, id_analista: UUID | None = None) -> Ticket | None:
+        ticket = db.query(Ticket).filter(Ticket.id_ticket == id_ticket).first()
         
         if not ticket:
             return None
@@ -64,8 +67,8 @@ def actualizar_ticket(id_ticket: int, estado: str | None, nivel: str | None = No
             ticket.estado = estado
             ticket.updated_at = now
         
-        session.commit()
-        session.refresh(ticket)  # opcional: recargar con lo último de la BD
+        db.commit()
+        db.refresh(ticket)  # opcional: recargar con lo último de la BD
         return ticket
 
 """

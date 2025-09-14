@@ -1,9 +1,10 @@
+from backend.util.util_conectar_orm import conectarORM
 from backend.util.util_llm import obtenerModelo
 from backend.agents.AgenteOrquestador import AgenteOrquestador
 
 from backend.tools.buscarBaseConocimientos import BC_Tool
 from backend.tools.AgenteBD import AgenteBD
-
+from backend.tools.crearTicket import make_crear_ticket_Tool
 # =========================
 #  CONTEXTO: IAnalytics (adaptado a tu stack)
 # =========================
@@ -65,20 +66,18 @@ def PromptSistema(user: dict) -> str:
       - Use exclusivamente BC_Tool para servicios, guías o procedimientos.
       - Solo responda con lo devuelto por BC_Tool (sin invención). Si no hay cobertura útil → escale creando ticket.
 
-    2) ESTADO DE TICKETS:
-      - Si piden estado y NO proporcionan número, solicite ÚNICAMENTE el número de ticket (nada más).
-      - Con el número, invoque DB_Tool intent "estado_ticket" con {"ticket_id": "<ID>"}.
-      - No exponga a la vista del usuario campos internos ajenos al estado.
-
-    3) ESCALAMIENTO OBLIGATORIO (Creación de tickets):
+    2) ESCALAMIENTO OBLIGATORIO (Creación de tickets):
       - Escale si:
           a) BC_Tool no cubre la consulta,
           b) el cliente pide humano,
           c) falla alguna tool.
-      - Antes de DB_Tool infiera:
+      - Antes de CrearTicket_Tool infiera:
           • "asunto": título corto (ej. "Error al exportar reporte PDF").
           • "tipo": "incidencia" o "solicitud".
-      - Luego DB_Tool con intent "crear_ticket" y payload {"asunto": "...", "tipo": "incidencia|solicitud"}.
+          • "nivel": "bajo", "medio", "alto" o "crítico" (si no está claro, use "bajo").
+          • "servicio": uno de los servicios del usuario (si no está claro, use el primero).
+      - Si falta "asunto" o "tipo", solicítelos mínimamente
+      - Luego CrearTicket_Tool con payload {"asunto": "...", "tipo": "incidencia|solicitud", "nivel": "bajo|medio|alto|critico", "servicio": "..."}.
       - Tras crear el ticket: usar plantilla de cierre.
 
     4) COBERTURA / ALCANCE:
@@ -100,11 +99,12 @@ def PromptSistema(user: dict) -> str:
       • Uso: buscar y citar guías oficiales. Si no hay resultado útil → escalar (crear ticket).
       • Al citar, no incluir datos sensibles ni ejemplos con PII; reescribir ejemplos para usar valores ficticios.
 
-    - DB_Tool (intents: crear_ticket, estado_ticket, actualizar_ticket, asignacion, escalamiento, panel_analista, mis_tickets)
-      • crear_ticket: requiere {"asunto": str, "tipo": "incidencia"|"solicitud"}.
-      • estado_ticket: requiere {"ticket_id": str}. Si falta, pida solo el número de ticket (nada más).
-      • Si falta "asunto"/"tipo" o "ticket_id", solicítelos mínimamente sin pedir PII.
-      • Nunca devuelva al usuario valores internos (colaborador_id, cliente_id, IDs de base); úselos solo internamente.
+    - CrearTicket_Tool (intents: crear_ticket)
+      • Uso: crear tickets de soporte o solicitudes.
+      • Usar solo si el usuario lo pide explícitamente o si BC_Tool no cubre.
+      • Requiere {"asunto": str, "nivel": "bajo"|"medio"|"alto"|"crítico", "tipo": "incidencia"|"solicitud", "servicio": str}.
+      • Si falta "asunto" o "tipo", solicítelos mínimamente sin pedir PII.
+    
   """.strip()
 
   plantillas = """
@@ -160,29 +160,19 @@ class AgentsAsTools:
     def __init__(self, user, saver):
         self.llm = obtenerModelo()
         self.user = user
-
         contexto_sistema = PromptSistema(user)
-
+        def get_session_user():
+            return self.user
+        CrearTicket_Tool = make_crear_ticket_Tool(get_session_user)
         self.agenteOrquestador = AgenteOrquestador(
             llm=self.llm,
             user = self.user,
             memoria=saver,
-            thread= f"persona:{self.user.get('persona_id') or 'anon'}-3",
+            thread= f"persona:{self.user.get('persona_id') or 'anon'}-9",
             checkpoint_ns= f"cliente:{self.user.get('cliente_id')}",
             tools=[
                 BC_Tool(),
-                AgenteBD(
-                    llm=obtenerModelo(),
-                    contexto="""
-                    Eres un agente de base de datos encargado de ejecutar intents de tickets:
-                    - crear_ticket: requiere {"asunto": str, "tipo": "incidencia"|"solicitud"}.
-                    - estado_ticket: requiere {"ticket_id": str}.
-                    - actualizar_ticket, asignacion, escalamiento, panel_analista, mis_tickets: usar según corresponda.
-                    Si crear_ticket es invocado sin 'asunto' o 'tipo', solicita al orquestador que te los provea.
-                    Si 'estado_ticket' es invocado sin 'ticket_id', solicita al orquestador que lo pregunte al usuario (solo el número).
-                    Si cualquier operación falla, devuelve una señal de escalamiento.
-                    """.strip()
-                )
+                CrearTicket_Tool,
             ],
             contexto=contexto_sistema
         )
