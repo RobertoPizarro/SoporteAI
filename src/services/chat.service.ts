@@ -16,3 +16,18 @@ export const sendMessage = async (message: string) => {
     throw new Error("Error al conectar con el backend");
   }
 };
+
+export const resetChat = async () => {
+    try {
+        const resp = await apiRequest(ENDPOINTS.CHAT_RESET, {
+            method: "POST",
+            mode: "cors",
+            credentials: "include",
+        });
+
+        return resp;
+    } catch (error) {
+        console.error("Error en resetChat:", error);
+        throw new Error("Error al reiniciar la conversación");
+    }
+};

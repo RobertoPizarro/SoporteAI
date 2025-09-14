@@ -27,7 +27,8 @@ export const ENDPOINTS = {
   AUTH_GOOGLE_ANALISTA: "/api/backend/auth/google/analista",
   // Chat
   CHAT_MESSAGE: "/api/backend/user/chat",
-  
+  CHAT_RESET: "/api/backend/user/reset",
+
   // Tickets
   TICKETS: "/tickets",
   TICKET_BY_ID: (id: string) => `/tickets/${id}`,

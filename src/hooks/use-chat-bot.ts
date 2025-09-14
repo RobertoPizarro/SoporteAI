@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Message } from "@/types";
 import { sendMessage } from "@/services/chat.service";
+import { resetChat } from "@/services/chat.service";
 
 export default function useChatBot() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -37,7 +38,6 @@ export default function useChatBot() {
       setInputValue("");
       setIsTyping(true);
       setShowFrequentQuestions(false);
-
       try {
         const response = await sendMessage(textToSend);
 
@@ -60,11 +60,16 @@ export default function useChatBot() {
     }
   };
 
-  const handleNewChat = () => {
-    setMessages([]);
-    setInputValue("");
-    setIsTyping(false);
-    setShowFrequentQuestions(true);
+  const handleNewChat = async () => {
+    try {
+        await resetChat();
+        setMessages([]);
+        setInputValue("");
+        setShowFrequentQuestions(true);
+        console.log("Nueva conversación iniciada");
+    } catch (error) {
+        console.error("Error al reiniciar conversación:", error);
+    }
   };
 
   const handleQuestionClick = (question: string) => {
