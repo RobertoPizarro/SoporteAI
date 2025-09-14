@@ -1,9 +1,7 @@
-from backend.db.database import get_session, Cliente
+from backend.db.database import Cliente
+from sqlalchemy import select
 
-def obtener_cliente_nombre(id_cliente: str):
-    session = get_session()
-    try: 
-        fila = session.query(Cliente).filter(Cliente.id_cliente == id_cliente).first()
-        return fila.nombre if fila else None
-    finally:
-        session.close()
+def obtener_cliente_nombre(db, id_cliente: str):
+    stmt = select(Cliente).where(Cliente.id_cliente == id_cliente)
+    result = db.execute(stmt).scalars().first()
+    return result.nombre if result else None

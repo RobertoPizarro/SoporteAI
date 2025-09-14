@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from backend.util.util_key import obtenerAPI
 from flask import Request, session
 from backend.db.crud.crud_cliente import obtener_cliente_nombre
-
+from fastapi import Request
 
 DATABASE_URL = obtenerAPI("CONF-DATABASE-ANALYTICS-URL")
 
@@ -24,13 +24,12 @@ def conectarORM():
     finally:
         session.close()
 
-from fastapi import Request
-
 def obtenerSesion(req: Request):
     user = req.session.get("user")
     if user:
         cliente_id = user.get("cliente_id")
-        user["cliente_nombre"] = obtener_cliente_nombre(cliente_id)
+        with conectarORM() as db:
+            user["cliente_nombre"] = obtener_cliente_nombre(db, cliente_id)
         req.session["user"] = user
     return req.session.get("user")
     

@@ -1,7 +1,5 @@
-from backend.db.database import get_session, Colaborador
+from backend.db.models import Colaborador
 
-def obtener_colaboradores() :
-    session = get_session()
-    colaboradores = session.query(Colaborador).all()
-    session.close()
+def obtener_colaboradores(db) :
+    colaboradores = db.execute(Colaborador).all()
     return colaboradores
