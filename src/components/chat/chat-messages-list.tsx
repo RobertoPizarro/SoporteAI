@@ -15,13 +15,13 @@ interface ChatMessagesListProps {
 }
 
 const ChatMessagesList = ({
-                              messages,
-                              role,
-                              handleQuestionClick,
-                              isTyping,
-                              showFrequentQuestions,
-                              messagesEndRef,
-                          }: ChatMessagesListProps) => {
+      messages,
+      role,
+      handleQuestionClick,
+      isTyping,
+      showFrequentQuestions,
+      messagesEndRef,
+  }: ChatMessagesListProps) => {
     return (
         <div className="flex-1 overflow-y-auto px-8 min-h-0">
             <div className="max-w-5xl mx-auto py-8">
