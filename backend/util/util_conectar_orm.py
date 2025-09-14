@@ -3,7 +3,6 @@ from contextlib import contextmanager
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from backend.util.util_key import obtenerAPI
-from flask import Request, session
 from backend.db.crud.crud_cliente import obtener_cliente_nombre
 from fastapi import Request
 

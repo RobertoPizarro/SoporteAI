@@ -1,4 +1,3 @@
-from json import load
 from fastapi import APIRouter, Request, HTTPException
 from pydantic import BaseModel
 from google.oauth2 import id_token

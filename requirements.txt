@@ -5,6 +5,7 @@ langchain-openai
 langgraph
 langgraph-checkpoint-postgres
 psycopg[binary]
+psycopg2-binary
 azure-identity 
 azure-keyvault-secrets
 azure-search-documents
@@ -13,3 +14,4 @@ SQLAlchemy
 google-auth
 fastapi
 uvicorn
+itsdangerous
