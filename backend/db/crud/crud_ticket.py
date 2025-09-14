@@ -29,6 +29,7 @@ def crear_ticket(db, payload: TicketCreatePublic, user):
     nuevo = Ticket(
         id_colaborador=user.id_colaborador,
         id_analista= analista.id if analista else None,
+        id_cliente_servicio=user.id_cliente_servicio,
         asunto=payload.asunto,
         nivel=payload.nivel,
         tipo=payload.tipo,

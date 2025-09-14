@@ -10,15 +10,16 @@ from backend.tools.AgenteBD import AgenteBD
 
 def PromptSistema(user: dict) -> str:
   user = user or {}
-  nombre = user.get("nombre")
+  nombre = user.get("name")
   email = user.get("email")
   empresa = user.get("cliente_nombre")
-
+  servicios = user.get("servicios", [])
   informacionDelUsuario = f"""
     INFORMACION DEL USUARIO ACTUAL
       - nombre: {nombre}
       - email: {email}
       - empresa: {empresa}
+      - servicios: {', '.join([s['nombre'] for s in servicios]) if servicios else 'Ninguno'}
       - colaborador_id: {user.get('colaborador_id')}
       - cliente_id: {user.get('cliente_id')}
     """.strip()
@@ -43,8 +44,8 @@ def PromptSistema(user: dict) -> str:
     CUMPLIMIENTO ESTRICTO DE PRIVACIDAD (REGLA CRÍTICA)
       • Prohibido solicitar, confirmar, almacenar, repetir o inferir datos personales del usuario o de terceros.
       • Nunca pida: nombre, email, empresa, documento de identidad, teléfono, dirección física, geodatos, IDs internos (colaborador_id, cliente_id), credenciales, tokens, IPs, logs crudos que contengan PII.
-      • Si el usuario pide que revele datos sensibles (su colaborador_id o cliente_id), responda que no puede compartirlos por políticas de privacidad y ofrezca alternativas (crear ticket o continuar con guía sin exponer datos).
-      • Si el usuario copia/pega PII, NO lo repita ni lo confirmes. En su lugar: enmascare («[oculto]») y continúe con el flujo.
+      • SOLO colaborador_id y cliente_id SON DATOS SENSIBLES.
+      • Si el usuario pide que revele datos sensibles (colaborador_id o cliente_id), responda que no puede compartirlos por políticas de privacidad y ofrezca alternativas (crear ticket o continuar con guía sin exponer datos). 
       • Personalización: use exclusivamente el bloque CONTEXTO DEL USUARIO ACTUAL. No solicite ni verifique PII adicional.
       • Saludo: diríjase por el nombre si está en el contexto; nunca pida o verifique el email/empresa.
       • Excepciones: Ninguna para exposición de PII al usuario final. Los IDs internos pueden usarse solo de forma **interna** para tools, sin revelarlos.
@@ -88,7 +89,7 @@ def PromptSistema(user: dict) -> str:
   REGLAS OPERATIVAS
     - Idioma: español, profesional y empático; emojis con moderación.
     - Interprete errores ortográficos, responda claro y preciso.
-    - Para datos específicos de tickets o métricas: use DB_Tool; no exponga PII ni IDs internos en la respuesta.
+    - Para datos específicos de tickets o métricas: use DB_Tool; no exponga IDs internos en la respuesta.
     - Si BC_Tool no tiene cobertura: escalar creando ticket (no decir "no puedo" sin alternativa).
     - No copie-peque PII ni fragmentos de logs con PII; resuma y enmascare.
   """.strip() 
@@ -127,7 +128,6 @@ PLANTILLAS
   ejemplos_rapidos = """
 EJEMPLOS RÁPIDOS (CUMPLIMIENTO)
 - P: "¿Cuál es mi colaborador_id?" → R: Negativa por privacidad + oferta de alternativa.
-- P: "Mi DNI es 12345678, ¿pueden validar?" → R: No confirmar, enmascarar, seguir guía sin PII.
 - P: "Quiero el estado de mi ticket" (sin ID) → R: Pedir solo número de ticket.
 - P: "Necesito acceso a X" y BC_Tool no cubre → R: Crear ticket (solicitud), cerrar con plantilla.
 """.strip()
@@ -165,8 +165,9 @@ class AgentsAsTools:
 
         self.agenteOrquestador = AgenteOrquestador(
             llm=self.llm,
+            user = self.user,
             memoria=saver,
-            thread= f"persona:{self.user.get('persona_id') or 'anon'}",
+            thread= f"persona:{self.user.get('persona_id') or 'anon'}-3",
             checkpoint_ns= f"cliente:{self.user.get('cliente_id')}",
             tools=[
                 BC_Tool(),

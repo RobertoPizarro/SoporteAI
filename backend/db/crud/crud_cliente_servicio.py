@@ -1,5 +1,6 @@
 from backend.db.models import ClienteServicio, Servicio
 from sqlalchemy import select
+from uuid import UUID
 
 def obtener_clientes_servicios(db):
     filas = db.execute(select(ClienteServicio)).scalars().all()
@@ -7,9 +8,15 @@ def obtener_clientes_servicios(db):
 
 def obtener_servicios_clientes(db, id_cliente: str):
     q = (
-        select(ClienteServicio.id, Servicio.nombre)
+        select(
+            ClienteServicio.id.label("id_cliente_servicio"),
+            Servicio.nombre.label("nombre"),
+        )
+        .select_from(ClienteServicio)
         .join(Servicio, Servicio.id == ClienteServicio.id_servicio)
-        .where(ClienteServicio.id_cliente == id_cliente)
+        .where(
+            ClienteServicio.id_cliente == id_cliente,
+            )
         .order_by(Servicio.nombre.asc())
     )
-    return db.execute(q).all()
+    return db.execute(q).mappings().all()

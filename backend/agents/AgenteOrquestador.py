@@ -15,6 +15,7 @@ class AgenteOrquestador:
     def __init__(
         self,
         llm: AzureChatOpenAI,
+        user: dict,
         contexto: str = "",
         thread: str = "",
         checkpoint_ns: str = "soporte",
@@ -22,6 +23,7 @@ class AgenteOrquestador:
         memoria=None,
     ):
         self.llm = llm
+        self.user = user
         self.contexto = contexto
         self.memoria = memoria or InMemorySaver()
         self.tools = tools
