@@ -227,7 +227,7 @@ class AgentsAsTools:
             llm=self.llm,
             user = self.user,
             memoria=saver,
-            thread= f"persona:{self.user.get('persona_id') or 'anon'}-115",
+            thread= f"persona:{self.user.get('persona_id') or 'anon'}-22234",
             checkpoint_ns= f"cliente:{self.user.get('cliente_id')}",
             tools=[
                 BC_Tool(),

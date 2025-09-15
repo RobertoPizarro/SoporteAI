@@ -10,7 +10,17 @@ export const sendMessage = async (message: string) => {
       body: JSON.stringify({ mensaje: message }),
     });
 
-    return data.respuesta;
+    // 🔍 DEBUG: Ver toda la respuesta del backend
+    console.log("🌐 FULL BACKEND RESPONSE:", JSON.stringify(data, null, 2));
+    
+    // Si es una respuesta de ticket, devolver el objeto completo
+    if (data.type === 'ticket') {
+      console.log("🎫 TICKET RESPONSE DETECTED:", data);
+      return data;
+    }
+    
+    // Si es una respuesta normal, devolver solo el campo respuesta
+    return data.respuesta || data;
   } catch (error) {
     console.error("Error en sendMessage:", error);
     throw new Error("Error al conectar con el backend");

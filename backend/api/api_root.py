@@ -21,6 +21,12 @@ def chat(req: Request, body: ChatIn):
     orq = AgentsAsTools(user=user, saver=saver)
     
     respuesta = orq.enviarMensaje(body.mensaje)
+    
+    # Si la respuesta es un diccionario con estructura de ticket, devolverla completa
+    if isinstance(respuesta, dict) and respuesta.get('type') == 'ticket':
+        return respuesta
+    
+    # Si es una respuesta normal, usar el formato anterior
     return {"respuesta": respuesta}
 
 @chat_router.post("/user/reset")

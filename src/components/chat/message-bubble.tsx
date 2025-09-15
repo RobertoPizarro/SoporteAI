@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Message } from "@/types";
+import { Message, Ticket } from "@/types";
 import { Bot, User, Copy, Volume2, Square } from "lucide-react";
 import TicketCard from "../user/ticket-card";
 import { copyText, speakText } from "@/lib/utils";
@@ -79,6 +79,16 @@ const MessageBubble = ({
               : "bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
           }`}
         >
+          {/* DEBUG: Ver qué está llegando */}
+          {(() => {
+            console.log("🔍 MESSAGE BUBBLE DEBUG:");
+            console.log("Content:", message.content);
+            console.log("Type of content:", typeof message.content);
+            console.log("Is string?", typeof message.content === "string");
+            console.log("Will render TicketCard?", typeof message.content !== "string");
+            return null;
+          })()}
+          
           {typeof message.content === "string" ? (
             <>
               <p className="text-sm leading-relaxed">{message.content}</p>
@@ -151,7 +161,7 @@ const MessageBubble = ({
               </div>
             </>
           ) : (
-            <TicketCard ticket={message.content} />
+            <TicketCard ticket={message.content as Ticket} />
           )}
         </div>
       </div>
