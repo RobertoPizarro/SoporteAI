@@ -17,6 +17,7 @@ def obtener_tickets(db, user:dict):
     try:
         rol = revisarUsuario(user)
         user_rol = uuid.UUID(user[rol])
+        print(f'user: {user}')
         ticket = db.execute(select(Ticket).filter(Ticket.id_colaborador == user_rol)).scalars().all()
         print(f"Tickets encontrados: {len(ticket)}")
         return ticket
@@ -29,6 +30,7 @@ def obtener_tickets_abiertos(db, user:dict) -> list[Ticket]:
     try:
         user_rol = uuid.UUID(user["colaborador_id"])
         print("User role ID:", user_rol)
+        print(f'user: {user}')
         try:
             ticket = db.execute(select(Ticket).filter(Ticket.id_colaborador == user_rol, Ticket.estado != "finalizado")).scalars(). all()
         except Exception as e:
@@ -43,6 +45,7 @@ def obtener_tickets_abiertos(db, user:dict) -> list[Ticket]:
 def obtener_ticket_especifico(db, id_ticket : int, user:dict) -> Ticket:
     try:
         rol = revisarUsuario(user)
+        print(f'user: {user}')
         user_rol = uuid.UUID(user[rol])
         ticket = db.execute(select(Ticket).filter(Ticket.id_ticket == id_ticket, Ticket.id_colaborador == user_rol)).first()
         return ticket

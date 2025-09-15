@@ -45,8 +45,8 @@ def insertar_colaborador(db, sub: str, email: str | None, name: str | None, hd: 
             cliente_id = cd.id_cliente
             col = db.execute(
                 select(Colaborador).where(
-                    Colaborador.id== persona_id,
-                    Colaborador.id== cliente_id
+                    Colaborador.id_persona== persona_id,
+                    Colaborador.id_cliente== cliente_id
                 )
             ).scalars().first()
             if not col:
