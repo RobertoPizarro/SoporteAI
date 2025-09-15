@@ -4,9 +4,11 @@ from datetime import datetime, timezone
 from uuid import UUID
 from pydantic import BaseModel, Field
 from typing import Optional
-import enum
 from backend.db.crud.crud_analista import obtener_analista_nivel
+import enum
 
+# Estados considerados "abiertos" en la BD (valores literales del ENUM en Postgres)
+OPEN_STATUS = ("aceptado", "en atención")
 class TicketNivelEnum(str, enum.Enum):
     bajo = "bajo"
     medio = "medio"
@@ -30,6 +32,7 @@ def revisarUsuario(user):
             rol = "colaborador_id"
         return rol
     except Exception as e:
+        print(f"Error al revisar usuario: {str(e)}")
         raise ValueError(f"Error al revisar usuario: {str(e)}")
 
 def crear_ticket(db, payload: TicketCreatePublic, user: dict):
@@ -51,15 +54,23 @@ def crear_ticket(db, payload: TicketCreatePublic, user: dict):
 
 def obtener_tickets(db, user):
     try:
+        print ("Entrando en obtener_tickets")
         rol = revisarUsuario(user)
-        return db.execute(select(Ticket).where(Ticket.id_colaborador == user[rol])).scalars().all()
+        print("Rol determined:", rol)
+        user_rol = user.get(rol)
+        print("User role ID:", user_rol)
+        return db.execute(select(Ticket).where(Ticket.id_colaborador == user_rol)).scalars().all()
+
     except Exception as e:
         raise ValueError(f"Error al obtener tickets: {str(e)}")
 
 def obtener_ticket_especifico(db, id_ticket : int, user):
     try:
         rol = revisarUsuario(user)
-        ticket = db.execute(select(Ticket).where(Ticket.id_ticket == id_ticket, Ticket.id_colaborador == user[rol])).first()
+        print("Rol determined:", rol)
+        user_rol = user.get(rol)
+        print("User role ID:", user_rol)
+        ticket = db.execute(select(Ticket).where(Ticket.id_ticket == id_ticket, Ticket.id_colaborador == user_rol)).first()
         return ticket
     except Exception as e:
         raise ValueError(f"Error al obtener ticket específico: {str(e)}")
@@ -75,11 +86,33 @@ def obtener_ticket_asunto(db, asunto : str, user):
 def obtener_tickets_abiertos(db, user):
     try:
         rol = revisarUsuario(user)
-        tickets = db.execute(select(Ticket).where(Ticket.estado != "cerrado", Ticket.id_colaborador == user[rol])).scalars().all()
-        return tickets
+        user_rol = user[rol]
+        print ("User role ID:", user_rol)
     except Exception as e:
-        raise ValueError(f"Error al obtener tickets abiertos: {str(e)}")
+        print (f"Error al revisar usuario: {str(e)}")
+        raise ValueError(f"Error al revisar usuario: {str(e)}")
+    try:
+        # Aseguramos que el comparador de UUID use el tipo correcto
+        try:
+            user_uuid = UUID(str(user_rol)) if user_rol is not None else None
+        except Exception:
+            user_uuid = user_rol  # como fallback, usar el valor como viene
 
+        query = (
+            select(Ticket)
+            .where(
+                Ticket.id_colaborador == user_uuid,
+                Ticket.estado.in_(OPEN_STATUS),
+            )
+        )
+        tickets = db.execute(query).scalars().all()
+        print(f"Tickets abiertos encontrados: {len(tickets)}")
+        print ("Tickets details:", tickets)
+    except Exception as e:
+        print (f"Error al obtener tickets abiertos: {str(e)}")
+        raise ValueError(f"Error al obtener tickets abiertos: {str(e)}")
+    return tickets
+    
 def actualizar_ticket(db, id_ticket: int, estado: str | None, nivel: str | None = None, id_analista: UUID | None = None) -> Ticket | None:
         ticket = db.query(Ticket).filter(Ticket.id_ticket == id_ticket).first()
         

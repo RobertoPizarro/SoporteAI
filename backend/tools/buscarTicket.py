@@ -1,4 +1,4 @@
-from backend.db.crud.crud_ticket import obtener_ticket_asunto, obtener_ticket_especifico, obtener_tickets, obtener_tickets_abiertos
+from backend.db.crud.crud_ticket2 import obtener_ticket_asunto, obtener_ticket_especifico, obtener_tickets, obtener_tickets_abiertos
 from backend.util.util_conectar_orm import conectarORM
 from pydantic import BaseModel, Field
 from langchain_core.tools import tool
@@ -61,8 +61,11 @@ def make_buscar_tools(get_session_user):
         ),
     )
     def listar_tickets_abiertos():
+        print ("Entrando en listar_tickets_abiertos")
         user = get_session_user()
+        print ("User in listar_tickets_abiertos:", user)
         with conectarORM() as db:
+            print ("Conectado a la base de datos")
             tickets = obtener_tickets_abiertos(db, user)
         if tickets:
             return f"""Se encontraron {len(tickets)} tickets abiertos. Detalles:
@@ -81,7 +84,9 @@ def make_buscar_tools(get_session_user):
     )
     def listar_todos_los_tickets():
         user = get_session_user()
+        print ("User in listar_todos_los_tickets:", user)
         with conectarORM() as db:
+            print ("Conectado a la base de datos")
             tickets = obtener_tickets(db, user)
         if tickets:
             return f"""Se encontraron {len(tickets)} tickets en total. Detalles:
