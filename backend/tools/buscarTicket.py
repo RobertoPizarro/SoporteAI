@@ -1,4 +1,4 @@
-from backend.db.crud.crud_ticket2 import obtener_ticket_asunto, obtener_ticket_especifico, obtener_tickets, obtener_tickets_abiertos
+from backend.db.crud.crud_ticket import obtener_ticket_asunto, obtener_ticket_especifico, obtener_tickets, obtener_tickets_abiertos
 from backend.util.util_conectar_orm import conectarORM
 from pydantic import BaseModel, Field
 from langchain_core.tools import tool
@@ -48,7 +48,7 @@ def make_buscar_tools(get_session_user):
         with conectarORM() as db:
             ticket = obtener_ticket_especifico(db, id_ticket, user)
         if ticket:
-            return f'Se encontró el ticket con ID {id_ticket}. Detalles: Asunto - {ticket.Ticket.asunto}, Estado - {ticket.Ticket.estado}, Nivel - {ticket.Ticket.nivel}, Tipo - {ticket.Ticket.tipo}.'
+            return f'Se encontró el ticket con ID {id_ticket}. Detalles: Asunto - {ticket.asunto}, Estado - {ticket.estado}, Nivel - {ticket.nivel}, Tipo - {ticket.tipo}.'
         return f'No se encontró el ticket con ID {id_ticket}.'
 
     @tool  (
