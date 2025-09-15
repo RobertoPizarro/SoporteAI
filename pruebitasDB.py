@@ -5,11 +5,12 @@ from backend.util.util_conectar_orm import conectarORM
 from uuid import UUID
 from sqlalchemy import select, func
 
-user = {'email': 'nick.salcedo@unmsm.edu.pe', 'name': 'NICK EMANUEL SALCEDO ALFARO', 'persona_id': '36a06c49-d9c6-f958-5fe1-3cfa73a0905b', 'cliente_id': '3c7fc393-880f-1e80-4c17-538b57570b40', 'colaborador_id': '74feb05e-647f-fd67-ea47-c83a7c8aab7a', 'rol': 'colaborador', 'cliente_nombre': 'UNMSM', 'servicios': [{'id': 'd50bf689-bfca-809b-5a7a-7c7bd8f42d1f', 'nombre': 'DATA SCIENCE'}]}
+user = {'email': 'nick.salcedo@unmsm.edu.pe', 'name': 'NICK EMANUEL SALCEDO ALFARO', 'persona_id': '36a06c49-d9c6-f958-5fe1-3cfa73a0905b', 'cliente_id': '3c7fc393-880f-1e80-4c17-538b57570b40', 'colaborador_id': '69b94e6e-57c4-2f05-b57f-1b55b05249fd', 'rol': 'colaborador', 'cliente_nombre': 'UNMSM', 'servicios': [{'id': 'd50bf689-bfca-809b-5a7a-7c7bd8f42d1f', 'nombre': 'DATA SCIENCE'}]}
 
-'70aba8a0-93aa-8801-9762-d2c60fa0ca6b'
-'7e23e386-b3cf-109a-4494-5e924c8d45d3'
+
+
 """
+ESTOS SON TODOS LOS MODELOS RELACIONADOS A TICKETS MAPEADOS
 
 TicketEstadoEnum = PGEnum(
     "aceptado", "cancelado", "en atención", "finalizado",
@@ -76,60 +77,25 @@ def revisarUsuario(user):
             rol = "analista_id"
         elif user["rol"] == "colaborador":
             rol = "colaborador_id"
-        return rol
+        return user[rol]
     except Exception as e:
-        print(f"Error al revisar usuario: {str(e)}")
         raise ValueError(f"Error al revisar usuario: {str(e)}")
 
-def obtener_tickets_abiertos(db, user):
+def obtener_tickets(db, user):
+    rol = revisarUsuario(user)
     try:
-        rol = revisarUsuario(user)
-        user_rol = user[rol]
-        print ("User role ID:", user_rol)
+        query = select(Ticket).where(Ticket.id_colaborador == rol)
+        ticket = db.execute(query).scalars().all()
+        return ticket
     except Exception as e:
-        print (f"Error al revisar usuario: {str(e)}")
-        raise ValueError(f"Error al revisar usuario: {str(e)}")
-    try:
-        # Aseguramos que el comparador de UUID use el tipo correcto
-        try:
-            user_uuid = UUID(str(user_rol)) if user_rol is not None else None
-        except Exception:
-            user_uuid = user_rol  # como fallback, usar el valor como viene
-
-        # Verificar si existe el colaborador con ese ID
-        try:
-            col = db.execute(select(Colaborador).where(Colaborador.id == user_uuid)).scalar_one_or_none()
-            print("Colaborador existe?:", col is not None)
-            if col:
-                print("Colaborador:", col)
-        except Exception as e:
-            print("Error al verificar colaborador:", str(e))
-
-        # Contar tickets totales y mostrar una muestra para comparar IDs
-        try:
-            total_tickets = db.execute(select(func.count()).select_from(Ticket)).scalar() or 0
-            print("Total tickets en BD:", total_tickets)
-            muestra = db.execute(select(Ticket).order_by(Ticket.id_ticket.desc()).limit(5)).scalars().all()
-            print("Muestra 5 tickets recientes:", [
-                {"id": t.id_ticket, "id_colaborador": str(t.id_colaborador), "estado": t.estado}
-                for t in muestra
-            ])
-        except Exception as e:
-            print("Error al obtener muestra de tickets:", str(e))
-
-        # Tickets del colaborador (sin filtrar por estado)
-        query = select(Ticket).where(Ticket.id_colaborador == user_uuid)
-        tickets = db.execute(query).scalars().all()
-        print(f"Tickets del colaborador encontrados: {len(tickets)}")
-        print ("Tickets details (colaborador):", tickets)
-    except Exception as e:
-        print (f"Error al obtener tickets abiertos: {str(e)}")
-        raise ValueError(f"Error al obtener tickets abiertos: {str(e)}")
-    return tickets
+        raise ValueError(f"Error al obtener tickets: {str(e)}")
 
 with conectarORM() as db:
-    tickets = obtener_tickets_abiertos(db, user)
-    print(f"Total tickets abiertos: {len(tickets)}")
-    for t in tickets:
-        print(t.id_ticket, t.asunto, t.estado, t.created_at, t.updated_at)
+    tickets = obtener_tickets(db, user)
+    for ticket in tickets:
+        print("Ticket encontrado:")
+        print(ticket.id_ticket, ticket.asunto, ticket.estado, ticket.created_at, ticket.updated_at)
+    else:
+        if not tickets:
+            print("Ticket no encontrado.")
 
