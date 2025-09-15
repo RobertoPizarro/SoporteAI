@@ -40,10 +40,38 @@ export default function useChatBot() {
       setShowFrequentQuestions(false);
       try {
         const response = await sendMessage(textToSend);
+        
+        console.log("🔍 RESPONSE FROM SERVICE:", response);
+        console.log("🔍 Type:", typeof response);
+        
+        // Manejar respuesta de ticket desde el backend
+        let processedContent = response;
+        
+        if (typeof response === 'object' && response.type === 'ticket') {
+          // El backend devolvió la estructura completa de ticket
+          processedContent = response.ticket;
+          console.log("🎫 USING BACKEND TICKET OBJECT:", processedContent);
+        } else if (typeof response === 'string' && response.includes('He generado el ticket')) {
+          // Fallback: parsear del texto (por compatibilidad)
+          const ticketMatch = response.match(/ticket #?(\d+)/);
+          if (ticketMatch) {
+            const ticketId = parseInt(ticketMatch[1]);
+            const ticketObject = {
+              id: ticketId,
+              asunto: 'Ticket creado desde chat',
+              tipo: 'Solicitud',
+              nivel: 'Medio',
+              estado: 'abierto',
+              fecha_creacion: new Date().toISOString(),
+            };
+            processedContent = ticketObject;
+            console.log("🎫 FALLBACK TICKET CREATED:", ticketObject);
+          }
+        }
 
         const botMessage: Message = {
           type: "bot",
-          content: response,
+          content: processedContent,
         };
         addMessage(botMessage);
       } catch (error) {
