@@ -1,9 +1,9 @@
 from backend.util.util_conectar_orm import conectarORM
 from backend.util.util_llm import obtenerModelo
 from backend.agents.AgenteOrquestador import AgenteOrquestador
+import uuid
 
 from backend.tools.buscarBaseConocimientos import BC_Tool
-from backend.tools.AgenteBD import AgenteBD
 from backend.tools.crearTicket import make_crear_ticket_Tool
 from backend.tools.agenteBuscador import make_agente_buscador
 # =========================
@@ -223,18 +223,22 @@ class AgentsAsTools:
             return self.user
         CrearTicket_Tool = make_crear_ticket_Tool(get_session_user)
         BuscarTicket_Tool = make_agente_buscador(llm=self.llm, user=self.user)
+        self.user["thread_id"] = self.user.get("thread_id") or (
+            f"persona:{self.user.get('persona_id') or 'anon'}-{uuid.uuid4().hex}"
+        )
+
         self.agenteOrquestador = AgenteOrquestador(
             llm=self.llm,
-            user = self.user,
+            user=self.user,
             memoria=saver,
-            thread= f"persona:{self.user.get('persona_id') or 'anon'}-22234",
-            checkpoint_ns= f"cliente:{self.user.get('cliente_id')}",
+            thread=self.user["thread_id"],
+            checkpoint_ns=f"cliente:{self.user.get('cliente_id')}",
             tools=[
                 BC_Tool(),
                 CrearTicket_Tool,
                 BuscarTicket_Tool,
             ],
-            contexto=contexto_sistema
+            contexto=contexto_sistema,
         )
 
     def enviarMensaje(self, consulta: str = ""):

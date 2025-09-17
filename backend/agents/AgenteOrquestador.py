@@ -45,21 +45,23 @@ class AgenteOrquestador:
             },
         )
 
-    def reiniciarMemoria(self) -> bool:
+    def reiniciarMemoria(self) -> str:
         """
         Si es InMemorySaver: reinstancia y reconstruye el agente.
         Si es PostgresSaver: abre un nuevo thread.
         """
+        # Siempre generamos un nuevo thread id para garantizar que la conversación
+        # previa no se siga mezclando (independiente del tipo de saver)
+        thread = f"persona:{self.user.get('persona_id') or 'anon'}-{uuid.uuid4().hex}"
+
         if isinstance(self.memoria, InMemorySaver):
-            # Reinicia la memoria en RAM y reconstruye el agente
+            # Reinicia la memoria en RAM y reconstruye el agente con un nuevo hilo
             self.memoria = InMemorySaver()
-            self.agente = crearAgente(
-                llm=self.llm, contexto=self.contexto, memoria=self.memoria, tools=self.tools
-            )
         else:
-            # Para almacenes persistentes, cambia a un nuevo hilo
-            self.thread = f"temp-{uuid.uuid4().hex}"
-        return True
+            # Para almacenes persistentes simplemente cambiamos el thread
+            self.thread = thread
+
+        return self.thread
 
     def definirHilo(self, thread: str = "", checkpoint_ns=None) -> bool:
         """
