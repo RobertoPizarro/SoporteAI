@@ -81,14 +81,7 @@ def revisarUsuario(user):
     except Exception as e:
         raise ValueError(f"Error al revisar usuario: {str(e)}")
 
-def obtener_tickets(db, user):
-    rol = revisarUsuario(user)
-    try:
-        query = select(Ticket).where(Ticket.id_colaborador == rol)
-        ticket = db.execute(query).scalars().all()
-        return ticket
-    except Exception as e:
-        raise ValueError(f"Error al obtener tickets: {str(e)}")
+from backend.db.crud.crud_ticket import obtener_tickets
 
 with conectarORM() as db:
     tickets = obtener_tickets(db, user)

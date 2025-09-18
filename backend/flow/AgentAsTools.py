@@ -1,13 +1,19 @@
-from backend.util.util_conectar_orm import conectarORM
-from backend.util.util_llm import obtenerModelo
+# Agente que usa otros agentes como herramientas  
 from backend.agents.AgenteOrquestador import AgenteOrquestador
+
+# Utilitario para crear el modelo de lenguaje
+from backend.util.util_llm import obtenerModelo
+
+# Tools del agente orquestador
+from backend.tools.buscarBaseConocimientos import BC_Tool
+from backend.tools.buscarTicket import make_buscar_tools
+from backend.tools.crearTicket import make_crear_ticket_Tool
+
+# Manejo de memoria del agente
 import uuid
 
-from backend.tools.buscarBaseConocimientos import BC_Tool
-from backend.tools.crearTicket import make_crear_ticket_Tool
-from backend.tools.agenteBuscador import make_agente_buscador
 # =========================
-#  CONTEXTO: IAnalytics (adaptado a tu stack)
+#  CONTEXTO: IAnalytics
 # =========================
 
 def PromptSistema(user: dict) -> str:
@@ -215,31 +221,37 @@ def PromptSistema(user: dict) -> str:
 # =========================
 
 class AgentsAsTools:
-    def __init__(self, user, saver):
-        self.llm = obtenerModelo()
-        self.user = user
-        contexto_sistema = PromptSistema(user)
-        def get_session_user():
-            return self.user
-        CrearTicket_Tool = make_crear_ticket_Tool(get_session_user)
-        BuscarTicket_Tool = make_agente_buscador(llm=self.llm, user=self.user)
-        self.user["thread_id"] = self.user.get("thread_id") or (
-            f"persona:{self.user.get('persona_id') or 'anon'}-{uuid.uuid4().hex}"
-        )
+  def __init__(self, user, saver):
+    self.llm = obtenerModelo()
+    self.user = user
+    contexto_sistema = PromptSistema(user)
 
-        self.agenteOrquestador = AgenteOrquestador(
-            llm=self.llm,
-            user=self.user,
-            memoria=saver,
-            thread=self.user["thread_id"],
-            checkpoint_ns=f"cliente:{self.user.get('cliente_id')}",
-            tools=[
-                BC_Tool(),
-                CrearTicket_Tool,
-                BuscarTicket_Tool,
-            ],
-            contexto=contexto_sistema,
-        )
+    def get_session_user():
+      return self.user
 
-    def enviarMensaje(self, consulta: str = ""):
-        return self.agenteOrquestador.enviarMensaje(consulta=consulta)
+    # Instanciar tools
+    CrearTicket_Tool = make_crear_ticket_Tool(get_session_user)
+    BuscarTicket_Tool = make_buscar_tools(get_session_user)  # lista de 4 tools
+
+    # Thread id para la memoria
+    self.user["thread_id"] = self.user.get("thread_id") or (
+      f"persona:{self.user.get('persona_id') or 'anon'}-{uuid.uuid4().hex}"
+    )
+
+    # Agente orquestador con todas las tools expuestas directamente
+    self.agenteOrquestador = AgenteOrquestador(
+      llm=self.llm,
+      user=self.user,
+      memoria=saver,
+      thread=self.user["thread_id"],
+      checkpoint_ns=f"cliente:{self.user.get('cliente_id')}",
+      tools=[
+        BC_Tool(),            # Base de conocimiento
+        CrearTicket_Tool,     # Crear ticket
+        *BuscarTicket_Tool,   # Tools de búsqueda/listado
+      ],
+      contexto=contexto_sistema,
+    )
+
+  def enviarMensaje(self, consulta: str = ""):
+    return self.agenteOrquestador.enviarMensaje(consulta=consulta)

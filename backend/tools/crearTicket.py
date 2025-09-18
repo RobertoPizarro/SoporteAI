@@ -7,15 +7,14 @@ def make_crear_ticket_Tool(get_session_user):
     @tool(
         "CrearTicket",
         description=(
-            "Eres CrearTicket. Sólo puedes crear un nuevo ticket en el sistema de soporte."
-            "Usa esta herramienta sólo si el usuario te lo pide explícitamente."
-            "Debes esperar un diccionario con las claves: asunto, nivel, tipo, servicio."
-            "El nivel puede ser 'bajo', 'medio', 'alto' o 'crítico'."
-            "El tipo puede ser 'incidencia' o 'solicitud'."
+            "Eres CrearTicket. Sólo puedes crear un nuevo ticket en el sistema de soporte."\
+            "Usa esta herramienta sólo si el usuario te lo pide explícitamente."\
+            "Debes esperar un diccionario con las claves: asunto, nivel, tipo, servicio."\
+            "El nivel puede ser 'bajo', 'medio', 'alto' o 'crítico'."\
+            "El tipo puede ser 'incidencia' o 'solicitud'."\
             "Devuelve un mensaje de confirmación con el ID del ticket creado o un mensaje de error."
         ),
         args_schema=TicketCreatePublic,
-        return_direct=True,
     )
     def crearTicket_Tool(asunto: str, nivel: str, tipo: str, servicio: str) -> dict:
         user = get_session_user()
@@ -36,30 +35,46 @@ def make_crear_ticket_Tool(get_session_user):
                 nuevo_ticket = crear_ticket(db, payload, user)
                 
                 if nuevo_ticket:
-                    # ✅ ACCEDER A LOS DATOS DENTRO DEL CONTEXTO DE LA SESIÓN
                     ticket_data = {
                         "id": nuevo_ticket.id_ticket,
                         "asunto": nuevo_ticket.asunto,
-                        "tipo": nuevo_ticket.tipo.value,
-                        "nivel": nuevo_ticket.nivel.value,
+                        "tipo": nuevo_ticket.tipo, 
+                        "nivel": nuevo_ticket.nivel, 
                         "servicio": payload.servicio,  # ← USAR EL SERVICIO DEL PAYLOAD
                         "estado": "Nuevo",
-                        "usuario": user.nombre if hasattr(user, 'nombre') else str(user),
-                        "fechaCreacion": nuevo_ticket.created_at.strftime('%d/%m/%Y') if hasattr(nuevo_ticket, 'created_at') else "",
-                        "fechaActualizacion": nuevo_ticket.updated_at.strftime('%d/%m/%Y') if hasattr(nuevo_ticket, 'updated_at') else "",
-                        "diagnostico": "",
-                        "cliente": getattr(user, 'cliente', ''),
-                        "fechaCierre": ""
+                        "usuario": user.get("name"),
+                        "fechaCreacion": nuevo_ticket.created_at.strftime('%d/%m/%Y') if hasattr(nuevo_ticket, 'created_at') else None,
+                        "fechaActualizacion": nuevo_ticket.updated_at.strftime('%d/%m/%Y') if hasattr(nuevo_ticket, 'updated_at') else None,
+                        "cliente": user.get("cliente_nombre"),
                     }
                     
-                    ticket_response = {
+                    base_msg = (
+                        f"He generado el ticket {nuevo_ticket.id_ticket} con su solicitud. "
+                        "Nuestro equipo de soporte se pondrá en contacto con usted a través de su correo."
+                    )
+
+                    try:
+                        nivel_enum = nuevo_ticket.nivel if isinstance(nuevo_ticket.nivel, TicketNivelEnum) else TicketNivelEnum(nuevo_ticket.nivel)
+                    except Exception:
+                        nivel_enum = None
+                        
+                    nivel_msg_map = {
+                        TicketNivelEnum.bajo: "El horario estimado de atención es dentro de 24 horas.",
+                        TicketNivelEnum.medio: "El horario estimado de atención es dentro de 12 horas.",
+                        TicketNivelEnum.alto: "El horario estimado de atención es dentro de 4 horas.",
+                        TicketNivelEnum.critico: "Nos contactaremos con usted lo más pronto posible.",
+                    }
+                    extra_msg = nivel_msg_map.get(
+                        nivel_enum,  # type: ignore[arg-type]
+                        "Nos contactaremos con usted lo más pronto posible."
+                    )
+                    message = f"{base_msg} {extra_msg}".strip()
+
+                    return {
                         "type": "ticket",
-                        "message": f"He generado el ticket {nuevo_ticket.id_ticket} con su solicitud. Nuestro equipo de soporte se pondrá en contacto con usted a través de su correo. A partir de ahora, la atención continuará por ese medio. Gracias por su paciencia.",
+                        "message": message,
                         "ticket": ticket_data
                     }
-                    print(f"[DEBUG] CrearTicket_Tool returning OBJECT: {ticket_response}")
-                    print(f"[DEBUG] Type of response: {type(ticket_response)}")
-                    return ticket_response
                 else:
                     return {"error": "No se pudo crear el ticket. Por favor, inténtelo de nuevo más tarde.", "type": "error"}
         except Exception as e:
