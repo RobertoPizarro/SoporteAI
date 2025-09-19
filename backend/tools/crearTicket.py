@@ -48,36 +48,14 @@ def make_crear_ticket_Tool(get_session_user):
                         "cliente": user.get("cliente_nombre"),
                     }
                     
-                    base_msg = (
-                        f"He generado el ticket {nuevo_ticket.id_ticket} con su solicitud. "
-                        "Nuestro equipo de soporte se pondrá en contacto con usted a través de su correo."
-                    )
-
-                    try:
-                        nivel_enum = nuevo_ticket.nivel if isinstance(nuevo_ticket.nivel, TicketNivelEnum) else TicketNivelEnum(nuevo_ticket.nivel)
-                    except Exception:
-                        nivel_enum = None
-                        
-                    nivel_msg_map = {
-                        TicketNivelEnum.bajo: "El horario estimado de atención es dentro de 24 horas.",
-                        TicketNivelEnum.medio: "El horario estimado de atención es dentro de 12 horas.",
-                        TicketNivelEnum.alto: "El horario estimado de atención es dentro de 4 horas.",
-                        TicketNivelEnum.critico: "Nos contactaremos con usted lo más pronto posible.",
-                    }
-                    extra_msg = nivel_msg_map.get(
-                        nivel_enum,  # type: ignore[arg-type]
-                        "Nos contactaremos con usted lo más pronto posible."
-                    )
-                    message = f"{base_msg} {extra_msg}".strip()
-
                     return {
-                        "type": "ticket",
-                        "message": message,
-                        "ticket": ticket_data
+                        "type": "ticket_created",
+                        "ticket": ticket_data,
+                        "message": f"Ticket creado con éxito. ID del ticket: {nuevo_ticket.id_ticket}."
                     }
                 else:
-                    return {"error": "No se pudo crear el ticket. Por favor, inténtelo de nuevo más tarde.", "type": "error"}
+                    raise Exception("No se pudo crear el ticket. Por favor, inténtelo de nuevo más tarde.")
         except Exception as e:
-            return {"error": f"Error al crear el ticket: {str(e)}", "type": "error"}
-        
+            raise Exception(f'Error al crear el ticket: {str(e)}')
+
     return crearTicket_Tool

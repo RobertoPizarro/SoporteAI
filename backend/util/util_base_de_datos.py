@@ -12,5 +12,4 @@ def obtenerConexionBaseDeDatos():
         print("Conexión a la base de datos establecida.")
         return conn, saver
     except Exception as e:
-        print("No se pudo conectar a la base de datos. Error:", e)
-        return None, None
+        raise Exception(f'Error al conectar a la base de datos: {e}')
