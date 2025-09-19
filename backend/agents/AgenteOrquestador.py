@@ -16,7 +16,7 @@ class AgenteOrquestador:
         self,
         llm: AzureChatOpenAI,
         user: dict,
-        contexto: str = "",
+        contexto,
         thread: str = "",
         checkpoint_ns: str = "soporte",
         tools: list | None = None,

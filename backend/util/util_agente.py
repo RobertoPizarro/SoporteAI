@@ -1,4 +1,5 @@
 # Utilitario para crear y ejecutar agentes
+from langchain_core.prompts import ChatPromptTemplate
 from langgraph.prebuilt import create_react_agent
 
 # Utilitario para el modelo de lenguaje
@@ -7,8 +8,9 @@ from langchain_openai import AzureChatOpenAI
 # Manejo de memoria del agente
 from langgraph.checkpoint.memory import InMemorySaver
 
+from langchain_core.prompts import ChatPromptTemplate
 def crearAgente(
-    llm: AzureChatOpenAI, tools: list | None = None, contexto: str = "", memoria=None
+    llm: AzureChatOpenAI, contexto: ChatPromptTemplate, tools: list | None = None, memoria=None
 ):
     if tools is None:
         tools = []

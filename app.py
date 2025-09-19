@@ -5,9 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from contextlib import asynccontextmanager
 import uvicorn
-from backend.api.api_auth_colaborador import auth_colab_router
-from backend.api.api_auth_analista import auth_analista_router
-from backend.api.api_root import chat_router
+from backend.api.auth.api_auth_colaborador import auth_colab_router
+from backend.api.auth.api_auth_analista import auth_analista_router
+from backend.api.usuario.api_root import chat_router
 from backend.util.util_base_de_datos import obtenerConexionBaseDeDatos  # -> (conn_cm, saver)
 # Lifespan: abre PostgresSaver al inicio y ciérralo al final
 @asynccontextmanager
