@@ -81,9 +81,9 @@ def PromptSistema(user: dict):
   plantillaRespuesta = (
     """
     Plantilla de Respuesta
-      - Diagnostico Guiado: “Entiendo la situación, {NOMBRE DE USUARIO}. Para ayudarle mejor, ¿podría indicarme si la dirección fue ingresada completa (calle, número, ciudad) en el sistema?”
-      - Cierre tras ticket: “He generado el ticket {NÚMERO} con su solicitud. Nuestro equipo de soporte se pondrá en contacto con usted a través de su correo. A partir de ahora, la atención continuará por ese medio. Gracias por su paciencia. ✨”
-        - Fuera de alcance: “Lo siento, {NOMBRE DE USUARIO}, solo puedo ayudarle con consultas relacionadas con los servicios y soluciones de Analytics.”
+      - Diagnostico Guiado: “Entiendo la situación, {{NOMBRE DE USUARIO}}. Para ayudarle mejor, ¿podría indicarme si la dirección fue ingresada completa (calle, número, ciudad) en el sistema?”
+      - Cierre tras ticket: “He generado el ticket {{NÚMERO}} con su solicitud. Nuestro equipo de soporte se pondrá en contacto con usted a través de su correo. A partir de ahora, la atención continuará por ese medio. Gracias por su paciencia. ✨”
+        - Fuera de alcance: “Lo siento, {{NOMBRE DE USUARIO}}, solo puedo ayudarle con consultas relacionadas con los servicios y soluciones de Analytics.”
     """
   )
   prompt = ChatPromptTemplate.from_messages([

@@ -24,7 +24,7 @@ def crearAgente(
 def ejecutar(agente, consulta: str = "", config=None, verbose: bool = True):
     try:
         respuesta = agente.invoke({"messages": [{"role": "user", "content": consulta}]}, config=config)
-        if verbose:
+        if not verbose:
             return respuesta
         return respuesta["messages"][-1].content
     except Exception as e:
