@@ -1,11 +1,14 @@
-from sqlalchemy import select
-from backend.db.models import Ticket
+from sqlalchemy import select, update
+from backend.db.models import Ticket, Analista
 from datetime import datetime, timezone
 from uuid import UUID
 from pydantic import BaseModel, Field
 from typing import Optional
 from backend.db.crud.crud_analista import obtener_analista_nivel
 import enum
+from backend.db.crud.crud_escalado import crear_escalado
+from sqlalchemy.orm import Session
+import uuid
 
 class TicketNivelEnum(str, enum.Enum):
     bajo = "bajo"
@@ -113,6 +116,34 @@ def actualizar_ticket(db, id_ticket: int, estado: str | None, nivel: str | None 
         db.refresh(ticket)  # opcional: recargar con lo último de la BD
         return ticket
 
+#falta probar
+def escalar_ticket(bd : Session, idTicket : int, id_analista_der: uuid.UUID, 
+                  id_analista_soli: uuid.UUID, motivo: str, diagnostico : str):
+    
+    query_analista = select(Analista).where(Analista.id == id_analista_der)
+    analista_destino = bd.execute(query_analista).scalar_one_or_none()
+    
+    if not analista_destino:
+        raise ValueError(f"Analista destino {id_analista_der} no encontrado")
+    
+    crear_escalado(bd, idTicket, id_analista_der, id_analista_soli, motivo)
+    query_update  = update(Ticket).where(Ticket.id_ticket == idTicket).values(
+        id_analista = id_analista_der,
+        nivel = analista_destino.nivel,
+        estado = "en_atencion",
+        diagnostico = diagnostico
+    )
+    result = bd.execute(query_update)
+    
+    if result.rowcount == 0:
+        raise ValueError(f"Ticket {idTicket} no encontrado")
+    
+    print(f"Ticket escalado a nivel {analista_destino.nivel}")
+    return analista_destino.nivel    
+    
+    
+    
+    
 """
 from enum import Enum
 
