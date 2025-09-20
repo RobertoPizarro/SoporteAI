@@ -30,11 +30,11 @@ export const ENDPOINTS = {
   CHAT_RESET: "/api/backend/user/reset",
 
   // Tickets
-  TICKETS: "/tickets",
-  TICKET_BY_ID: (id: string) => `/tickets/${id}`,
-  UPDATE_TICKET_STATUS: (id: string) => `/tickets/${id}/status`,
-  ESCALATE_TICKET: (id: string) => `/tickets/${id}/escalate`,
-  
+  TICKETS: "/api/backend/analista/analista/tickets",
+  TICKET_BY_ID: (id: string) => `/api/backend/analista/analista/ticket?ticket=${id}`,
+  UPDATE_TICKET_STATUS: (id: string) => `/api/backend/analista/estado?ticket=${id}`,
+  ESCALATE_TICKET: (id: string) => `/api/backend/analista/escalar?ticket=${id}`,
+
   // Usuarios
   USERS: "/users",
   USER_BY_ID: (id: string) => `/users/${id}`,
