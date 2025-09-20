@@ -1,4 +1,4 @@
-from backend.db.models import External
+from backend.db.models import External, Analista
 from sqlalchemy import select
 
 def insertar_analista(db, sub: str, email: str | None, name: str | None, hd: str | None):
@@ -11,8 +11,6 @@ def insertar_analista(db, sub: str, email: str | None, name: str | None, hd: str
     ).scalars().first()
 
     persona_id = ext.id_persona
-    # 2) Crear analista si no existe
-    from backend.db.database import Analista  # Importar aquí para evitar ciclos
 
     analista = db.execute(
         select(Analista).where(Analista.id_persona == persona_id)
