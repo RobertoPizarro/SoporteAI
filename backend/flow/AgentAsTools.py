@@ -128,8 +128,11 @@ class AgentsAsTools:
     def get_session_user():
       return self.user
 
+    def get_saver():
+      return saver
+    
     # Instanciar tools
-    CrearTicket_Tool = make_crear_ticket_Tool(get_session_user)
+    CrearTicket_Tool = make_crear_ticket_Tool(get_session_user, get_saver)
     BuscarTicket_Tool = make_buscar_tools(get_session_user)  # lista de 4 tools
 
     # Thread id para la memoria

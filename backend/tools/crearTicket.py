@@ -1,9 +1,10 @@
 from langchain_core.tools import tool
 from backend.db.crud.crud_ticket import crear_ticket, TicketCreatePublic, TicketNivelEnum, TicketTipoEnum
+from backend.db.crud.crud_conversacion import guardar_conversacion
 from backend.util.util_conectar_orm import conectarORM
-
-
-def make_crear_ticket_Tool(get_session_user):
+from backend.util.util_formateo import formatearMensaje
+from typing import List
+def make_crear_ticket_Tool(get_session_user, get_saver):
     @tool(
         "CrearTicket",
         description=(
@@ -18,6 +19,7 @@ def make_crear_ticket_Tool(get_session_user):
     )
     def crearTicket_Tool(asunto: str, nivel: str, tipo: str, servicio: str) -> dict:
         user = get_session_user()
+        saver = get_saver()
         if not user:
             return {"error": "Usuario no autenticado.", "type": "error"}
         try:
@@ -29,10 +31,18 @@ def make_crear_ticket_Tool(get_session_user):
             )
         except Exception as e:
             raise Exception(f"Error en los datos proporcionados: {str(e)}")
-
+        thread = user.get("thread_id")
+        state = saver.get({"configurable": {"thread_id": thread}}) if saver else None
+        mensajes = state["channel_values"]["messages"] if state else []
+        conversacion: List[dict] = formatearMensaje(mensajes)                
         try:
             with conectarORM() as db:
                 nuevo_ticket = crear_ticket(db, payload, user)
+                
+                try:
+                    guardar_conversacion(db, nuevo_ticket.id_ticket, conversacion)
+                except Exception as e:
+                    raise Exception(f"Error al guardar la conversación: {str(e)}")
                 
                 if nuevo_ticket:
                     ticket_data = {
