@@ -13,6 +13,49 @@ export interface UpdateTicketData {
 // Estados que requieren descripción obligatoria
 const CLOSING_STATES = ["Resuelto", "Cerrado", "Rechazado"];
 
+// Función utilitaria para capitalizar texto
+const capitalize = (text: string): string => {
+  if (!text) return text;
+  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+};
+
+// Función utilitaria para formatear fechas ISO a formato legible
+const formatDate = (isoDate: string | null): string => {
+  if (!isoDate) return "";
+  
+  try {
+    const date = new Date(isoDate);
+    
+    // Verificar si la fecha es válida
+    if (isNaN(date.getTime())) return "";
+    
+    // Formato: "20 Sep 2025, 18:00"
+    return date.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'America/Lima' // Ajusta según tu zona horaria
+    });
+  } catch (error) {
+    console.warn('Error formateando fecha:', isoDate, error);
+    return "";
+  }
+};
+
+// Función utilitaria para formatear estado del backend al frontend
+const formatEstado = (estado: string): string => {
+  const estadoMap: { [key: string]: string } = {
+    'aceptado': 'Nuevo',
+    'en atención': 'En Progreso', 
+    'finalizado': 'Finalizado',
+    'cancelado': 'Rechazado'
+  };
+  
+  return estadoMap[estado] || capitalize(estado);
+};
+
 // Interface para el ticket que viene del backend
 interface BackendTicket {
   id_ticket: number;
@@ -37,14 +80,14 @@ const transformBackendTicket = (backendTicket: BackendTicket): Ticket => {
     analista: backendTicket.id_analista || "Sin asignar",
     cliente: "Cliente", // Por ahora placeholder, luego mapear desde id_cliente_servicio
     servicio: "Servicio", // Por ahora placeholder, luego mapear desde id_cliente_servicio  
-    fechaCreacion: backendTicket.created_at,
-    fechaActualizacion: backendTicket.updated_at,
-    fechaCierre: backendTicket.closed_at || "",
-    asunto: backendTicket.asunto,
+    fechaCreacion: formatDate(backendTicket.created_at), // ✨ Formatear fecha
+    fechaActualizacion: formatDate(backendTicket.updated_at), // ✨ Formatear fecha
+    fechaCierre: formatDate(backendTicket.closed_at), // ✨ Formatear fecha (puede ser null)
+    asunto: capitalize(backendTicket.asunto), // ✨ Capitalizar asunto
     nivel: backendTicket.nivel === "bajo" ? 1 : backendTicket.nivel === "medio" ? 2 : 3,
-    estado: backendTicket.estado === "aceptado" ? "Nuevo" : "",
+    estado: formatEstado(backendTicket.estado), // ✨ Formatear estado
     diagnostico: backendTicket.diagnostico || "",
-    tipo: backendTicket.tipo
+    tipo: capitalize(backendTicket.tipo) // ✨ Capitalizar tipo
   };
 };
 

@@ -26,7 +26,7 @@ const TicketCard = ({ ticket }: { ticket: Ticket }) => {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 mb-2">
               <span className="text-sm font-mono text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">
-                {ticket.id}
+                TCK-{ticket.id}
               </span>
               <span
                 className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium ${getStatusBadge(
