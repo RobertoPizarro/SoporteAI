@@ -73,23 +73,44 @@ def crear_ticket(db, payload: TicketCreatePublic, user: dict):
         raise Exception(f'Error al crear ticket: {str(e)}')
 
 def obtener_tickets_analista(db, user):
+    """Retorna Tickets y agrega atributos colaborador_nombre y servicio_nombre.
+
+    - Realiza una sola consulta con JOINs y una subconsulta correlacionada para el nombre del colaborador.
+    - Adjunta los nombres como atributos en cada instancia Ticket para que Pydantic los lea.
+    """
     rol = revisarUsuario(user)
     try:
-        ext = (
-        select(External.nombre)
-        .join(Persona, Persona.id == External.id_persona)
-        .join(Colaborador, Colaborador.id_persona == Persona.id)
-        .where(Colaborador.id == Ticket.id_colaborador)
-        .limit(1).correlate(Ticket).scalar_subquery()
+        # Subconsulta: primer External.nombre asociado a la Persona del Colaborador del Ticket
+        ext_nombre_sq = (
+            select(External.nombre)
+            .join(Persona, Persona.id == External.id_persona)
+            .join(Colaborador, Colaborador.id_persona == Persona.id)
+            .where(Colaborador.id == Ticket.id_colaborador)
+            .limit(1)
+            .correlate(Ticket)
+            .scalar_subquery()
         )
+
         query = (
-        select(ext.label("colaborador_nombre"), Servicio.nombre.label("servicio_nombre"),)
-        .join(ClienteServicio, ClienteServicio.id == Ticket.id_cliente_servicio, isouter=True)
-        .join(Servicio, Servicio.id == ClienteServicio.id_servicio, isouter=True)
-        .where(Ticket.id_analista == rol)
+            select(
+                Ticket,
+                ext_nombre_sq.label("colaborador_nombre"),
+                Servicio.nombre.label("servicio_nombre"),
+            )
+            .join(ClienteServicio, ClienteServicio.id == Ticket.id_cliente_servicio, isouter=True)
+            .join(Servicio, Servicio.id == ClienteServicio.id_servicio, isouter=True)
+            .where(Ticket.id_analista == rol)
+            .order_by(Ticket.created_at.desc())
         )
-        ticket = db.execute(query).scalars().all()
-        return ticket
+
+        rows = db.execute(query).all()
+        tickets: list[Ticket] = []
+        for t, colaborador_nombre, servicio_nombre in rows:
+            # Adjuntar atributos para que el BaseModel los recoja
+            setattr(t, "colaborador_nombre", colaborador_nombre)
+            setattr(t, "servicio_nombre", servicio_nombre)
+            tickets.append(t)
+        return tickets
     except Exception as e:
         raise ValueError(f"Error al obtener tickets del analista: {str(e)}")
 
@@ -113,26 +134,36 @@ def obtener_ticket_especifico(db, id_ticket : int, user):
     except Exception as e:
         raise ValueError(f"Error al obtener ticket específico: {str(e)}")
 
-def obtener_ticket_especifico_analista(db, id_ticket : int, user):
+def obtener_ticket_especifico_analista(db, id_ticket: int, user):
+    """Retorna un Ticket y adjunta colaborador_nombre y servicio_nombre como atributos."""
     rol = revisarUsuario(user)
     try:
-        ext = (
-        select(External.nombre)
-        .join(Persona, Persona.id == External.id_persona)
-        .join(Colaborador, Colaborador.id == Persona.id)
-        .where(Colaborador.id == Ticket.id_colaborador)
-        .limit(1)
-        .correlate(Ticket)
-        .scalar_subquery()
+        ext_nombre_sq = (
+            select(External.nombre)
+            .join(Persona, Persona.id == External.id_persona)
+            .join(Colaborador, Colaborador.id_persona == Persona.id)
+            .where(Colaborador.id == Ticket.id_colaborador)
+            .limit(1)
+            .correlate(Ticket)
+            .scalar_subquery()
         )
         query = (
-        select(Ticket, ext.label("colaborador_nombre"), Servicio.nombre.label("servicio_nombre"))
-        .join(ClienteServicio, ClienteServicio.id == Ticket.id_cliente_servicio, isouter=True)
-        .join(Servicio, Servicio.id == ClienteServicio.id_servicio, isouter=True)
-        .where(Ticket.id_ticket == id_ticket, Ticket.id_analista == rol)
+            select(
+                Ticket,
+                ext_nombre_sq.label("colaborador_nombre"),
+                Servicio.nombre.label("servicio_nombre"),
+            )
+            .join(ClienteServicio, ClienteServicio.id == Ticket.id_cliente_servicio, isouter=True)
+            .join(Servicio, Servicio.id == ClienteServicio.id_servicio, isouter=True)
+            .where(Ticket.id_ticket == id_ticket, Ticket.id_analista == rol)
         )
-        ticket = db.execute(query).scalars().first()
-        return ticket
+        row = db.execute(query).first()
+        if not row:
+            return None
+        t, colaborador_nombre, servicio_nombre = row
+        setattr(t, "colaborador_nombre", colaborador_nombre)
+        setattr(t, "servicio_nombre", servicio_nombre)
+        return t
     except Exception as e:
         raise ValueError(f"Error al obtener ticket específico del analista: {str(e)}")
 
