@@ -16,7 +16,7 @@ def insertar_analista(db, sub: str, email: str | None, name: str | None, hd: str
         select(Analista).where(Analista.id_persona == persona_id)
     ).scalars().first()
     
-    analista_id = str(analista.id_analista)
+    analista_id = str(analista.id)
 
     return {
         "persona_id": str(persona_id),
