@@ -50,7 +50,16 @@ def chatAnalista(ticket: int):
     return {"mensaje": f"Funcionalidad de chat para el ticket {ticket}"}  
 
 @analista_router.get("/analista/ticket")
-def obtenerTicket(ticket: int):
-    # Lógica para obtener un ticket específico
+def obtenerTicket(req: Request, ticket: int):
+    analista = req.session.get("user")
+    if not analista or analista.get("rol") != "analista":
+        raise HTTPException(401, "unauthorized")
+    try:
+        with conectarORM() as db:
+            ticket = obtener_ticket_especifico(db, ticket, analista)
+            if not ticket:
+                raise HTTPException(404, f"Ticket {ticket} no encontrado o no autorizado")
+    except Exception as e:
+        raise HTTPException(500, f"Error interno: {e}")
     return {"ticket": {"id": ticket, "asunto": "Asunto del ticket", "estado": "abierto"}}
 
