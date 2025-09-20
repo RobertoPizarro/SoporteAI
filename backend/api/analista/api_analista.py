@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Request, HTTPException
-from backend.db.crud.crud_ticket import obtener_tickets, obtener_ticket_especifico, actualizar_ticket_estado
+from backend.db.crud.crud_ticket import obtener_tickets_analista, obtener_ticket_especifico_analista, actualizar_ticket_estado
 from backend.db.crud.crud_conversacion import traer_conversacion
+from backend.db.models import Colaborador
 from backend.util.util_conectar_orm import conectarORM
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
@@ -12,15 +13,19 @@ class TicketRead(BaseModel):
     asunto: str
     estado: str
     nivel: str
-    tipo: str
+    tipo: str # Nombre colaborador # Nombre servicio
     id_colaborador: str | None = None
     id_analista: int | None = None
     id_cliente_servicio: int | None = None
     diagnostico: str | None = None
     created_at: datetime | None = None
     closed_at: datetime | None = None
-
+    colaborador_nombre: str | None = None
+    servicio_nombre: str | None = None
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
+
+class TicketResponse(BaseModel):
+    tickets: list[TicketRead]
 
 @analista_router.get("/analista/tickets")
 def obtenerTickets(req: Request):
@@ -29,7 +34,7 @@ def obtenerTickets(req: Request):
         raise HTTPException(401, "unauthorized")
     try:
         with conectarORM() as db:
-            tickets = obtener_tickets(db, analista)
+            tickets = obtener_tickets_analista(db, analista)
             data = [TicketRead.model_validate(t).model_dump() for t in tickets]
             return {"tickets": data}
     except Exception as e:
@@ -80,7 +85,7 @@ def obtenerTicket(req: Request, ticket: int):
         raise HTTPException(401, "unauthorized")
     try:
         with conectarORM() as db:
-            ticket = obtener_ticket_especifico(db, ticket, analista)
+            ticket = obtener_ticket_especifico_analista(db, ticket, analista)
             if not ticket:
                 raise HTTPException(404, f"Ticket {ticket} no encontrado o no autorizado")
     except Exception as e:
