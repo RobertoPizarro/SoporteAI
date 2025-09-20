@@ -1,5 +1,6 @@
 from sqlalchemy import select, update
-from backend.db.models import Ticket
+from sqlalchemy.orm import selectinload
+from backend.db.models import Ticket, Colaborador, ClienteServicio
 from datetime import datetime, timezone
 from pydantic import BaseModel, Field
 from backend.db.crud.crud_analista import obtener_analista_nivel, nivel_numero
@@ -71,6 +72,15 @@ def crear_ticket(db, payload: TicketCreatePublic, user: dict):
     except Exception as e:
         raise Exception(f'Error al crear ticket: {str(e)}')
 
+def obtener_tickets_analista(db, user):
+    rol = revisarUsuario(user)
+    try:
+        query = select(Ticket).options(selectinload(Ticket.colaborador).selectinload(Colaborador.persona), selectinload(Ticket.cliente_servicio).selectinload(ClienteServicio.servicio)).where(Ticket.id_analista == rol)
+        ticket = db.execute(query).scalars().all()
+        return ticket
+    except Exception as e:
+        raise ValueError(f"Error al obtener tickets del analista: {str(e)}")
+
 def obtener_tickets(db, user):
     rol = revisarUsuario(user)
     try:
@@ -90,6 +100,15 @@ def obtener_ticket_especifico(db, id_ticket : int, user):
         return ticket
     except Exception as e:
         raise ValueError(f"Error al obtener ticket específico: {str(e)}")
+
+def obtener_ticket_especifico_analista(db, id_ticket : int, user):
+    rol = revisarUsuario(user)
+    try:
+        query = select(Ticket).options(selectinload(Ticket.colaborador).selectinload(Colaborador.persona), selectinload(Ticket.cliente_servicio).selectinload(ClienteServicio.servicio)).where(Ticket.id_ticket == id_ticket, Ticket.id_analista == rol)
+        ticket = db.execute(query).scalars().first()
+        return ticket
+    except Exception as e:
+        raise ValueError(f"Error al obtener ticket específico del analista: {str(e)}")
 
 def obtener_ticket_asunto(db, asunto : str, user):
     rol = revisarUsuario(user)
