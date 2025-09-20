@@ -34,21 +34,23 @@ def revisarUsuario(user):
 
 
 def crear_ticket(db, payload: TicketCreatePublic, user: dict):
-    servicios = user.get("servicios", [])
-    analista = obtener_analista_nivel(db, str(payload.nivel))
-    id_cliente_servicio = next((s.get("id_cliente_servicio") or s.get("id") for s in servicios if s.get("nombre") == payload.servicio),None)
-    
-    nuevo = Ticket(
-        id_colaborador=user["colaborador_id"],
-        id_analista= analista.id if analista else None,
-        id_cliente_servicio=id_cliente_servicio,
-        asunto=payload.asunto,
-        nivel=payload.nivel,
-        tipo=payload.tipo,
-        )
-    db.add(nuevo)
-    db.flush()
-    return nuevo
+    try:
+        servicios = user.get("servicios", [])
+        analista = obtener_analista_nivel(db, str(payload.nivel))
+        id_cliente_servicio = next((s.get("id_cliente_servicio") or s.get("id") for s in servicios if s.get("nombre") == payload.servicio.strip().upper()),None)
+        nuevo = Ticket(
+            id_colaborador=user["colaborador_id"],
+            id_analista= analista.id if analista else None,
+            id_cliente_servicio=id_cliente_servicio,
+            asunto=payload.asunto,
+            nivel=payload.nivel,
+            tipo=payload.tipo,
+            )
+        db.add(nuevo)
+        db.flush()
+        return nuevo
+    except Exception as e:
+        raise Exception(f'Error al crear ticket: {str(e)}')
 
 def obtener_tickets(db, user):
     rol = revisarUsuario(user)

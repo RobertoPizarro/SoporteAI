@@ -28,7 +28,7 @@ def make_crear_ticket_Tool(get_session_user):
                 servicio=servicio
             )
         except Exception as e:
-            return {"error": f"Error en los datos proporcionados: {str(e)}", "type": "error"}
+            raise Exception(f"Error en los datos proporcionados: {str(e)}")
 
         try:
             with conectarORM() as db:
