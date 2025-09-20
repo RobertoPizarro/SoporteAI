@@ -44,9 +44,11 @@ def google_analista(req: Request, body: LoginIn):
     _assert_gmail(email)  # fuerza @gmail.com
 
     sub   = info["sub"]
-    print ("info provider:", sub)
     name  = info.get("name") or (email.split("@")[0] if email else None)
-    hd    = info.get("hd")  # suele venir None para gmail.com
+    hd    = info.get("hd")
+    
+    print ("hd:", hd, "email:", email, "name:", name, "sub:", sub)
+    # suele venir None para gmail.com
     with conectarORM() as db:
         out = insertar_analista(db, sub=sub, email=email, name=name, hd=hd)
 
