@@ -58,7 +58,7 @@ app.add_middleware(
 app.include_router(auth_colab_router,     prefix="/auth", tags=["auth"])
 app.include_router(auth_analista_router,  prefix="/auth", tags=["auth"])
 app.include_router(chat_router,                        tags=["chat"])
-app.include_router(analista_router,      prefix="/analista", tags=["analista"])
+app.include_router(analista_router,       tags=["analista"])
 
 @app.get("/")
 def home():

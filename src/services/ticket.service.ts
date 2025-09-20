@@ -18,7 +18,11 @@ export const getTickets = async (): Promise<Ticket[] | null> => {
   try {
     // Intentar backend primero
     const data = await apiRequest(ENDPOINTS.TICKETS);
-    return data;
+    console.log("🎫 Backend response:", data);
+    console.log("🎫 Data response:", data.tickets);
+    
+    // El backend devuelve {tickets: [...]}
+    return data.tickets || [];
   } catch (error) {
     console.warn("Backend no disponible, usando datos locales:", error);
     // Fallback a datos locales

@@ -30,7 +30,9 @@ const AnalystDashboard = () => {
       try {
         setIsLoading(true);
         const ticketsData = await getTickets();
+        console.log("🎫 Tickets data received:", ticketsData);
         if (ticketsData) {
+          console.log("🎫 First ticket structure:", ticketsData[0]);
           setTickets(ticketsData);
         }
       } catch (error) {
@@ -45,11 +47,11 @@ const AnalystDashboard = () => {
 
   const filteredTickets = tickets.filter((ticket) => {
     const matchesFilter =
-      selectedFilter === "Todos" || ticket.estado === selectedFilter;
+      selectedFilter === "Todos" || ticket?.estado === selectedFilter;
     const matchesSearch =
-      ticket.asunto.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ticket.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ticket.usuario.toLowerCase().includes(searchTerm.toLowerCase());
+      (ticket?.asunto || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      String(ticket?.id || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (ticket?.usuario || '').toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
