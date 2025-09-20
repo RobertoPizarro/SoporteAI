@@ -2,7 +2,25 @@ from fastapi import APIRouter, Request, HTTPException
 from backend.db.crud.crud_ticket import obtener_tickets, obtener_ticket_especifico, actualizar_ticket_estado
 from backend.db.crud.crud_conversacion import traer_conversacion
 from backend.util.util_conectar_orm import conectarORM
+from pydantic import BaseModel, ConfigDict
+from datetime import datetime
+
 analista_router = APIRouter()
+
+class TicketRead(BaseModel):
+    id_ticket: int
+    asunto: str
+    estado: str
+    nivel: str
+    tipo: str
+    id_colaborador: str | None = None
+    id_analista: int | None = None
+    id_cliente_servicio: int | None = None
+    diagnostico: str | None = None
+    created_at: datetime | None = None
+    closed_at: datetime | None = None
+
+    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
 @analista_router.get("/analista/tickets")
 def obtenerTickets(req: Request):
@@ -12,7 +30,8 @@ def obtenerTickets(req: Request):
     try:
         with conectarORM() as db:
             tickets = obtener_tickets(db, analista)
-            return {"tickets": tickets}
+            data = [TicketRead.model_validate(t).model_dump() for t in tickets]
+            return {"tickets": data}
     except Exception as e:
         raise HTTPException(500, f"Error interno: {e}")
 
@@ -66,5 +85,5 @@ def obtenerTicket(req: Request, ticket: int):
                 raise HTTPException(404, f"Ticket {ticket} no encontrado o no autorizado")
     except Exception as e:
         raise HTTPException(500, f"Error interno: {e}")
-    return {"ticket": {"id": ticket, "asunto": "Asunto del ticket", "estado": "abierto"}}
+    return {"ticket": TicketRead.model_validate(ticket).model_dump()}
 
