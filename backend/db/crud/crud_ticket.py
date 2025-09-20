@@ -179,9 +179,8 @@ def escalar_ticket(bd : Session, idTicket : int, motivo: str):
         nivel = nivel_destino,
         estado = "en atención",
     ))
-
-    print(f"Ticket escalado a nivel {nivel_destino}")
-    return str(nivel_destino)
+    bd.flush()
+    return {nivel_destino, id_analista_destino}
 
 def traer_conversacion(db : Session, idTicket : int ):
     query = select(Conversacion).where(Conversacion.id_ticket == idTicket)
