@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 from backend.api.auth.api_auth_colaborador import auth_colab_router
 from backend.api.auth.api_auth_analista import auth_analista_router
+from backend.api.analista.api_analista import analista_router
 from backend.api.usuario.api_root import chat_router
 from backend.util.util_base_de_datos import obtenerConexionBaseDeDatos  # -> (conn_cm, saver)
 # Lifespan: abre PostgresSaver al inicio y ciérralo al final
@@ -57,6 +58,7 @@ app.add_middleware(
 app.include_router(auth_colab_router,     prefix="/auth", tags=["auth"])
 app.include_router(auth_analista_router,  prefix="/auth", tags=["auth"])
 app.include_router(chat_router,                        tags=["chat"])
+app.include_router(analista_router,      prefix="/analista", tags=["analista"])
 
 @app.get("/")
 def home():

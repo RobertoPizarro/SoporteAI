@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request, HTTPException
 from backend.db.crud.crud_ticket import obtener_tickets, obtener_ticket_especifico, actualizar_ticket_estado
+from backend.db.crud.crud_conversacion import traer_conversacion
 from backend.util.util_conectar_orm import conectarORM
 analista_router = APIRouter()
 
@@ -46,9 +47,13 @@ def cambiarEstadoTicket(req: Request, ticket: int, estado: str, diagnostico: str
 
 @analista_router.get("/analista/chat")
 def chatAnalista(ticket: int):
-    # Lógica para el chat del ticket
-    return {"mensaje": f"Funcionalidad de chat para el ticket {ticket}"}  
-
+    try:
+        with conectarORM() as db:
+            contenido = traer_conversacion(db, ticket)
+            return {"chat": contenido}
+    except Exception as e:
+        raise HTTPException(500, f"Error interno: {e}")
+    
 @analista_router.get("/analista/ticket")
 def obtenerTicket(req: Request, ticket: int):
     analista = req.session.get("user")

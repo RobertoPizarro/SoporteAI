@@ -1,14 +1,10 @@
 from sqlalchemy import select, update
-from backend.db.models import Ticket, Analista, Conversacion
+from backend.db.models import Ticket
 from datetime import datetime, timezone
-from uuid import UUID
 from pydantic import BaseModel, Field
-from typing import Optional
 from backend.db.crud.crud_analista import obtener_analista_nivel, nivel_numero
 import enum
 from backend.db.crud.crud_escalado import crear_escalado
-from sqlalchemy.orm import Session
-import uuid
 
 class TicketNivelEnum(str, enum.Enum):
     bajo = "bajo"
@@ -23,6 +19,10 @@ class TicketCreatePublic(BaseModel):
     nivel: TicketNivelEnum
     tipo: TicketTipoEnum
     servicio: str
+
+# ---------------------------------------------
+# Utilidades
+# ----------------------------------------------
 
 def numero_a_nivel(numero: int) -> TicketNivelEnum:
     """Convierte un número (1-4) a un valor del Enum TicketNivelEnum."""
@@ -47,6 +47,9 @@ def revisarUsuario(user):
     except Exception as e:
         raise ValueError(f"Error al revisar usuario: {str(e)}")
 
+# ---------------------------------------------
+# CRUD de Ticket
+# ----------------------------------------------
 
 def crear_ticket(db, payload: TicketCreatePublic, user: dict):
     try:
@@ -109,30 +112,6 @@ def obtener_tickets_abiertos(db, user):
         raise ValueError(f"Error al obtener tickets abiertos: {str(e)}")
     return tickets
 
-def actualizar_ticket(db, id_ticket: int, estado: str | None, nivel: str | None = None, id_analista: UUID | None = None) -> Ticket | None:
-        ticket = db.query(Ticket).filter(Ticket.id_ticket == id_ticket).first()
-        
-        if not ticket:
-            return None
-        
-        now = datetime.now(timezone.utc)
-
-        if estado == "finalizado":
-            ticket.estado = estado
-            ticket.closed_at = now
-            ticket.updated_at = now
-        elif id_analista and nivel:
-            ticket.id_analista = id_analista
-            ticket.nivel = nivel
-            ticket.updated_at = now
-        elif estado:
-            ticket.estado = estado
-            ticket.updated_at = now
-        
-        db.commit()
-        db.refresh(ticket)  # opcional: recargar con lo último de la BD
-        return ticket
-
 def actualizar_ticket_estado(db, id_ticket: int, estado: str, diagnostico: str | None = ""):
         ticket = db.execute(select(Ticket).filter(Ticket.id_ticket == id_ticket).with_for_update()).scalar_one_or_none()
         
@@ -151,8 +130,7 @@ def actualizar_ticket_estado(db, id_ticket: int, estado: str, diagnostico: str |
         db.flush()
         return ticket
 
-#falta probar
-def escalar_ticket(bd : Session, idTicket : int, motivo: str):
+def escalar_ticket(bd, idTicket : int, motivo: str):
     query_ticket = select(Ticket).where(Ticket.id_ticket == idTicket)
     try:
         ticket: Ticket | None = bd.execute(query_ticket).scalar_one_or_none()
@@ -181,9 +159,3 @@ def escalar_ticket(bd : Session, idTicket : int, motivo: str):
     ))
     bd.flush()
     return nivel_destino
-
-def traer_conversacion(db : Session, idTicket : int ):
-    query = select(Conversacion).where(Conversacion.id_ticket == idTicket)
-    conversacion = db.execute(query).scalar_one_or_none()
-    return conversacion.contenido if conversacion else None
-    

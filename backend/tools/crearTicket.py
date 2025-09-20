@@ -40,8 +40,8 @@ def make_crear_ticket_Tool(get_session_user):
                         "asunto": nuevo_ticket.asunto,
                         "tipo": nuevo_ticket.tipo, 
                         "nivel": nuevo_ticket.nivel, 
-                        "servicio": payload.servicio,  # ← USAR EL SERVICIO DEL PAYLOAD
-                        "estado": "Nuevo",
+                        "servicio": payload.servicio,
+                        "estado": "Aceptado",
                         "usuario": user.get("name"),
                         "fechaCreacion": nuevo_ticket.created_at.strftime('%d/%m/%Y') if hasattr(nuevo_ticket, 'created_at') else None,
                         "fechaActualizacion": nuevo_ticket.updated_at.strftime('%d/%m/%Y') if hasattr(nuevo_ticket, 'updated_at') else None,
