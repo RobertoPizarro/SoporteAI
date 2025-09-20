@@ -13,6 +13,41 @@ export interface UpdateTicketData {
 // Estados que requieren descripción obligatoria
 const CLOSING_STATES = ["Resuelto", "Cerrado", "Rechazado"];
 
+// Interface para el ticket que viene del backend
+interface BackendTicket {
+  id_ticket: number;
+  asunto: string;
+  estado: string;
+  nivel: string;
+  tipo: string;
+  id_colaborador: string;
+  id_analista: string | null;
+  id_cliente_servicio: string;
+  diagnostico: string | null;
+  created_at: string;
+  updated_at: string;
+  closed_at: string | null;
+}
+
+// Función para transformar ticket del backend al formato del frontend
+const transformBackendTicket = (backendTicket: BackendTicket): Ticket => {
+  return {
+    id: backendTicket.id_ticket.toString(),
+    usuario: backendTicket.id_colaborador, // Por ahora usamos el ID, luego podemos mapear a nombre
+    analista: backendTicket.id_analista || "Sin asignar",
+    cliente: "Cliente", // Por ahora placeholder, luego mapear desde id_cliente_servicio
+    servicio: "Servicio", // Por ahora placeholder, luego mapear desde id_cliente_servicio  
+    fechaCreacion: backendTicket.created_at,
+    fechaActualizacion: backendTicket.updated_at,
+    fechaCierre: backendTicket.closed_at || "",
+    asunto: backendTicket.asunto,
+    nivel: backendTicket.nivel === "bajo" ? 1 : backendTicket.nivel === "medio" ? 2 : 3,
+    estado: backendTicket.estado === "aceptado" ? "Nuevo" : "",
+    diagnostico: backendTicket.diagnostico || "",
+    tipo: backendTicket.tipo
+  };
+};
+
 // Obtener todos los tickets
 export const getTickets = async (): Promise<Ticket[] | null> => {
   try {
@@ -22,7 +57,11 @@ export const getTickets = async (): Promise<Ticket[] | null> => {
     console.log("🎫 Data response:", data.tickets);
     
     // El backend devuelve {tickets: [...]}
-    return data.tickets || [];
+    if (data.tickets && Array.isArray(data.tickets)) {
+      return data.tickets.map(transformBackendTicket);
+    }
+    
+    return [];
   } catch (error) {
     console.warn("Backend no disponible, usando datos locales:", error);
     // Fallback a datos locales
