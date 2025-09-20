@@ -134,8 +134,11 @@ def actualizar_ticket(db, id_ticket: int, estado: str | None, nivel: str | None 
         return ticket
 
 def actualizar_ticket_estado(db, id_ticket: int, estado: str, diagnostico: str | None = ""):
-        ticket = db.execute(select(Ticket).filter(Ticket.id_ticket == id_ticket).with_for_update()).scalars().first()
+        ticket = db.execute(select(Ticket).filter(Ticket.id_ticket == id_ticket).with_for_update()).scalar_one_or_none()
         
+        if not ticket:
+            raise ValueError(f"Ticket {id_ticket} no encontrado")
+
         if estado == "finalizado" or estado == "cancelado":
             ticket.estado = estado
             ticket.closed_at = datetime.now(timezone.utc)
@@ -145,7 +148,7 @@ def actualizar_ticket_estado(db, id_ticket: int, estado: str, diagnostico: str |
         elif estado:
             ticket.estado = estado
 
-        db.update(ticket)
+        db.flush()
         return ticket
 
 #falta probar
