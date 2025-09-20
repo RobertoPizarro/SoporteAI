@@ -1,6 +1,6 @@
 from sqlalchemy import select, update
 from sqlalchemy.orm import selectinload
-from backend.db.models import Ticket, Colaborador, ClienteServicio, Persona
+from backend.db.models import Ticket, Colaborador, ClienteServicio, Persona, External, Servicio
 from datetime import datetime, timezone
 from pydantic import BaseModel, Field
 from backend.db.crud.crud_analista import obtener_analista_nivel, nivel_numero
@@ -75,7 +75,19 @@ def crear_ticket(db, payload: TicketCreatePublic, user: dict):
 def obtener_tickets_analista(db, user):
     rol = revisarUsuario(user)
     try:
-        query = select(Ticket).options(selectinload(Ticket.colaborador).selectinload(Colaborador.persona), selectinload(Ticket.cliente_servicio).selectinload(ClienteServicio.servicio)).where(Ticket.id_analista == rol)
+        ext = (
+        select(External.nombre)
+        .join(Persona, Persona.id == External.id_persona)
+        .join(Colaborador, Colaborador.id_persona == Persona.id)
+        .where(Colaborador.id == Ticket.id_colaborador)
+        .limit(1).correlate(Ticket).scalar_subquery()
+        )
+        query = (
+        select(ext.label("colaborador_nombre"), Servicio.nombre.label("servicio_nombre"),)
+        .join(ClienteServicio, ClienteServicio.id == Ticket.id_cliente_servicio, isouter=True)
+        .join(Servicio, Servicio.id == ClienteServicio.id_servicio, isouter=True)
+        .where(Ticket.id_analista == rol)
+        )
         ticket = db.execute(query).scalars().all()
         return ticket
     except Exception as e:
@@ -104,17 +116,20 @@ def obtener_ticket_especifico(db, id_ticket : int, user):
 def obtener_ticket_especifico_analista(db, id_ticket : int, user):
     rol = revisarUsuario(user)
     try:
+        ext = (
+        select(External.nombre)
+        .join(Persona, Persona.id == External.id_persona)
+        .join(Colaborador, Colaborador.id == Persona.id)
+        .where(Colaborador.id == Ticket.id_colaborador)
+        .limit(1)
+        .correlate(Ticket)
+        .scalar_subquery()
+        )
         query = (
-            select(Ticket)
-            .options(
-                selectinload(Ticket.colaborador)
-                    .selectinload(Colaborador.persona)
-                    .selectinload(Persona.externals),  # ← para obtener nombre desde External.nombre
-                selectinload(Ticket.cliente_servicio)
-                    .selectinload(ClienteServicio.servicio),  # ← servicio.nombre
-            )
-            .where(Ticket.id_analista == rol)
-            .order_by(Ticket.created_at.desc())
+        select(Ticket, ext.label("colaborador_nombre"), Servicio.nombre.label("servicio_nombre"))
+        .join(ClienteServicio, ClienteServicio.id == Ticket.id_cliente_servicio, isouter=True)
+        .join(Servicio, Servicio.id == ClienteServicio.id_servicio, isouter=True)
+        .where(Ticket.id_ticket == id_ticket, Ticket.id_analista == rol)
         )
         ticket = db.execute(query).scalars().first()
         return ticket

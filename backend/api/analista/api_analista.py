@@ -5,6 +5,7 @@ from backend.db.models import Colaborador
 from backend.util.util_conectar_orm import conectarORM
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
+import uuid
 
 analista_router = APIRouter()
 
@@ -14,9 +15,9 @@ class TicketRead(BaseModel):
     estado: str
     nivel: str
     tipo: str # Nombre colaborador # Nombre servicio
-    id_colaborador: str | None = None
-    id_analista: int | None = None
-    id_cliente_servicio: int | None = None
+    id_colaborador: uuid.UUID | None = None
+    id_analista: uuid.UUID | None = None
+    id_cliente_servicio: uuid.UUID | None = None
     diagnostico: str | None = None
     created_at: datetime | None = None
     closed_at: datetime | None = None
