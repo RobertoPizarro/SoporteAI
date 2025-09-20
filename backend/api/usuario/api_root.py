@@ -23,9 +23,11 @@ def chat(req: Request, body: ChatIn):
     if user.get("thread_id") != orq.user.get("thread_id"):
         user["thread_id"] = orq.user.get("thread_id")
         req.session["user"] = user
-    
-    respuesta = orq.enviarMensaje(body.mensaje)
-    
+    try:
+        respuesta = orq.enviarMensaje(body.mensaje)
+    except Exception as e:
+        raise HTTPException(500, f"Error al enviar mensaje: {e}")
+
     # Si la respuesta es un diccionario con estructura de ticket, devolverla completa
     if isinstance(respuesta, dict) and respuesta.get('type') == 'ticket':
         return respuesta

@@ -9,8 +9,7 @@ import enum
 from sqlalchemy.orm import Session
 import uuid 
 
-def crear_escalado(bd: Session, idTicket: int, id_analista_der: uuid.UUID, 
-                  id_analista_soli: uuid.UUID, motivo: str) -> Escalado:
+def crear_escalado(bd: Session, idTicket: int, id_analista_der, id_analista_soli, motivo: str) -> Escalado:
     try:
         new_escalado = Escalado(
             id_ticket = idTicket,
@@ -25,5 +24,4 @@ def crear_escalado(bd: Session, idTicket: int, id_analista_der: uuid.UUID,
         print(f"ID asignado: {new_escalado.id_escalado}")
         return new_escalado
     except Exception as e:
-        print(f"Error creando escalado: {e}")
-        raise
+        raise ValueError(f"Error al crear escalado: {str(e)}")

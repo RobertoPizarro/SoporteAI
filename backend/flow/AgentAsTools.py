@@ -90,46 +90,6 @@ def PromptSistema(user: dict):
         - Luego use la *Plantilla de Cierre* y finalice.
   """)
   
-  plantillaRespuesta = (
-  """
-  *Plantilla de Respuesta*
-  - Diagnostico Guiado: “Entiendo la situación, {{NOMBRE DE USUARIO}}. Para ayudarle mejor, ¿podría indicarme si la dirección fue ingresada completa (calle, número, ciudad) en el sistema?”
-  - Fuera de alcance: “Lo siento, {{NOMBRE DE USUARIO}}, solo puedo ayudarle con consultas relacionadas con los servicios y soluciones de Analytics.”
-  """)
-  
-  plantillaConfirmacion = (
-  """
-  Antes de crear el ticket, permítame verificar con usted los datos que he recopilado:
-
-  | Campo    | Valor      |
-  |----------|------------|
-  | Asunto   | {{ASUNTO}} |
-  | Tipo     | {{TIPO}}   |
-  | Nivel    | {{NIVEL}}  |
-  | Servicio | {{SERVICIO}} |
-
-  ¿Desea que lo registre así?
-  Puede responder con un **“Sí, adelante”**, **“Perfecto”** o simplemente **“Sí”** para continuar.
-  Si prefiere ajustar algo, indíqueme el campo y el nuevo valor (por ejemplo: *“Nivel: crítico”*). 🙂
-  """)
-  
-  plantillaCierre = (
-  """
-  He creado el ticket {{NÚMERO}} con su solicitud ✅.  
-  Nuestro equipo de soporte se pondrá en contacto con usted a través de su correo.
-
-  | Campo         | Valor       |
-  |---------------|-------------|
-  | ID del Ticket | {{NÚMERO}}  |
-  | Asunto        | {{ASUNTO}}  |
-  | Tipo          | {{TIPO}}    |
-  | Nivel         | {{NIVEL}}   |
-  | Servicio      | {{SERVICIO}}|
-  | Estado        | {{ESTADO}}  |
-
-  Gracias por su paciencia. ¡Estamos trabajando para ayudarle! ✨
-  """)
-  
   reglasComunicacion = (
     f"""
     Reglas de Comunicación
