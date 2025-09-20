@@ -1,6 +1,6 @@
 from sqlalchemy import select, update
 from sqlalchemy.orm import selectinload
-from backend.db.models import Ticket, Colaborador, ClienteServicio
+from backend.db.models import Ticket, Colaborador, ClienteServicio, Persona
 from datetime import datetime, timezone
 from pydantic import BaseModel, Field
 from backend.db.crud.crud_analista import obtener_analista_nivel, nivel_numero
@@ -104,7 +104,18 @@ def obtener_ticket_especifico(db, id_ticket : int, user):
 def obtener_ticket_especifico_analista(db, id_ticket : int, user):
     rol = revisarUsuario(user)
     try:
-        query = select(Ticket).options(selectinload(Ticket.colaborador).selectinload(Colaborador.persona), selectinload(Ticket.cliente_servicio).selectinload(ClienteServicio.servicio)).where(Ticket.id_ticket == id_ticket, Ticket.id_analista == rol)
+        query = (
+            select(Ticket)
+            .options(
+                selectinload(Ticket.colaborador)
+                    .selectinload(Colaborador.persona)
+                    .selectinload(Persona.externals),  # ← para obtener nombre desde External.nombre
+                selectinload(Ticket.cliente_servicio)
+                    .selectinload(ClienteServicio.servicio),  # ← servicio.nombre
+            )
+            .where(Ticket.id_analista == rol)
+            .order_by(Ticket.created_at.desc())
+        )
         ticket = db.execute(query).scalars().first()
         return ticket
     except Exception as e:
