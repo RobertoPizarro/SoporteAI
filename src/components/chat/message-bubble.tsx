@@ -4,6 +4,7 @@ import { Bot, User, Copy, Volume2, Square } from "lucide-react";
 import TicketCard from "../user/ticket-card";
 import { copyText, speakText } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const MessageBubble = ({
    message,
@@ -84,9 +85,22 @@ role: "client" | "analyst";
                         <>
                             <div className="text-sm leading-relaxed prose prose-sm max-w-none">
                                 <ReactMarkdown
+                                    remarkPlugins={[remarkGfm]}
                                     components={{
                                         p: ({ children }) => (
                                             <p className="mb-2 last:mb-0">{children}</p>
+                                        ),
+                                        table: ({ children }) => (
+                                            <table className="w-full border-collapse my-2">
+                                                {children}
+                                            </table>
+                                        ),
+                                        thead: ({ children }) => <thead className="bg-black/5">{children}</thead>,
+                                        th: ({ children }) => (
+                                        <th className="text-left border px-2 py-1">{children}</th>
+                                        ),
+                                        td: ({ children }) => (
+                                        <td className="border px-2 py-1 align-top">{children}</td>
                                         ),
                                         strong: ({ children }) => (
                                             <strong className="font-semibold">{children}</strong>
@@ -110,8 +124,8 @@ role: "client" | "analyst";
                                         ),
                                         pre: ({ children }) => (
                                             <pre className="bg-black bg-opacity-10 p-3 rounded-lg overflow-x-auto mb-2">
-                        <code className="text-xs font-mono">{children}</code>
-                      </pre>
+                                                <code className="text-xs font-mono">{children}</code>
+                                            </pre>
                                         ),
                                         h1: ({ children }) => (
                                             <h1 className="text-lg font-bold mb-2">{children}</h1>

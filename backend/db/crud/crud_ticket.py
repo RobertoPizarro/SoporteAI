@@ -52,7 +52,8 @@ def crear_ticket(db, payload: TicketCreatePublic, user: dict):
     try:
         servicios = user.get("servicios", [])
         analista = obtener_analista_nivel(db, str(payload.nivel))
-        id_cliente_servicio = next((s.get("id_cliente_servicio") or s.get("id") for s in servicios if s.get("nombre") == payload.servicio.strip().upper()),None)
+        id_cliente_servicio = next((s.get("id_cliente_servicio") or s.get("id") for s in servicios if s.get("nombre") == payload.servicio), None)
+        
         nuevo = Ticket(
             id_colaborador=user["colaborador_id"],
             id_analista= analista.id if analista else None,
