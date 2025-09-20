@@ -31,7 +31,7 @@ export const ENDPOINTS = {
 
   // Tickets
   TICKETS: "/api/backend/analista/tickets",
-  TICKET_BY_ID: (id: string) => `/api/backend/analista/analista/ticket?ticket=${id}`,
+  TICKET_BY_ID: (id: string) => `/api/backend/analista/ticket?ticket=${id}`,
   UPDATE_TICKET_STATUS: (id: string) => `/api/backend/analista/estado?ticket=${id}`,
   ESCALATE_TICKET: (id: string) => `/api/backend/analista/escalar?ticket=${id}`,
 

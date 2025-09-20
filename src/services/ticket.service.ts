@@ -117,7 +117,14 @@ export const getTicketById = async (id: string): Promise<Ticket | null> => {
   try {
     // Intentar backend primero
     const data = await apiRequest(ENDPOINTS.TICKET_BY_ID(id));
-    return data;
+    console.log("🎫 Single ticket response:", data);
+    
+    // El backend devuelve {ticket: {...}}
+    if (data.ticket) {
+      return transformBackendTicket(data.ticket);
+    }
+    
+    return null;
   } catch (error) {
     console.warn("Backend no disponible, usando datos locales:", error);
     // Fallback a datos locales
