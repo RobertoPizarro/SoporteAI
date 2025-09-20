@@ -69,7 +69,7 @@ class Ticket(Base, CreateTimestampMixin, UpdateTimestampMixin):
 
 """
 
-
+"""
 def revisarUsuario(user):
     rol = ""
     try:
@@ -91,4 +91,10 @@ with conectarORM() as db:
     else:
         if not tickets:
             print("Ticket no encontrado.")
+"""
+#with conectarORM() as db :
+#    crud_ticket.escalar_ticket(db, 20, "f36c6de9-5abd-7258-bf3f-19533740fd1b", "jajaja", "jajajaja")
 
+with conectarORM() as db :
+    conversacion = crud_ticket.traer_conversacion(db, 15)
+    print (conversacion)

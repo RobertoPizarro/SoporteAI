@@ -222,8 +222,10 @@ class Ticket(Base, CreateTimestampMixin, UpdateTimestampMixin):
     colaborador: Mapped["Colaborador"] = relationship(back_populates="tickets")
     cliente_servicio: Mapped["ClienteServicio"] = relationship(back_populates="tickets")
     analista: Mapped[Optional["Analista"]] = relationship(back_populates="tickets")
-    conversaciones: Mapped[List["Conversacion"]] = relationship(
-        back_populates="ticket", cascade="all, delete-orphan"
+    conversacion: Mapped[Optional["Conversacion"]] = relationship(
+        back_populates="ticket", 
+        cascade="all, delete-orphan",
+        uselist=False  # ← CLAVE para 1:1
     )
     escalados: Mapped[List["Escalado"]] = relationship(
         back_populates="ticket", cascade="all, delete-orphan"
@@ -243,7 +245,7 @@ class Conversacion(Base):
         BigInteger, ForeignKey("ticket.id_ticket", ondelete="CASCADE"), nullable=False
     )
     contenido: Mapped[dict] = mapped_column(JSONB, nullable=False)
-    ticket: Mapped["Ticket"] = relationship(back_populates="conversaciones")
+    ticket: Mapped["Ticket"] = relationship(back_populates="conversacion")
 
     def __repr__(self) -> str:
         return f"<Conversacion id={self.id_conversacion} ticket={self.id_ticket}>"

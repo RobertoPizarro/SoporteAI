@@ -1,5 +1,5 @@
 from sqlalchemy import select, update
-from backend.db.models import Ticket, Analista
+from backend.db.models import Ticket, Analista, Conversacion
 from datetime import datetime, timezone
 from uuid import UUID
 from pydantic import BaseModel, Field
@@ -23,6 +23,18 @@ class TicketCreatePublic(BaseModel):
     nivel: TicketNivelEnum
     tipo: TicketTipoEnum
     servicio: str
+
+def numero_a_nivel(numero: int) -> TicketNivelEnum:
+    """Convierte un número (1-4) a un valor del Enum TicketNivelEnum."""
+    mapa = {
+        1: TicketNivelEnum.bajo,
+        2: TicketNivelEnum.medio,
+        3: TicketNivelEnum.alto,
+        4: TicketNivelEnum.critico
+    }
+    if numero not in mapa:
+        raise ValueError(f"Nivel inválido: {numero}. Debe estar entre 1 y 4.")
+    return mapa[numero]
 
 def revisarUsuario(user):
     rol = ""
@@ -118,19 +130,20 @@ def actualizar_ticket(db, id_ticket: int, estado: str | None, nivel: str | None 
 
 #falta probar
 def escalar_ticket(bd : Session, idTicket : int, id_analista_der: uuid.UUID, 
-                  id_analista_soli: uuid.UUID, motivo: str, diagnostico : str):
-    
+                   motivo: str, diagnostico : str):
+    query_ticket = select(Ticket).where(Ticket.id_ticket == idTicket)
+    ticket : Ticket = bd.execute(query_ticket).scalar_one_or_none()
     query_analista = select(Analista).where(Analista.id == id_analista_der)
     analista_destino = bd.execute(query_analista).scalar_one_or_none()
     
     if not analista_destino:
         raise ValueError(f"Analista destino {id_analista_der} no encontrado")
     
-    crear_escalado(bd, idTicket, id_analista_der, id_analista_soli, motivo)
+    crear_escalado(bd, idTicket, id_analista_der, ticket.id_analista, motivo)
     query_update  = update(Ticket).where(Ticket.id_ticket == idTicket).values(
         id_analista = id_analista_der,
-        nivel = analista_destino.nivel,
-        estado = "en_atencion",
+        nivel = numero_a_nivel(analista_destino.nivel),
+        estado = "en atención",
         diagnostico = diagnostico
     )
     result = bd.execute(query_update)
@@ -141,7 +154,10 @@ def escalar_ticket(bd : Session, idTicket : int, id_analista_der: uuid.UUID,
     print(f"Ticket escalado a nivel {analista_destino.nivel}")
     return analista_destino.nivel    
     
-    
+def traer_conversacion(db : Session, idTicket : int ):
+    query = select(Conversacion).where(Conversacion.id_ticket == idTicket)
+    conversacion = db.execute(query).scalar_one_or_none()
+    return conversacion.contenido
     
     
 """
