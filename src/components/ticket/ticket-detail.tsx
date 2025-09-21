@@ -16,7 +16,7 @@ const TicketDetail = ({
         </h2>
         <div className="space-y-4">
           <span className="text-sm font-medium text-emerald-600 bg-emerald-50 px-3 py-2 rounded-lg">
-            {currentTicket.id}
+            TCK-{currentTicket.id}
           </span>
           <div className="flex items-center space-x-4">
             <span className="text-sm font-medium border bg-orange-100 text-orange-700 border-orange-200 px-3 py-2 rounded-full">
@@ -76,7 +76,7 @@ const TicketDetail = ({
             Correo
           </label>
           <p className="text-sm font-semibold text-slate-800 mt-2">
-            {user?.correo || "Correo no disponible"}
+            {currentTicket.email}
           </p>
         </div>
       </div>
