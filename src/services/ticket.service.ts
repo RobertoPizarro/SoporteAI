@@ -56,6 +56,18 @@ const formatEstado = (estado: string): string => {
   return estadoMap[estado] || capitalize(estado);
 };
 
+// Función utilitaria para convertir estado del frontend al backend
+const formatEstadoToBackend = (estado: string): string => {
+  const estadoMap: { [key: string]: string } = {
+    'Nuevo': 'aceptado',
+    'En Progreso': 'en atención',
+    'Finalizado': 'finalizado', 
+    'Rechazado': 'cancelado'
+  };
+  
+  return estadoMap[estado] || estado.toLowerCase();
+};
+
 // Interface para el ticket que viene del backend
 interface BackendTicket {
   id_ticket: number;
@@ -175,14 +187,21 @@ export const updateTicketStatus = async (
   };
 
   try {
+    // Convertir estado del frontend al formato del backend
+    const backendEstado = formatEstadoToBackend(newStatus);
+    
+    // Construir URL con parámetros de query para PATCH
+    const baseUrl = ENDPOINTS.UPDATE_TICKET_STATUS(ticketId);
+    const params = new URLSearchParams({
+      estado: backendEstado,
+      ...(solution && { diagnostico: solution }),
+    });
+    const fullUrl = `${baseUrl}&${params.toString()}`;
+
     // Intentar backend primero
-    const updatedTicket = await apiRequest(
-      ENDPOINTS.UPDATE_TICKET_STATUS(ticketId),
-      {
-        method: "PATCH",
-        body: JSON.stringify(updateData),
-      }
-    );
+    const updatedTicket = await apiRequest(fullUrl, {
+      method: "PATCH",
+    });
     return updatedTicket;
   } catch (error) {
     console.warn("Backend no disponible, usando datos locales:", error);
@@ -206,6 +225,37 @@ export const updateTicketStatus = async (
     }
 
     throw new Error(`Ticket con ID ${ticketId} no encontrado`);
+  }
+};
+
+// Escalar ticket
+export const escalateTicket = async (
+  ticketId: string,
+  motivo: string
+): Promise<{ mensaje: string } | null> => {
+  // Validación: motivo es requerido
+  if (!motivo?.trim()) {
+    throw new Error("El motivo de escalación es requerido");
+  }
+
+  try {
+    // Construir URL con parámetros de query para PATCH
+    const baseUrl = ENDPOINTS.ESCALATE_TICKET(ticketId);
+    const params = new URLSearchParams({
+      motivo: motivo.trim(),
+    });
+    const fullUrl = `${baseUrl}&${params.toString()}`;
+
+    // Intentar backend primero
+    const response = await apiRequest(fullUrl, {
+      method: "PATCH",
+    });
+
+    console.log("🔼 Ticket escalado:", response);
+    return response;
+  } catch (error) {
+    console.warn("Error escalando ticket:", error);
+    throw error;
   }
 };
 
