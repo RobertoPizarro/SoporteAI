@@ -64,8 +64,11 @@ interface BackendTicket {
   nivel: string;
   tipo: string;
   id_colaborador: string;
+  colaborador_nombre: string
   id_analista: string | null;
   id_cliente_servicio: string;
+  servicio: string;
+  servicio_nombre: string;
   diagnostico: string | null;
   created_at: string;
   updated_at: string;
@@ -76,10 +79,10 @@ interface BackendTicket {
 const transformBackendTicket = (backendTicket: BackendTicket): Ticket => {
   return {
     id: backendTicket.id_ticket.toString(),
-    usuario: backendTicket.id_colaborador, // Por ahora usamos el ID, luego podemos mapear a nombre
+    usuario: backendTicket.colaborador_nombre, // Por ahora usamos el ID, luego podemos mapear a nombre
     analista: backendTicket.id_analista || "Sin asignar",
-    cliente: "Cliente", // Por ahora placeholder, luego mapear desde id_cliente_servicio
-    servicio: "Servicio", // Por ahora placeholder, luego mapear desde id_cliente_servicio  
+    cliente: backendTicket.colaborador_nombre,
+    servicio: backendTicket.servicio_nombre,
     fechaCreacion: formatDate(backendTicket.created_at), // ✨ Formatear fecha
     fechaActualizacion: formatDate(backendTicket.updated_at), // ✨ Formatear fecha
     fechaCierre: formatDate(backendTicket.closed_at), // ✨ Formatear fecha (puede ser null)
