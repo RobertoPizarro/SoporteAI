@@ -86,10 +86,12 @@ def obtenerTicket(req: Request, ticket: int):
         raise HTTPException(401, "unauthorized")
     try:
         with conectarORM() as db:
-            ticket = obtener_ticket_especifico_analista(db, ticket, analista)
-            if not ticket:
+            ticket_obj = obtener_ticket_especifico_analista(db, ticket, analista)
+            if not ticket_obj:
                 raise HTTPException(404, f"Ticket {ticket} no encontrado o no autorizado")
+            # ✨ SERIALIZAR DENTRO DE LA SESIÓN
+            ticket_data = TicketRead.model_validate(ticket_obj).model_dump()
+        return {"ticket": ticket_data}
     except Exception as e:
         raise HTTPException(500, f"Error interno: {e}")
-    return {"ticket": TicketRead.model_validate(ticket).model_dump()}
 
