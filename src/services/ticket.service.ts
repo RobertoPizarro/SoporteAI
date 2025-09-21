@@ -56,6 +56,18 @@ const formatEstado = (estado: string): string => {
   return estadoMap[estado] || capitalize(estado);
 };
 
+// Función utilitaria para convertir estado del frontend al backend
+const formatEstadoToBackend = (estado: string): string => {
+  const estadoMap: { [key: string]: string } = {
+    'Nuevo': 'aceptado',
+    'En Progreso': 'en atención',
+    'Finalizado': 'finalizado', 
+    'Rechazado': 'cancelado'
+  };
+  
+  return estadoMap[estado] || estado.toLowerCase();
+};
+
 // Interface para el ticket que viene del backend
 interface BackendTicket {
   id_ticket: number;
@@ -175,14 +187,21 @@ export const updateTicketStatus = async (
   };
 
   try {
+    // Convertir estado del frontend al formato del backend
+    const backendEstado = formatEstadoToBackend(newStatus);
+    
+    // Construir URL con parámetros de query para PATCH
+    const baseUrl = ENDPOINTS.UPDATE_TICKET_STATUS(ticketId);
+    const params = new URLSearchParams({
+      estado: backendEstado,
+      ...(solution && { diagnostico: solution }),
+    });
+    const fullUrl = `${baseUrl}&${params.toString()}`;
+
     // Intentar backend primero
-    const updatedTicket = await apiRequest(
-      ENDPOINTS.UPDATE_TICKET_STATUS(ticketId),
-      {
-        method: "PATCH",
-        body: JSON.stringify(updateData),
-      }
-    );
+    const updatedTicket = await apiRequest(fullUrl, {
+      method: "PATCH",
+    });
     return updatedTicket;
   } catch (error) {
     console.warn("Backend no disponible, usando datos locales:", error);
