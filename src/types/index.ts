@@ -42,6 +42,7 @@ export type Ticket = {
   estado: string;
   diagnostico: string;
   tipo: string;
+  email: string;
 };
 
 export type Message = {
