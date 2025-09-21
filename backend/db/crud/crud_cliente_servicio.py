@@ -1,6 +1,8 @@
+# Modelos
 from backend.db.models import ClienteServicio, Servicio
+
+# SQLAlchemy
 from sqlalchemy import select
-from uuid import UUID
 
 def obtener_clientes_servicios(db):
     filas = db.execute(select(ClienteServicio)).scalars().all()

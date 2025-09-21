@@ -1,19 +1,26 @@
-# app.py
-from logging import debug
+# FastAPI para SoporteAI
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
+
+# Lifespan
 from contextlib import asynccontextmanager
+
+# Servidor ASGI
 import uvicorn
+
+# Routers
 from backend.api.auth.api_auth_colaborador import auth_colab_router
 from backend.api.auth.api_auth_analista import auth_analista_router
 from backend.api.analista.api_analista import analista_router
 from backend.api.usuario.api_root import chat_router
-from backend.util.util_base_de_datos import obtenerConexionBaseDeDatos  # -> (conn_cm, saver)
-# Lifespan: abre PostgresSaver al inicio y ciérralo al final
+
+# Utilitario de conexión al checkpointer
+from backend.util.util_base_de_datos import obtenerConexionBaseDeDatos 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    conn, saver = obtenerConexionBaseDeDatos()  # context manager + PostgresSaver real
+    conn, saver = obtenerConexionBaseDeDatos() 
     app.state.conn = conn
     app.state.checkpointer = saver
     print("Checkpointer listo:", type(saver).__name__ if saver else None)
@@ -57,8 +64,8 @@ app.add_middleware(
 # Routers
 app.include_router(auth_colab_router,     prefix="/auth", tags=["auth"])
 app.include_router(auth_analista_router,  prefix="/auth", tags=["auth"])
-app.include_router(chat_router,                        tags=["chat"])
-app.include_router(analista_router,       tags=["analista"])
+app.include_router(chat_router,                           tags=["chat"])
+app.include_router(analista_router,                       tags=["analista"])
 
 @app.get("/")
 def home():

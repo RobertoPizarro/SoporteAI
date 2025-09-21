@@ -1,8 +1,14 @@
+# Rutas API para analistas
 from fastapi import APIRouter, Request, HTTPException
+
+# CRUD
 from backend.db.crud.crud_ticket import obtener_tickets_analista, obtener_ticket_especifico_analista, actualizar_ticket_estado
 from backend.db.crud.crud_conversacion import traer_conversacion
-from backend.db.models import Colaborador
+
+# ORM
 from backend.util.util_conectar_orm import conectarORM
+
+# Modelos
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 import uuid
@@ -72,7 +78,6 @@ def cambiarEstadoTicket(ticket: int, estado: str, diagnostico: str | None = ""):
             raise HTTPException(404, f"Ticket {ticket} no encontrado")
     return {"mensaje": f"Estado del ticket {ticket} cambiado a: {estado}"}
 
-
 @analista_router.get("/analista/chat")
 def chatAnalista(ticket: int):
     try:
@@ -92,7 +97,7 @@ def obtenerTicket(req: Request, ticket: int):
             ticket_obj = obtener_ticket_especifico_analista(db, ticket, analista)
             if not ticket_obj:
                 raise HTTPException(404, f"Ticket {ticket} no encontrado o no autorizado")
-            # ✨ SERIALIZAR DENTRO DE LA SESIÓN
+            
             ticket_data = TicketRead.model_validate(ticket_obj).model_dump()
         return {"ticket": ticket_data}
     except Exception as e:

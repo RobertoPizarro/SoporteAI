@@ -1,7 +1,12 @@
-import enum
-from backend.db.models import Analista, Ticket, TicketEstadoEnum
+# Modelos
+from backend.db.models import Analista, Ticket
+
+# SQLAlchemy
 from sqlalchemy import func, String, cast
 from sqlalchemy import select
+
+import enum
+
 def obtener_analistas(db) :
     analistas = db.execute(select(Analista)).scalars().all()
     return analistas 

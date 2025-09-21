@@ -1,14 +1,21 @@
+# Rutas FASTAPI para autenticación de analistas
 from fastapi import APIRouter, Request, HTTPException
-from pydantic import BaseModel
+
+# Google OAuth
 from google.oauth2 import id_token
 from google.auth.transport import requests as grequests
-import os
-from dotenv import load_dotenv
+
+# ORM
 from backend.util.util_conectar_orm import conectarORM
+
+# CRUD
 from backend.db.persona.create_analista import insertar_analista
 
+# Helpers
+from backend.util.util_key import obtenerAPI
+from pydantic import BaseModel
+
 auth_analista_router = APIRouter()
-load_dotenv()
 class LoginIn(BaseModel):
     id_token: str
 
@@ -24,7 +31,7 @@ def google_analista(req: Request, body: LoginIn):
     if not idt:
         raise HTTPException(400, "missing id_token")
 
-    client_id = os.getenv("GOOGLE_CLIENT_ID")
+    client_id = obtenerAPI("CONF-CLIENT-GOOGLE-ID")
     if not client_id:
         raise HTTPException(500, "server_misconfig: GOOGLE_CLIENT_ID missing")
 
@@ -41,13 +48,12 @@ def google_analista(req: Request, body: LoginIn):
         raise HTTPException(403, "email_not_verified")
 
     email = info.get("email")
-    _assert_gmail(email)  # fuerza @gmail.com
+    _assert_gmail(email)
 
     sub   = info["sub"]
     name  = info.get("name") or (email.split("@")[0] if email else None)
     hd    = info.get("hd")
     
-    print ("hd:", hd, "email:", email, "name:", name, "sub:", sub)
     # suele venir None para gmail.com
     with conectarORM() as db:
         out = insertar_analista(db, sub=sub, email=email, name=name, hd=hd)

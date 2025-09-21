@@ -2,7 +2,6 @@ from backend.db.models import External, Analista
 from sqlalchemy import select
 
 def insertar_analista(db, sub: str, email: str | None, name: str | None, hd: str | None):
-    # 1) Buscar external por (provider, id_provider)
     ext = db.execute(
         select(External).where(
             External.provider == "google",

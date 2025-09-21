@@ -1,14 +1,21 @@
+# Rutas FASTAPI para autenticación de colaboradores
 from fastapi import APIRouter, Request, HTTPException
-from pydantic import BaseModel
+
+# Google OAuth
 from google.oauth2 import id_token
 from google.auth.transport import requests as grequests
-import os
-from dotenv import load_dotenv
+
+# ORM
 from backend.util.util_conectar_orm import conectarORM
+
+# CRUD
 from backend.db.persona.create_persona import insertar_colaborador
 
+# Helpers
+from backend.util.util_key import obtenerAPI
+from pydantic import BaseModel
+
 auth_colab_router = APIRouter()
-load_dotenv()
 class LoginIn(BaseModel):
     id_token: str
 
@@ -18,7 +25,7 @@ def google_upsert(req: Request, body: LoginIn):
     if not idt:
         raise HTTPException(400, "missing id_token")
 
-    client_id = os.getenv("GOOGLE_CLIENT_ID")
+    client_id = obtenerAPI("CONF-CLIENT-GOOGLE-ID")
     if not client_id:
         raise HTTPException(500, "server_misconfig: GOOGLE_CLIENT_ID missing")
 

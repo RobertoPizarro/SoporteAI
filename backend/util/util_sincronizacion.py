@@ -13,7 +13,6 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 # Helpers propios
 from backend.util.util_documentos import conectarDocumentIntelligence
 from backend.util.util_base_de_conocimientos import conectarBaseDeConocimientos
-from backend.util.util_key import obtenerAPI
 
 # -------------------------------
 # Utilitarios
