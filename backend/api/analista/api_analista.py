@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Request, HTTPException
 
 # CRUD
-from backend.db.crud.crud_ticket import obtener_tickets_analista, obtener_ticket_especifico_analista, actualizar_ticket_estado
+from backend.db.crud.crud_ticket import obtener_tickets_analista, obtener_ticket_especifico_analista, actualizar_ticket_estado, escalar_ticket
 from backend.db.crud.crud_conversacion import traer_conversacion
 
 # ORM
@@ -58,7 +58,6 @@ def escalarTicket(req: Request, ticket: int, motivo: str):
         raise HTTPException(401, "unauthorized")
     try:
         with conectarORM() as db:
-            from backend.db.crud.crud_ticket import escalar_ticket
             nivel_destino = escalar_ticket(db, ticket, motivo)
             return {"mensaje": f"Ticket {ticket} escalado correctamente a nivel {nivel_destino} por el motivo: {motivo}"}
     except Exception as e:
