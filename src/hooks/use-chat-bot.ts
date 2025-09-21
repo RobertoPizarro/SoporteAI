@@ -63,43 +63,51 @@ export default function useChatBot() {
 
                 console.log("🔍 RESPONSE FROM SERVICE:", response);
                 console.log("🔍 Type:", typeof response);
+                console.log("🔍 EXACT RESPONSE TEXT:", JSON.stringify(response));
 
-                let processedContent = response;
+                // Solo detectar si se creó un ticket para bloquear el chat
                 let shouldBlockChat = false;
 
-                // Detectar si se creó un ticket
-                if (typeof response === 'object' && response.type === 'ticket_created') {
-                    // El backend devolvió un ticket creado
-                    processedContent = response.ticket;
-                    shouldBlockChat = true;
-                    console.log("🎫 TICKET CREATED - BLOCKING CHAT:", processedContent);
-                } else if (typeof response === 'object' && response.type === 'ticket') {
-                    // Formato anterior por compatibilidad
-                    processedContent = response.ticket;
-                    shouldBlockChat = true;
-                    console.log("🎫 TICKET (OLD FORMAT) - BLOCKING CHAT:", processedContent);
-                } else if (typeof response === 'string' && response.includes('He generado el ticket')) {
-                    // Fallback: parsear del texto (por compatibilidad)
-                    const ticketMatch = response.match(/ticket #?(\d+)/);
-                    if (ticketMatch) {
-                        const ticketId = parseInt(ticketMatch[1]);
-                        const ticketObject = {
-                            id: ticketId,
-                            asunto: 'Ticket creado desde chat',
-                            tipo: 'Solicitud',
-                            nivel: 'Medio',
-                            estado: 'aceptado', // Estado por defecto según el backend
-                            fecha_creacion: new Date().toISOString(),
-                        };
-                        processedContent = ticketObject;
-                        shouldBlockChat = true;
-                        console.log("🎫 FALLBACK TICKET CREATED - BLOCKING CHAT:", ticketObject);
+                if (typeof response === 'string') {
+                    // 🔍 DEBUGGING: Mostrar el texto completo para análisis
+                    console.log("📝 STRING RESPONSE - ANALYZING FOR TICKET:");
+                    console.log("  Full text:", response);
+                    console.log("  Contains 'ticket':", response.toLowerCase().includes('ticket'));
+                    console.log("  Contains 'generado':", response.toLowerCase().includes('generado'));
+                    console.log("  Contains 'creado':", response.toLowerCase().includes('creado'));
+                    
+                    // Múltiples patrones de detección de ticket
+                    const ticketPatterns = [
+                        /he generado el ticket/i,
+                        /ticket.*creado/i,
+                        /creado.*ticket/i,
+                        /ticket #?(\d+)/i,
+                        /generado.*ticket/i,
+                        /nuevo ticket/i
+                    ];
+                    
+                    for (const pattern of ticketPatterns) {
+                        const match = response.match(pattern);
+                        if (match) {
+                            console.log(`✅ PATTERN MATCHED: ${pattern}`, match);
+                            shouldBlockChat = true;
+                            console.log("🎫 TICKET DETECTED IN STRING - BLOCKING CHAT");
+                            break;
+                        }
                     }
+                    
+                    if (!shouldBlockChat) {
+                        console.log("❌ NO TICKET PATTERNS FOUND IN STRING");
+                    }
+                } else {
+                    console.log("❌ RESPONSE IS NOT STRING - CHAT REMAINS OPEN");
                 }
+
+                console.log("🔒 SHOULD BLOCK CHAT:", shouldBlockChat);
 
                 const botMessage: Message = {
                     type: shouldBlockChat ? "ticket" : "bot",
-                    content: processedContent,
+                    content: response, // Usar directamente el string response
                 };
 
                 addMessage(botMessage);
