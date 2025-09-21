@@ -58,5 +58,6 @@ def google_analista(req: Request, body: LoginIn):
         "persona_id": out["persona_id"],
         "analista_id": out["analista_id"],
         "rol": "analista",
+        "nivel": out.get("nivel"),
     }
     return {"ok": True, **out}
