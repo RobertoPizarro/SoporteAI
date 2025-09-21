@@ -1,6 +1,6 @@
 from sqlalchemy import select, update
 from sqlalchemy.orm import selectinload
-from backend.db.models import Ticket, Colaborador, ClienteServicio, Persona, External, Servicio
+from backend.db.models import Ticket, Colaborador, ClienteServicio, Persona, External, Servicio, Cliente
 from datetime import datetime, timezone
 from pydantic import BaseModel, Field
 from backend.db.crud.crud_analista import obtener_analista_nivel, nivel_numero
@@ -80,9 +80,18 @@ def obtener_tickets_analista(db, user):
     """
     rol = revisarUsuario(user)
     try:
-        # Subconsulta: primer External.nombre asociado a la Persona del Colaborador del Ticket
+        # Subconsultas: primer External.nombre y External.correo asociados a la Persona del Colaborador del Ticket
         ext_nombre_sq = (
             select(External.nombre)
+            .join(Persona, Persona.id == External.id_persona)
+            .join(Colaborador, Colaborador.id_persona == Persona.id)
+            .where(Colaborador.id == Ticket.id_colaborador)
+            .limit(1)
+            .correlate(Ticket)
+            .scalar_subquery()
+        )
+        ext_correo_sq = (
+            select(External.correo)
             .join(Persona, Persona.id == External.id_persona)
             .join(Colaborador, Colaborador.id_persona == Persona.id)
             .where(Colaborador.id == Ticket.id_colaborador)
@@ -96,19 +105,24 @@ def obtener_tickets_analista(db, user):
                 Ticket,
                 ext_nombre_sq.label("colaborador_nombre"),
                 Servicio.nombre.label("servicio_nombre"),
+                Cliente.nombre.label("cliente_nombre"),
+                ext_correo_sq.label("email"),
             )
             .join(ClienteServicio, ClienteServicio.id == Ticket.id_cliente_servicio, isouter=True)
             .join(Servicio, Servicio.id == ClienteServicio.id_servicio, isouter=True)
+            .join(Cliente, Cliente.id == ClienteServicio.id_cliente, isouter=True)
             .where(Ticket.id_analista == rol)
             .order_by(Ticket.created_at.desc())
         )
 
         rows = db.execute(query).all()
         tickets: list[Ticket] = []
-        for t, colaborador_nombre, servicio_nombre in rows:
+        for t, colaborador_nombre, servicio_nombre, cliente_nombre, email in rows:
             # Adjuntar atributos para que el BaseModel los recoja
             setattr(t, "colaborador_nombre", colaborador_nombre)
             setattr(t, "servicio_nombre", servicio_nombre)
+            setattr(t, "cliente_nombre", cliente_nombre)
+            setattr(t, "email", email)
             tickets.append(t)
         return tickets
     except Exception as e:
@@ -147,22 +161,36 @@ def obtener_ticket_especifico_analista(db, id_ticket: int, user):
             .correlate(Ticket)
             .scalar_subquery()
         )
+        ext_correo_sq = (
+            select(External.correo)
+            .join(Persona, Persona.id == External.id_persona)
+            .join(Colaborador, Colaborador.id_persona == Persona.id)
+            .where(Colaborador.id == Ticket.id_colaborador)
+            .limit(1)
+            .correlate(Ticket)
+            .scalar_subquery()
+        )
         query = (
             select(
                 Ticket,
                 ext_nombre_sq.label("colaborador_nombre"),
                 Servicio.nombre.label("servicio_nombre"),
+                Cliente.nombre.label("cliente_nombre"),
+                ext_correo_sq.label("email"),
             )
             .join(ClienteServicio, ClienteServicio.id == Ticket.id_cliente_servicio, isouter=True)
             .join(Servicio, Servicio.id == ClienteServicio.id_servicio, isouter=True)
+            .join(Cliente, Cliente.id == ClienteServicio.id_cliente, isouter=True)
             .where(Ticket.id_ticket == id_ticket, Ticket.id_analista == rol)
         )
         row = db.execute(query).first()
         if not row:
             return None
-        t, colaborador_nombre, servicio_nombre = row
+        t, colaborador_nombre, servicio_nombre, cliente_nombre, email = row
         setattr(t, "colaborador_nombre", colaborador_nombre)
         setattr(t, "servicio_nombre", servicio_nombre)
+        setattr(t, "cliente_nombre", cliente_nombre)
+        setattr(t, "email", email)
         return t
     except Exception as e:
         raise ValueError(f"Error al obtener ticket específico del analista: {str(e)}")
