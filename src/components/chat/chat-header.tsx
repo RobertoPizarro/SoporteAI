@@ -9,9 +9,43 @@ import {
   LogOut,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 const ChatHeader = ({ role }: { role: "client" | "analyst" }) => {
-  const [dropdownOpen, setDropdownOpen] = React.useState(false); /// Borrar
+  const [dropdownOpen, setDropdownOpen] = React.useState(false);
+  
+  // 🔥 Usar el hook para obtener datos reales del usuario
+  const { 
+    name, 
+    isLoading, 
+    isAuthenticated, 
+    isAnalista, 
+    nivel 
+  } = useCurrentUser();
+
+  // Función para obtener las iniciales del nombre
+  const getInitials = (name: string | null): string => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map(word => word.charAt(0))
+      .join("")
+      .toUpperCase()
+      .slice(0, 2); // Máximo 2 iniciales
+  };
+
+  // Función para determinar el título del analista basado en el nivel
+  const getAnalistaTitle = (nivel: number | null): string => {
+    if (!nivel) return "Analista";
+    switch (nivel) {
+      case 1: return "Analista Junior";
+      case 2: return "Analista Senior";
+      case 3: return "Analista Expert";
+      case 4: return "Analista Master";
+      default: return "Analista";
+    }
+  };
+
   return (
     <div className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200/50 flex-shrink-0">
       <div className="px-6 py-4 flex items-center justify-between">
@@ -42,13 +76,24 @@ const ChatHeader = ({ role }: { role: "client" | "analyst" }) => {
               className="flex items-center space-x-3 hover:bg-slate-50 rounded-2xl px-4 py-2.5 transition-all duration-300 group border border-transparent hover:border-slate-200"
             >
               <div className="text-right">
+                {/* 🔥 Mostrar nombre real del usuario o loading */}
                 <p className="text-sm font-semibold text-slate-700">
-                  Juan Pérez
+                  {isLoading ? "Cargando..." : name || "Usuario"}
                 </p>
-                <p className="text-xs text-slate-500">Analista Senior</p>
+                {/* 🔥 Mostrar título basado en el nivel del analista */}
+                <p className="text-xs text-slate-500">
+                  {isLoading ? "..." : isAnalista ? getAnalistaTitle(nivel) : "Colaborador"}
+                </p>
               </div>
               <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow duration-300">
-                <User className="w-5 h-5 text-white" />
+                {/* 🔥 Mostrar iniciales reales del usuario */}
+                {isLoading ? (
+                  <div className="animate-pulse w-5 h-5 bg-white/30 rounded"></div>
+                ) : (
+                  <span className="text-white font-semibold text-sm">
+                    {getInitials(name)}
+                  </span>
+                )}
               </div>
               <ChevronDown
                 className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${

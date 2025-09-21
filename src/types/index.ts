@@ -58,3 +58,21 @@ export type Colaborador = {
   nombre: string;
   correo: string;
 };
+
+export type UserAnalista = {
+  email: string;
+  name: string;
+  persona_id: string;
+  analista_id: string;
+  rol: "analista";
+  nivel?: number;
+};
+
+export type UserData = UserAnalista | {
+  email: string;
+  name: string;
+  persona_id: string;
+  colaborador_id: string;
+  rol: "colaborador";
+  cliente_id?: string;
+};
