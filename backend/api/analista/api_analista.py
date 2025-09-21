@@ -45,7 +45,7 @@ def obtenerTickets(req: Request):
         raise HTTPException(500, f"Error interno: {e}")
 
 
-@analista_router.get("/analista/escalar")
+@analista_router.patch("/analista/escalar")
 def escalarTicket(req: Request, ticket: int, motivo: str):
     analista = req.session.get("user")
     if not analista or analista.get("rol") != "analista":
@@ -59,8 +59,8 @@ def escalarTicket(req: Request, ticket: int, motivo: str):
         raise HTTPException(500, f"Error interno: {e}")
 
 
-@analista_router.get("/analista/estado")
-def cambiarEstadoTicket(req: Request, ticket: int, estado: str, diagnostico: str | None = ""):
+@analista_router.patch("/analista/estado")
+def cambiarEstadoTicket(ticket: int, estado: str, diagnostico: str | None = ""):
     with conectarORM() as db:
         try:
             ticket_actualizado = actualizar_ticket_estado(db, ticket, estado, diagnostico)
