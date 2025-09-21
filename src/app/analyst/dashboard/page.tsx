@@ -107,8 +107,8 @@ const AnalystDashboard = () => {
               gradient: "from-amber-500 to-amber-600",
             },
             {
-              label: "Resueltos",
-              value: tickets.filter((t) => t.estado === "Resuelto").length,
+              label: "Finalizados",
+              value: tickets.filter((t) => t.estado === "Finalizado").length,
               icon: CheckCircle,
               gradient: "from-emerald-500 to-emerald-600",
             },
@@ -170,8 +170,8 @@ const AnalystDashboard = () => {
                   {[
                     "Todos",
                     "Nuevo",
-                    "En Progreso",
-                    "Resuelto",
+                    "En Progreso", 
+                    "Finalizado",
                     "Rechazado",
                   ].map((filter) => (
                     <button

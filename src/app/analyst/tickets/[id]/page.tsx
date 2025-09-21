@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import ChatMessagesList from "@/components/chat/chat-messages-list";
 import ChatHeader from "@/components/chat/chat-header";
@@ -9,11 +9,13 @@ import EscalateTicketModal from "@/components/analyst/escalate-ticket-modal";
 import PageAnimations from "@/components/ui/page-animations";
 import TicketDetail from "@/components/ticket/ticket-detail";
 import TicketManagement from "@/components/ticket/ticket-management";
-import { conversationFlow } from "@/data/conversation-flow";
+import { getChatByTicket } from "@/services/chat.service";
 import useTicket from "@/hooks/use-ticket";
 
 const TicketDetailsPage = () => {
   const params = useParams();
+  const [chatMessages, setChatMessages] = useState<any[]>([]);
+  const [isChatLoading, setIsChatLoading] = useState(true);
 
   const {
     currentTicket,
@@ -31,6 +33,28 @@ const TicketDetailsPage = () => {
   } = useTicket(params.id as string);
 
   const chatEndRef = useRef<HTMLDivElement | null>(null);
+
+  // Cargar mensajes del chat cuando se carga el ticket
+  useEffect(() => {
+    const loadChatMessages = async () => {
+      if (!params.id) return;
+      
+      try {
+        setIsChatLoading(true);
+        console.log("🔍 Cargando chat para ticket:", params.id);
+        const messages = await getChatByTicket(params.id as string);
+        setChatMessages(messages);
+        console.log("✅ Chat cargado:", messages);
+      } catch (error) {
+        console.error("❌ Error cargando chat:", error);
+        setChatMessages([]); // Chat vacío en caso de error
+      } finally {
+        setIsChatLoading(false);
+      }
+    };
+
+    loadChatMessages();
+  }, [params.id]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -81,11 +105,20 @@ const TicketDetailsPage = () => {
         </div>
 
         <div className="flex-1 flex flex-col min-w-0">
-          <ChatMessagesList
-            messages={conversationFlow}
-            messagesEndRef={chatEndRef}
-            role="analyst"
-          />
+          {isChatLoading ? (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-4 border-emerald-500 border-t-transparent mx-auto mb-3"></div>
+                <p className="text-sm text-slate-500">Cargando conversación...</p>
+              </div>
+            </div>
+          ) : (
+            <ChatMessagesList
+              messages={chatMessages}
+              messagesEndRef={chatEndRef}
+              role="analyst"
+            />
+          )}
 
           <div className="p-6 border-t border-slate-200/50 bg-slate-50/50 flex-shrink-0">
             <div className="text-center">

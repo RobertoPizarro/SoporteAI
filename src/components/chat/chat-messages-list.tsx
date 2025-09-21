@@ -38,7 +38,7 @@ const ChatMessagesList = ({
                     <MessageBubble
                         key={message.id || `message-${index}`}
                         message={message}
-                        isBot={message.type === "bot" || message.type === "ticket"}
+                        isBot={message.sender === "bot" || message.type === "bot" || message.type === "ticket"}
                         role={role}
                     />
                 ))}

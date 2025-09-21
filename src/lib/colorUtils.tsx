@@ -23,6 +23,9 @@ export const getStatusColorButton = (
   isDisabled: boolean,
   isCurrentStatus: boolean
 ) => {
+  // 🔍 DEBUG: Log para ver qué estado llega
+  console.log("🔘 getStatusColorButton recibió estado:", `"${estado}"`);
+  
   const baseColors: Record<
     string,
     { normal: string; current: string; disabled: string }
@@ -60,12 +63,17 @@ export const getStatusColorButton = (
     disabled: "bg-gray-50 text-gray-400 border border-gray-200",
   };
 
+  console.log(`🎨 Estado "${estado}" -> colores encontrados:`, colors);
+
   if (isDisabled) return colors.disabled;
   if (isCurrentStatus) return colors.current;
   return colors.normal;
 };
 
 export const getStatusColor = (estado: string): string => {
+  // 🔍 DEBUG: Log para ver qué estado llega
+  console.log("🎨 getStatusColor recibió estado:", `"${estado}"`, "tipo:", typeof estado);
+  
   switch (estado) {
     case TicketStatus.NUEVO:
       return "bg-blue-50 text-blue-700 border border-blue-200";
@@ -74,8 +82,13 @@ export const getStatusColor = (estado: string): string => {
     case TicketStatus.RESUELTO:
       return "bg-emerald-50 text-emerald-700 border border-emerald-200";
     case TicketStatus.RECHAZADO:
+      console.log("✅ RECHAZADO detectado - aplicando color rojo");
+      return "bg-red-50 text-red-700 border border-red-200";
+    case "Rechazado": // Backup por si viene sin enum
+      console.log("✅ 'Rechazado' string detectado - aplicando color rojo");
       return "bg-red-50 text-red-700 border border-red-200";
     default:
+      console.log("⚠️ Estado no reconocido, usando gris por defecto");
       return "bg-gray-50 text-gray-700 border border-gray-200";
   }
 };
@@ -97,13 +110,24 @@ export const getStatusColorDisabled = (estado: string): string => {
 };
 
 export const getStatusBadge = (estado: string): string => {
+  // 🔍 DEBUG: Log para ver qué estado llega al badge
+  console.log("🏷️ getStatusBadge recibió estado:", `"${estado}"`, "tipo:", typeof estado);
+  
   const styles: Record<string, string> = {
     [TicketStatus.NUEVO]: "bg-blue-50 text-blue-700 border border-blue-200",
     [TicketStatus.EN_PROGRESO]: "bg-amber-50 text-amber-700 border border-amber-200",
     [TicketStatus.RESUELTO]: "bg-emerald-50 text-emerald-700 border border-emerald-200",
-    [TicketStatus.RECHAZADO]: "bg-red-50 text-red-700 border border-red-200",
+    [TicketStatus.RECHAZADO]: "!bg-red-50 !text-red-700 !border-red-200", // ⚡ Agregando !important
   };
-  return styles[estado] || "bg-gray-50 text-gray-700 border border-gray-200";
+  
+  const resultado = styles[estado] || "bg-gray-50 text-gray-700 border border-gray-200";
+  console.log(`🎨 Badge para "${estado}" -> ${resultado}`);
+  
+  if (estado === TicketStatus.RECHAZADO) {
+    console.log("🔴 ESTADO RECHAZADO DETECTADO EN BADGE - Usando !important para forzar ROJO");
+  }
+  
+  return resultado;
 };
 
 export const getStatusColorBG = (estado: string): string => {

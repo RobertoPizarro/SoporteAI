@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Ticket, Colaborador } from "@/types";
 import { getTicketById, getUserById, updateTicketStatus, escalateTicket } from "@/services/ticket.service";
 
 export default function useTicket(id: string) {
+  const router = useRouter();
   const [currentTicket, setCurrentTicket] = useState<Ticket | null>(null);
   const [user, setUser] = useState<Colaborador | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,14 +28,20 @@ export default function useTicket(id: string) {
     if (currentTicket && pendingStatus) {
       try {
         // Usar el service para actualizar el ticket
-        const updatedTicket = await updateTicketStatus(
+        const response = await updateTicketStatus(
           currentTicket.id,
           pendingStatus,
           solution
         );
         
-        if (updatedTicket) {
-          setCurrentTicket(updatedTicket);
+        // El backend solo devuelve un mensaje de confirmación, no el ticket actualizado
+        // Por eso necesitamos recargar el ticket manualmente
+        console.log("✅ Estado actualizado:", response);
+        
+        // Recargar el ticket actualizado
+        const refreshedTicket = await getTicketById(currentTicket.id);
+        if (refreshedTicket) {
+          setCurrentTicket(refreshedTicket);
         }
         
         setShowStatusModal(false);
@@ -78,6 +86,10 @@ export default function useTicket(id: string) {
         
         // Cerrar el modal
         setShowEscalateModal(false);
+        
+        // 🚀 Redireccionar al dashboard después de escalar
+        console.log("🏠 Redirigiendo al dashboard...");
+        router.push("/analyst/dashboard");
         
         // Opcional: Mostrar mensaje de éxito al usuario
         // alert(result.mensaje); // Podrías usar un toast en lugar de alert

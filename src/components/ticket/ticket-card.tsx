@@ -29,9 +29,11 @@ const TicketCard = ({ ticket }: { ticket: Ticket }) => {
                 TCK-{ticket.id}
               </span>
               <span
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium ${getStatusBadge(
-                  ticket.estado
-                )}`}
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium ${
+                  ticket.estado === "Rechazado" 
+                    ? "bg-red-100 text-red-800 border border-red-200" // 🔴 Forzar rojo para Rechazado
+                    : getStatusBadge(ticket.estado)
+                }`}
               >
                 {getStatusIcon(ticket.estado)}
                 {ticket.estado}

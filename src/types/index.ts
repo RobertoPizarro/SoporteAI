@@ -48,6 +48,9 @@ export type Ticket = {
 export type Message = {
   id?: number;
   type: "bot" | "user" | "ticket";
+  sender?: "user" | "bot"; // Para mensajes del chat del backend
+  text?: string; // Para mensajes del backend
+  timestamp?: Date; // Para mensajes del backend
   content: string | Ticket;
   delay?: number;
 };
@@ -57,4 +60,22 @@ export type Colaborador = {
   cliente_id: number;
   nombre: string;
   correo: string;
+};
+
+export type UserAnalista = {
+  email: string;
+  name: string;
+  persona_id: string;
+  analista_id: string;
+  rol: "analista";
+  nivel?: number;
+};
+
+export type UserData = UserAnalista | {
+  email: string;
+  name: string;
+  persona_id: string;
+  colaborador_id: string;
+  rol: "colaborador";
+  cliente_id?: string;
 };
