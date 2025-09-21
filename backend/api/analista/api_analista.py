@@ -14,13 +14,16 @@ class TicketRead(BaseModel):
     asunto: str
     estado: str
     nivel: str
+    email: str
     tipo: str # Nombre colaborador # Nombre servicio
     id_colaborador: uuid.UUID | None = None
     id_analista: uuid.UUID | None = None
     id_cliente_servicio: uuid.UUID | None = None
     diagnostico: str | None = None
     created_at: datetime | None = None
+    updated_at: datetime | None = None
     closed_at: datetime | None = None
+    cliente_nombre: str | None = None
     colaborador_nombre: str | None = None
     servicio_nombre: str | None = None
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
