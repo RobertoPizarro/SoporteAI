@@ -228,3 +228,34 @@ export const updateTicketStatus = async (
   }
 };
 
+// Escalar ticket
+export const escalateTicket = async (
+  ticketId: string,
+  motivo: string
+): Promise<{ mensaje: string } | null> => {
+  // Validación: motivo es requerido
+  if (!motivo?.trim()) {
+    throw new Error("El motivo de escalación es requerido");
+  }
+
+  try {
+    // Construir URL con parámetros de query para PATCH
+    const baseUrl = ENDPOINTS.ESCALATE_TICKET(ticketId);
+    const params = new URLSearchParams({
+      motivo: motivo.trim(),
+    });
+    const fullUrl = `${baseUrl}&${params.toString()}`;
+
+    // Intentar backend primero
+    const response = await apiRequest(fullUrl, {
+      method: "PATCH",
+    });
+
+    console.log("🔼 Ticket escalado:", response);
+    return response;
+  } catch (error) {
+    console.warn("Error escalando ticket:", error);
+    throw error;
+  }
+};
+

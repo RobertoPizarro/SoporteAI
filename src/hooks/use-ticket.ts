@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Ticket, Colaborador } from "@/types";
-import { getTicketById, getUserById, updateTicketStatus } from "@/services/ticket.service";
+import { getTicketById, getUserById, updateTicketStatus, escalateTicket } from "@/services/ticket.service";
 
 export default function useTicket(id: string) {
   const [currentTicket, setCurrentTicket] = useState<Ticket | null>(null);
@@ -55,11 +55,45 @@ export default function useTicket(id: string) {
     setShowEscalateModal(true);
   };
 
-  const handleConfirmEscalateTicket = (reason: string) => {
-    console.log(`Escalando ticket ${currentTicket?.id} con razón: ${reason}`);
-    // Aquí puedes agregar la lógica para escalar el ticket
-    // Por ejemplo, llamar a una API o actualizar el estado del ticket
-    setShowEscalateModal(false);
+  const handleConfirmEscalateTicket = async (reason: string) => {
+    if (!currentTicket) {
+      console.error("No hay ticket para escalar");
+      return;
+    }
+
+    try {
+      console.log(`Escalando ticket ${currentTicket.id} con razón: ${reason}`);
+      
+      // Llamar al service para escalar el ticket
+      const result = await escalateTicket(currentTicket.id, reason);
+      
+      if (result) {
+        console.log("✅ Escalación exitosa:", result.mensaje);
+        
+        // Opcional: Recargar el ticket para mostrar los cambios
+        const updatedTicket = await getTicketById(currentTicket.id);
+        if (updatedTicket) {
+          setCurrentTicket(updatedTicket);
+        }
+        
+        // Cerrar el modal
+        setShowEscalateModal(false);
+        
+        // Opcional: Mostrar mensaje de éxito al usuario
+        // alert(result.mensaje); // Podrías usar un toast en lugar de alert
+      }
+    } catch (error) {
+      console.error("Error al escalar ticket:", error);
+      
+      // Mostrar error al usuario
+      alert(
+        error instanceof Error 
+          ? error.message 
+          : "Error al escalar el ticket. Intenta nuevamente."
+      );
+      
+      // Mantener el modal abierto para que el usuario pueda reintentar
+    }
   };
 
   const handleCancelEscalateTicket = () => {
