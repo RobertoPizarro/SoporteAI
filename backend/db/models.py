@@ -233,7 +233,32 @@ class Ticket(Base, CreateTimestampMixin, UpdateTimestampMixin):
     tipo: Mapped[str] = mapped_column(TicketTipoEnum, nullable=False)
     def __repr__(self) -> str:
         return f"<Ticket id={self.id_ticket} estado={self.estado} nivel={self.nivel}>"
+    
+    # ------------------------------
+    # Propiedades de conveniencia
+    # ------------------------------
+    
+    @property
+    def cliente_nombre(self) -> str | None:
+        return self.cliente_servicio.cliente.nombre if self.cliente_servicio and self.cliente_servicio.cliente else None
 
+    @property
+    def servicio_nombre(self) -> str | None:
+        return self.cliente_servicio.servicio.nombre if self.cliente_servicio and self.cliente_servicio.servicio else None
+
+    @property
+    def colaborador_nombre(self) -> str | None:
+        if not self.colaborador or not self.colaborador.persona:
+            return None
+        externals = self.colaborador.persona.externals
+        return externals[0].nombre if externals else None
+
+    @property
+    def email(self) -> str | None:
+        if not self.colaborador or not self.colaborador.persona:
+            return None
+        externals = self.colaborador.persona.externals
+        return externals[0].correo if externals else None
 
 class Conversacion(Base):
     __tablename__ = "conversacion"
