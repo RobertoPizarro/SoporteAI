@@ -26,14 +26,20 @@ export default function useTicket(id: string) {
     if (currentTicket && pendingStatus) {
       try {
         // Usar el service para actualizar el ticket
-        const updatedTicket = await updateTicketStatus(
+        const response = await updateTicketStatus(
           currentTicket.id,
           pendingStatus,
           solution
         );
         
-        if (updatedTicket) {
-          setCurrentTicket(updatedTicket);
+        // El backend solo devuelve un mensaje de confirmación, no el ticket actualizado
+        // Por eso necesitamos recargar el ticket manualmente
+        console.log("✅ Estado actualizado:", response);
+        
+        // Recargar el ticket actualizado
+        const refreshedTicket = await getTicketById(currentTicket.id);
+        if (refreshedTicket) {
+          setCurrentTicket(refreshedTicket);
         }
         
         setShowStatusModal(false);
