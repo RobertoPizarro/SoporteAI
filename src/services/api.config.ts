@@ -28,6 +28,7 @@ export const ENDPOINTS = {
   // Chat
   CHAT_MESSAGE: "/api/backend/user/chat",
   CHAT_RESET: "/api/backend/user/reset",
+  CHAT_GET: "/api/backend/analista/chat",
 
   // Tickets
   TICKETS: "/api/backend/analista/tickets",

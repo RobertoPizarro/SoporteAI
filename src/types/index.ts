@@ -48,6 +48,9 @@ export type Ticket = {
 export type Message = {
   id?: number;
   type: "bot" | "user" | "ticket";
+  sender?: "user" | "bot"; // Para mensajes del chat del backend
+  text?: string; // Para mensajes del backend
+  timestamp?: Date; // Para mensajes del backend
   content: string | Ticket;
   delay?: number;
 };
