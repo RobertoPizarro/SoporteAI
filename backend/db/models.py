@@ -259,6 +259,13 @@ class Ticket(Base, CreateTimestampMixin, UpdateTimestampMixin):
             return None
         externals = self.colaborador.persona.externals
         return externals[0].correo if externals else None
+    
+    @property
+    def analista_nombre(self) -> str | None:
+        if not self.analista or not self.analista.persona:
+            return None
+        externals = self.analista.persona.externals
+        return externals[0].nombre if externals else None
 
 class Conversacion(Base):
     __tablename__ = "conversacion"

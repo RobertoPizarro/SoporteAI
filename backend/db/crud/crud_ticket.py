@@ -1,5 +1,5 @@
 # Modelos
-from backend.db.models import Ticket, Colaborador, ClienteServicio, Persona
+from backend.db.models import Ticket, Colaborador, ClienteServicio, Persona, Analista
 
 # SQLAlchemy
 from sqlalchemy import select, update
@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 from datetime import datetime, timezone
 
 # CRUD
-from backend.db.crud.crud_analista import obtener_analista_nivel, nivel_numero
+from backend.db.crud.crud_analista import obtener_analista_nivel, nivel_numero, obtener_analista
 from backend.db.crud.crud_escalado import crear_escalado
 
 import enum
@@ -62,7 +62,7 @@ def revisarUsuario(user):
 def crear_ticket(db, payload: TicketCreatePublic, user: dict):
     try:
         servicios = user.get("servicios", [])
-        analista = obtener_analista_nivel(db, str(payload.nivel))
+        analista = obtener_analista(db)
         id_cliente_servicio = next((s.get("id_cliente_servicio") or s.get("id") for s in servicios if s.get("nombre") == payload.servicio), None)
         
         nuevo = Ticket(
@@ -79,12 +79,13 @@ def crear_ticket(db, payload: TicketCreatePublic, user: dict):
     except Exception as e:
         raise Exception(f'Error al crear ticket: {str(e)}')
 
-def obtener_tickets_analista(db, user):
+def obtener_tickets(db, user):
     rol = revisarUsuario(user)
+    campo = Ticket.id_analista if user["rol"] == "analista" else Ticket.id_colaborador
     try:
         stmt = (
             select(Ticket)
-            .where(Ticket.id_analista == rol)
+            .where(campo == rol)
             .options(
                 # Ticket -> ClienteServicio -> (Servicio, Cliente)
                 selectinload(Ticket.cliente_servicio).selectinload(ClienteServicio.servicio),
@@ -103,33 +104,13 @@ def obtener_tickets_analista(db, user):
     except Exception as e:
         raise ValueError(f"Error al obtener tickets del analista: {str(e)}")
 
-def obtener_tickets(db, user):
+def obtener_ticket_especifico(db, id_ticket: int, user):
     rol = revisarUsuario(user)
-    try:
-        campo = Ticket.id_analista if user["rol"] == "analista" else Ticket.id_colaborador
-        query = select(Ticket).where(campo == rol)
-        ticket = db.execute(query).scalars().all()
-        return ticket
-    except Exception as e:
-        raise ValueError(f"Error al obtener tickets: {str(e)}")
-    
-def obtener_ticket_especifico(db, id_ticket : int, user):
-    rol = revisarUsuario(user)
-    try:
-        campo = Ticket.id_analista if user["rol"] == "analista" else Ticket.id_colaborador
-        query = select(Ticket).where(Ticket.id_ticket == id_ticket, campo == rol)
-        ticket = db.execute(query).scalars().first()
-        return ticket
-    except Exception as e:
-        raise ValueError(f"Error al obtener ticket específico: {str(e)}")
-
-def obtener_ticket_especifico_analista(db, id_ticket: int, user):
-    """Retorna un Ticket y adjunta colaborador_nombre y servicio_nombre como atributos."""
-    rol = revisarUsuario(user)
+    campo = Ticket.id_analista if user["rol"] == "analista" else Ticket.id_colaborador
     try:
         stmt = (
         select(Ticket)
-        .where(Ticket.id_ticket == id_ticket, Ticket.id_analista == rol)
+        .where(Ticket.id_ticket == id_ticket, campo == rol)
         .options(
             # Ticket -> ClienteServicio -> (Servicio, Cliente)
             selectinload(Ticket.cliente_servicio).selectinload(ClienteServicio.servicio),
@@ -138,6 +119,11 @@ def obtener_ticket_especifico_analista(db, id_ticket: int, user):
             # Ticket -> Colaborador -> Persona -> Externals
             selectinload(Ticket.colaborador)
                 .selectinload(Colaborador.persona)
+                .selectinload(Persona.externals),
+            
+            # Ticket -> Analista -> Persona -> Externals (para analista_nombre)
+            selectinload(Ticket.analista)
+                .selectinload(Analista.persona)
                 .selectinload(Persona.externals),
             )
         )

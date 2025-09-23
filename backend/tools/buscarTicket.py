@@ -1,20 +1,17 @@
+# Query's para buscar tickets
 from backend.db.crud.crud_ticket import obtener_ticket_asunto, obtener_ticket_especifico, obtener_tickets, obtener_tickets_abiertos
-from backend.util.util_conectar_orm import conectarORM
+
+# Modelo Pydantic para los argumentos de las tools
 from pydantic import BaseModel, Field
+
+# Decorador tool
 from langchain_core.tools import tool
-from sqlalchemy.orm.exc import DetachedInstanceError
 
+# Formateo de tickets
+from backend.util.util_formateo import formatearTicket, formatearTickets
 
-def _ticket_to_dict(t):
-    """Serializa un objeto Ticket ORM a un dict seguro (sólo campos primitivos)."""
-    return {
-        "id": t.id_ticket,
-        "asunto": t.asunto,
-        "estado": getattr(t, "estado", None),
-        "nivel": getattr(t, "nivel", None),
-        "tipo": getattr(t, "tipo", None),
-    }
-
+# Conexión ORM
+from backend.util.util_conectar_orm import conectarORM
 class BuscarPorAsuntoInput(BaseModel):
     asunto: str = Field(..., description="Asunto o frase para buscar tickets.")
 
@@ -37,7 +34,7 @@ def make_buscar_tools(get_session_user):
         user = get_session_user()
         with conectarORM() as db:
             tickets = obtener_ticket_asunto(db, asunto, user)
-            tickets_list = [_ticket_to_dict(t) for t in tickets] if tickets else []
+            tickets_list = [formatearTickets(t) for t in tickets] if tickets else []
             if tickets_list:
                 return {
                     "type": "ticket_list",
@@ -73,7 +70,7 @@ def make_buscar_tools(get_session_user):
             if ticket:
                 return {
                     "type": "ticket",
-                    "ticket": _ticket_to_dict(ticket),
+                    "ticket": formatearTicket(ticket),
                     "message": f"Se encontró el ticket con ID {id_ticket}."
                 }
             return {
@@ -95,7 +92,7 @@ def make_buscar_tools(get_session_user):
         user = get_session_user()
         with conectarORM() as db:
             tickets = obtener_tickets_abiertos(db, user)
-            tickets_list = [_ticket_to_dict(t) for t in tickets] if tickets else []
+            tickets_list = [formatearTickets(t) for t in tickets] if tickets else []
             return {
                 "type": "ticket_list",
                 "mode": "abiertos",
@@ -121,7 +118,7 @@ def make_buscar_tools(get_session_user):
         try:
             with conectarORM() as db:
                 tickets = obtener_tickets(db, user)
-                tickets_list = [_ticket_to_dict(t) for t in tickets] if tickets else []
+                tickets_list = [formatearTickets(t) for t in tickets] if tickets else []
                 return {
                     "type": "ticket_list",
                     "mode": "todos",

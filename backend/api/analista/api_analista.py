@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Request, HTTPException
 
 # CRUD
-from backend.db.crud.crud_ticket import obtener_tickets_analista, obtener_ticket_especifico_analista, actualizar_ticket_estado, escalar_ticket
+from backend.db.crud.crud_ticket import obtener_tickets, obtener_ticket_especifico, actualizar_ticket_estado, escalar_ticket
 from backend.db.crud.crud_conversacion import traer_conversacion
 
 # ORM
@@ -44,7 +44,7 @@ def obtenerTickets(req: Request):
         raise HTTPException(401, "unauthorized")
     try:
         with conectarORM() as db:
-            tickets = obtener_tickets_analista(db, analista)
+            tickets = obtener_tickets(db, analista)
             data = [TicketRead.model_validate(t).model_dump() for t in tickets]
             return {"tickets": data}
     except Exception as e:
@@ -93,7 +93,7 @@ def obtenerTicket(req: Request, ticket: int):
         raise HTTPException(401, "unauthorized")
     try:
         with conectarORM() as db:
-            ticket_obj = obtener_ticket_especifico_analista(db, ticket, analista)
+            ticket_obj = obtener_ticket_especifico(db, ticket, analista)
             if not ticket_obj:
                 raise HTTPException(404, f"Ticket {ticket} no encontrado o no autorizado")
             

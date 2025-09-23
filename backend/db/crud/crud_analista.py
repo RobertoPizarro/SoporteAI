@@ -69,3 +69,24 @@ def obtener_analista_nivel(db, nivel_ticket):
         analista = db.execute(q2).scalars().first()
 
     return analista
+
+
+def obtener_analista(db):
+    subq = (
+        select(
+            Ticket.id_analista.label("id_analista"),
+            func.count(Ticket.id_ticket).label("abiertos"),
+        )
+        .where(cast(Ticket.estado, String) != "cerrado")   # <-- evita el InvalidTextRepresentation
+        .group_by(Ticket.id_analista)
+        .subquery()
+    )
+    q = (
+        select(Analista)
+        .outerjoin(subq, Analista.id == subq.c.id_analista)   # usa Analista.id_analista si así se llama tu atributo
+        .where(Analista.nivel == 1)                          # filtra SIEMPRE por analistas de nivel 1
+        .order_by(func.coalesce(subq.c.abiertos, 0).asc(), func.random())
+        .limit(1)
+    )
+    analista = db.execute(q).scalars().first()
+    return analista
