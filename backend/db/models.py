@@ -1,15 +1,26 @@
+# -----------------------
+# IMPORTS
+# -----------------------
+
+# Activa las anotaciones futuras
 from __future__ import annotations
-import uuid
-from typing import Optional, List, Protocol
+
+# Clases relacionadas para el mapeado de las tablas
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, declared_attr
 from sqlalchemy import Text, ForeignKey, UniqueConstraint, Index, text, BigInteger, DateTime, func, Integer
 from sqlalchemy.dialects.postgresql import UUID, JSONB, ENUM as PGEnum
+
+# Utilidades
+import uuid
+from typing import Optional, List, Protocol
 from datetime import datetime
+
 # ---------------------------
 # Base declarativa
 # ---------------------------
 class Base(DeclarativeBase):
     pass
+
 # ---------------------------
 # Entidades principales
 # ---------------------------
@@ -23,7 +34,6 @@ class HasTablename(Protocol):
 class UUIDMixin:
     @declared_attr
     def id(cls: type[HasTablename]) -> Mapped[uuid.UUID]:
-        # nombre exacto de la columna, p. ej. persona -> id_persona
         return mapped_column(
             f"id_{cls.__tablename__}",
             UUID(as_uuid=True),
@@ -34,14 +44,14 @@ class UUIDMixin:
 class CreateTimestampMixin:
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        server_default=func.now(),   # ← lo genera Postgres
+        server_default=func.now(),   
         nullable=False,
     )
     
 class UpdateTimestampMixin:
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        server_default=func.now(),   # ← lo genera Postgres
+        server_default=func.now(),
         nullable=False,
     )
 class Persona(Base, UUIDMixin):
@@ -55,6 +65,7 @@ class Persona(Base, UUIDMixin):
 # ---------------------------
 # Soporte de identidades externas
 # ---------------------------
+
 class External(Base, UUIDMixin, CreateTimestampMixin):
     __tablename__ = "external"
     __table_args__ = (
@@ -81,6 +92,7 @@ class External(Base, UUIDMixin, CreateTimestampMixin):
 # ---------------------------
 # Vínculos persona/cliente
 # ---------------------------
+
 class Cliente(Base, UUIDMixin):
     __tablename__ = "cliente"
     nombre: Mapped[str] = mapped_column(Text, nullable=False)
@@ -98,7 +110,7 @@ class Servicio(Base, UUIDMixin):
     __tablename__ = "servicio"
     nombre: Mapped[str] = mapped_column(Text, nullable=False)
 
-    cliente_servicios: Mapped[List["ClienteServicio"]] = relationship(  # ← AÑADIR
+    cliente_servicios: Mapped[List["ClienteServicio"]] = relationship(
         back_populates="servicio", cascade="all, delete-orphan"
     )
     

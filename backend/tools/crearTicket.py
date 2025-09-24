@@ -53,6 +53,7 @@ def make_crear_ticket_Tool(get_session_user, get_saver):
                         "servicio": payload.servicio,
                         "estado": "Aceptado",
                         "usuario": user.get("name"),
+                        "analista": nuevo_ticket.analista_nombre,
                         "fechaCreacion": nuevo_ticket.created_at.strftime('%d/%m/%Y') if hasattr(nuevo_ticket, 'created_at') else None,
                         "fechaActualizacion": nuevo_ticket.updated_at.strftime('%d/%m/%Y') if hasattr(nuevo_ticket, 'updated_at') else None,
                         "cliente": user.get("cliente_nombre"),

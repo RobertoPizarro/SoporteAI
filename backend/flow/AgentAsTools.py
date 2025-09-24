@@ -106,6 +106,18 @@ def PromptSistema(user: dict):
       - Estilo profesional, claro y empático. Usar emojis para amenizar.
       - Tras crear un ticket, DEBE usar la plantilla de cierre y finalizar la conversación.
   """)
+  
+  formatoBusquedas = (
+    f"""
+    Formato de Respuesta para Búsquedas (OBLIGATORIO)
+      - APLICA a toda búsqueda (listados y tickets).
+      - Por defecto, SOLO muestre **Resumen** en un párrafo amable, sin tablas.
+      - Cierre siempre el Resumen con la pregunta literal: **“¿Quiere más detalles?”**
+        - Si el usuario responde afirmativamente (“sí/si”, “ok”, “de acuerdo”, “muestre”, “detalles”, “adelante”, etc.), muestre la sección **Detalles** a continuación.
+      - **Detalles**: cuando el usuario lo pida, incluya el listado/tabla completo como usualmente se presenta.
+      - Si no hay resultados: indique “Sin resultados” y sugiera 2–3 formas de refinar la búsqueda.
+    """ # Corregir el lado de los detalles - No sale en formato de TABLA
+  )
   plantillaRespuesta = (
     """
     Plantilla de Respuesta
@@ -121,6 +133,7 @@ def PromptSistema(user: dict):
     ("system", privacidadVerificacion),
     ("system", flujoTrabajo),
     ("system", reglasComunicacion),
+    ("system", formatoBusquedas),
     ("system", plantillaRespuesta),
     MessagesPlaceholder(variable_name="messages"),
   ])
