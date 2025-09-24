@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Request, HTTPException
 
 # CRUD
-from backend.db.crud.crud_ticket import obtener_tickets, obtener_ticket_especifico, actualizar_ticket_estado, escalar_ticket
+from backend.db.crud.crud_ticket import obtener_tickets, obtener_ticket_especifico, actualizar_ticket_estado, escalar_ticket, actualizar_ticket_nivel
 from backend.db.crud.crud_conversacion import traer_conversacion
 
 # ORM
@@ -102,3 +102,15 @@ def obtenerTicket(req: Request, ticket: int):
     except Exception as e:
         raise HTTPException(500, f"Error interno: {e}")
 
+@analista_router.get("/analista/nivel")
+def cambiarNivelTicket(ticket: int, nivel: str):
+    with conectarORM() as db:
+        try:
+            ticket_actualizado = actualizar_ticket_nivel(db, ticket, nivel=nivel)
+        except ValueError as ve:
+            raise HTTPException(400, str(ve))
+        except Exception as e:
+            raise HTTPException(500, f"Error interno: {e}")
+        if not ticket_actualizado:
+            raise HTTPException(404, f"Ticket {ticket} no encontrado")
+    return {"mensaje": f"Nivel del ticket {ticket} cambiado a: {nivel}"}

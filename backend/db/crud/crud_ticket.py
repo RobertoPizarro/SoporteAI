@@ -173,6 +173,18 @@ def actualizar_ticket_estado(db, id_ticket: int, estado: str, diagnostico: str |
         db.flush()
         return ticket
 
+def actualizar_ticket_nivel(db, id_ticket: int, nivel: str):
+        ticket = db.execute(select(Ticket).filter(Ticket.id_ticket == id_ticket).with_for_update()).scalar_one_or_none()
+        
+        if not ticket:
+            raise ValueError(f"Ticket {id_ticket} no encontrado")
+        
+        if nivel:
+            ticket.nivel = nivel
+        
+        db.flush()
+        return ticket
+
 def escalar_ticket(bd, idTicket : int, motivo: str):
     query_ticket = select(Ticket).where(Ticket.id_ticket == idTicket)
     try:
