@@ -12,26 +12,26 @@ def formatearMensaje(conversacion: list) -> list[dict]:
         formateado.append({"role": role, "content": msg.content})
     return formateado
 
-def formatearTicket(ticket) -> str:
-    detalles = (
-        f"- *ID: * #{ticket.id_ticket}\n"
-        f"- *Asunto:* {ticket.asunto}\n"
-        f"- *Estado:* {ticket.estado}\n"
-        f"- *Nivel:* {ticket.nivel}\n"
-        f"- *Tipo:* {ticket.tipo}\n"
-        f"- *Empresa:* {ticket.cliente_nombre}\n"
-        f"- *Servicio:* {ticket.servicio_nombre}\n"
-        f"- *Analista:* {ticket.analista_nombre}\n"
-        f"- *Fecha de creacion:* {ticket.created_at.strftime('%d/%m/%Y') if ticket.created_at else 'No especificada'}\n"
-    )
+def formatearTicket(ticket) -> dict:
+    detalles = {
+        "ID": f"#{ticket.id_ticket}",
+        "Asunto": ticket.asunto,
+        "Estado": ticket.estado,
+        "Nivel": ticket.nivel,
+        "Tipo": ticket.tipo,
+        "Empresa": ticket.cliente_nombre,
+        "Servicio": ticket.servicio_nombre,
+        "Analista": ticket.analista_nombre,
+        "Fecha de creacion": ticket.created_at.strftime('%d/%m/%Y') if ticket.created_at else 'No especificada',
+    }
     
     if ticket.estado == 'en atención':
-        detalles += f"- *Fecha de actualización:* {ticket.updated_at.strftime('%d/%m/%Y') if ticket.updated_at else 'No especificada'}\n"
-    
+        detalles["Fecha de actualización"] = ticket.updated_at.strftime('%d/%m/%Y') if ticket.updated_at else 'No especificada'
+
     if ticket.estado == 'finalizado' or ticket.estado == 'cancelado':
-        detalles += f"- *Diagnostico:* {ticket.diagnostico}\n"
-        detalles += f"- *Fecha de cierre:* {ticket.closed_at.strftime('%d/%m/%Y') if ticket.closed_at else 'No especificada'}\n"
-        
+        detalles["Diagnostico"] = ticket.diagnostico
+        detalles["Fecha de cierre"] = ticket.closed_at.strftime('%d/%m/%Y') if ticket.closed_at else 'No especificada'
+
     return detalles
 
 def formatearTickets(ticket) -> dict:
