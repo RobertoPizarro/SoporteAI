@@ -76,9 +76,9 @@ def PromptSistema(user: dict):
           - `asunto` Un título corto y descriptivo que resuma el problema, pero en base a una descripción clara y concreta del usuario, no tan abierto ni genérico o ambiguo, debe ser especifico y lo más descriptivo posible y debe preguntar las veces necesarias hasta estar seguro (cosas como que solamente diga "no carga" no son suficientemente descriptivas)., 
           - `tipo` (incidencia/solicitud), 
           - `nivel` Clasifique la urgencia como 'bajo', 'medio', 'alto' o 'crítico' según estas reglas:
-            - `bajo`: Dudas, preguntas, errores estéticos o menores que no impiden el trabajo.
+            - `bajo`: Dudas, preguntas, errores estéticos o menores que NO impiden el trabajo.
             - `medio`: Errores que afectan una funcionalidad específica o causan lentitud, pero el resto de la plataforma funciona.
-            - `alto`: Errores bloqueantes donde una función principal no sirve y el usuario no puede realizar su trabajo.
+            - `alto`: Errores bloqueantes donde una función principal no sirve o el usuario no puede realizar su trabajo.
             - `crítico`: Toda la plataforma o servicio está caído, hay riesgo de pérdida de datos, o afecta transacciones financieras.        
             Tabla de tiempos de respuesta estimados según nivel:
               - bajo: 32 horas
@@ -162,7 +162,10 @@ def PromptSistema(user: dict):
     """
     Plantilla de Respuesta
       - Diagnostico Guiado: “Entiendo la situación, {{NOMBRE}}. Para ayudarle mejor, ¿podría indicarme si la dirección fue ingresada completa (calle, número, ciudad) en el sistema?”
-      - Cierre tras ticket: “He generado el ticket {{NÚMERO}} con su solicitud. Nuestro equipo de soporte se pondrá en contacto con usted a través de su correo. En aproximadamente {{TIEMṔO_NIVEL}}, la atención continuará por ese medio. Gracias por su paciencia. (Adicionalmente a este mensaje, vas a generar una tabla con los campos necesarios.) ✨”
+      - Cierre tras ticket: “He generado el ticket {{NÚMERO}} con su solicitud. Nuestro equipo de soporte se pondrá en contacto con usted a través de su correo. En aproximadamente {{TIEMṔO_NIVEL}}, la atención continuará por ese medio. Gracias por su paciencia. ✨”
+        • Tras este mensaje, renderice una TABLA Markdown con columnas EXACTAS:
+          | ID | Asunto | Estado | Nivel | Tipo | Servicio | Analista |
+        • Si no hay analista asignado aún, en la columna Analista muestre “No asignado”.
       - Fuera de alcance: “Lo siento, {{NOMBRE}}, solo puedo ayudarle con consultas relacionadas con los servicios y soluciones de Analytics.”
     """
   )

@@ -1,8 +1,8 @@
 from langchain_core.tools import tool
-from backend.db.crud.crud_ticket import crear_ticket, TicketCreatePublic, TicketNivelEnum, TicketTipoEnum
+from backend.db.crud.crud_ticket import crear_ticket, obtener_ticket_especifico, TicketCreatePublic, TicketNivelEnum, TicketTipoEnum
 from backend.db.crud.crud_conversacion import guardar_conversacion
 from backend.util.util_conectar_orm import conectarORM
-from backend.util.util_formateo import formatearMensaje
+from backend.util.util_formateo import formatearMensaje, formatearTicket
 from typing import List
 def make_crear_ticket_Tool(get_session_user, get_saver):
     @tool(
@@ -45,23 +45,13 @@ def make_crear_ticket_Tool(get_session_user, get_saver):
                     raise Exception(f"Error al guardar la conversación: {str(e)}")
                 
                 if nuevo_ticket:
-                    ticket_data = {
-                        "id": nuevo_ticket.id_ticket,
-                        "asunto": nuevo_ticket.asunto,
-                        "tipo": nuevo_ticket.tipo, 
-                        "nivel": nuevo_ticket.nivel, 
-                        "servicio": payload.servicio,
-                        "estado": "Aceptado",
-                        "usuario": user.get("name"),
-                        "analista": nuevo_ticket.analista_nombre,
-                        "fechaCreacion": nuevo_ticket.created_at.strftime('%d/%m/%Y') if hasattr(nuevo_ticket, 'created_at') else None,
-                        "fechaActualizacion": nuevo_ticket.updated_at.strftime('%d/%m/%Y') if hasattr(nuevo_ticket, 'updated_at') else None,
-                        "cliente": user.get("cliente_nombre"),
-                    }
-                    
+                    # Recargar el ticket con relaciones para obtener nombres y datos derivados (incluye analista_nombre)
+                    recargado = obtener_ticket_especifico(db, nuevo_ticket.id_ticket, user)
+                    ticket_fmt = formatearTicket(recargado) if recargado else None
+                    print(ticket_fmt)
                     return {
                         "type": "ticket_created",
-                        "ticket": ticket_data,
+                        "ticket": ticket_fmt,
                         "message": f"Ticket creado con éxito. ID del ticket: {nuevo_ticket.id_ticket}."
                     }
                 else:
