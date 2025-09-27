@@ -1,13 +1,31 @@
-import { Ticket, Colaborador } from "@/types";
-import React from "react";
+import { Ticket, Colaborador, TicketNivel } from "@/types";
+import React, { useEffect, useMemo } from "react";
 
 const TicketDetail = ({
   currentTicket,
-  user,
 }: {
   currentTicket: Ticket;
   user: Colaborador | null;
 }) => {
+
+  // 🕒 Calcular tiempo de duración después de que se haga la comparación
+  const tiempoDuracion = useMemo(() => {
+    console.log("🔄 Recalculando tiempoDuracion para nivel:", currentTicket.nivel);
+    
+    if (currentTicket.nivel === TicketNivel.BAJO) {
+      return 32;
+    } else if (currentTicket.nivel === TicketNivel.MEDIO) {
+      return 16;
+    } else if (currentTicket.nivel === TicketNivel.ALTO) {
+      return 8;
+    } else if (currentTicket.nivel === TicketNivel.CRITICO) {
+      return 4;
+    }
+    
+    // Valor por defecto
+    return 0;
+  }, [currentTicket.nivel]); // Se recalcula solo cuando cambia el nivel
+
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg border border-white/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
       <div className="mb-6">
@@ -39,6 +57,14 @@ const TicketDetail = ({
       </div>
 
       <div className="space-y-4">
+        <div className="bg-slate-50/70 rounded-2xl p-4">
+          <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+            Tiempo de atención
+          </label>
+          <p className="text-sm font-semibold text-slate-800 mt-2">
+            {tiempoDuracion} horas
+          </p>
+        </div>
         <div className="bg-slate-50/70 rounded-2xl p-4">
           <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">
             Cliente

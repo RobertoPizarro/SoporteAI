@@ -5,6 +5,13 @@ export enum TicketStatus {
   RECHAZADO = "Rechazado",
 }
 
+export enum TicketNivel {
+  BAJO = "bajo",
+  MEDIO = "medio",
+  ALTO = "alto",
+  CRITICO = "crítico",
+}
+
 export const CLOSING_STATUSES = [TicketStatus.RESUELTO, TicketStatus.RECHAZADO];
 
 // Lista de clientes disponibles
@@ -38,7 +45,7 @@ export type Ticket = {
   fechaActualizacion: string;
   fechaCierre: string;
   asunto: string;
-  nivel: number;
+  nivel: string;
   estado: string;
   diagnostico: string;
   tipo: string;

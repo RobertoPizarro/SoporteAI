@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Ticket, Colaborador } from "@/types";
-import { getTicketById, getUserById, updateTicketStatus, escalateTicket } from "@/services/ticket.service";
+import { getTicketById, getUserById, updateTicketStatus, escalateTicket, updateTicketLevel } from "@/services/ticket.service";
 
 export default function useTicket(id: string) {
   const router = useRouter();
@@ -11,6 +11,7 @@ export default function useTicket(id: string) {
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<string | null>(null);
   const [showEscalateModal, setShowEscalateModal] = useState(false);
+  const [showModifyModal, setShowModifyModal] = useState(false);
 
   async function handleFindUser(userId: string): Promise<Colaborador | null> {
     const user = await getUserById(userId);
@@ -22,6 +23,53 @@ export default function useTicket(id: string) {
       setPendingStatus(newStatus);
       setShowStatusModal(true);
     }
+  };
+
+  const handleModifyTicket = () => {
+    setShowModifyModal(true);
+  };
+
+  const handleConfirmModifyTicket = async (newLevel: string) => {
+    if (!currentTicket) {
+      console.error("No hay ticket para modificar");
+      return;
+    }
+
+    try {
+      console.log(`Modificando nivel del ticket ${currentTicket.id} de "${currentTicket.nivel}" a "${newLevel}"`);
+      
+      // 🚀 Llamar al service para modificar el nivel del ticket
+      const result = await updateTicketLevel(currentTicket.id, newLevel);
+      
+      if (result) {
+        console.log("✅ Nivel del ticket modificado exitosamente:", result);
+        
+        // Actualizar el ticket con la respuesta del backend
+        setCurrentTicket(result);
+        
+        // Cerrar el modal
+        setShowModifyModal(false);
+        
+        // Opcional: Mostrar mensaje de éxito
+        // alert(`Nivel del ticket cambiado de "${currentTicket.nivel}" a "${newLevel}"`);
+      }
+      
+    } catch (error) {
+      console.error("Error al modificar el nivel del ticket:", error);
+      
+      // Mostrar error al usuario
+      alert(
+        error instanceof Error 
+          ? error.message 
+          : "Error al modificar el nivel del ticket. Intenta nuevamente."
+      );
+      
+      // Mantener el modal abierto para que el usuario pueda reintentar
+    }
+  };
+
+  const handleCancelModifyTicket = () => {
+    setShowModifyModal(false);
   };
 
   const handleConfirmStatusChange = async (solution?: string) => {
@@ -139,11 +187,15 @@ export default function useTicket(id: string) {
     showStatusModal,
     pendingStatus,
     showEscalateModal,
+    showModifyModal,
     handleStatusChange,
+    handleModifyTicket,
     handleConfirmStatusChange,
     handleCancelStatusChange,
     handleEscalateTicket,
     handleConfirmEscalateTicket,
-    handleCancelEscalateTicket
+    handleCancelEscalateTicket,
+    handleConfirmModifyTicket,
+    handleCancelModifyTicket
   };
 }

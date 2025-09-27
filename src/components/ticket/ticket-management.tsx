@@ -1,34 +1,41 @@
 import React from "react";
 import { Ticket, TicketStatus } from "@/types";
 import { getStatusIcon, getStatusColorButton } from "@/lib/colorUtils";
-import { CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
+import { CheckCircle2, XCircle, AlertTriangle, Settings, ArrowUp } from "lucide-react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 
 const TicketManagement = ({
   currentTicket,
   handleStatusChange,
   onEscalateTicket,
+  onModifyTicket,
 }: {
   currentTicket: Ticket;
   handleStatusChange: (status: string) => void;
   onEscalateTicket: () => void;
+  onModifyTicket: () => void;
 }) => {
   // 🔥 Usar el hook para obtener datos del usuario actual
   const { nivel, isAnalista, isLoading } = useCurrentUser();
-  
+
   // Función para verificar si el botón de escalar debe estar deshabilitado
   const isEscalateDisabled = () => {
     // Si el ticket está cerrado
     if (isTicketClosed()) return true;
-    
+
     // Si no es analista, no puede escalar
     if (!isAnalista) return true;
-    
+
     // Si es analista nivel 4 (máximo), no puede escalar más
     if (nivel === 4) return true;
-    
+
     return false;
   };
+
+  const isModificationDisabled = () => {
+    // Si el ticket está cerrado
+    if (isTicketClosed()) return true;
+  }
 
   // Función para obtener el mensaje del botón escalar
   const getEscalateButtonText = () => {
@@ -166,6 +173,18 @@ const TicketManagement = ({
         </div>
       </div>
       <button
+        disabled={isModificationDisabled()}
+        onClick={onModifyTicket}
+        className={`w-full py-3 px-4 mt-6 font-semibold rounded-xl shadow-md transition-all duration-300 flex items-center justify-center gap-2 ${
+          isModificationDisabled()
+            ? "bg-gray-300 text-gray-500 cursor-not-allowed opacity-60 shadow-none"
+            : "bg-gradient-to-r from-emerald-500 to-green-500 text-white hover:shadow-xl hover:scale-105"
+        }`}
+      >
+        <Settings className="w-4 h-4" />
+        Modificar nivel de ticket
+      </button>
+      <button
         disabled={isEscalateDisabled()}
         onClick={onEscalateTicket}
         className={`w-full py-3 px-4 mt-6 font-semibold rounded-xl shadow-md transition-all duration-300 flex items-center justify-center gap-2 ${
@@ -178,6 +197,7 @@ const TicketManagement = ({
         {nivel === 4 && !isTicketClosed() && (
           <AlertTriangle className="w-4 h-4" />
         )}
+        {<ArrowUp className="w-4 h-4" />}
         {getEscalateButtonText()}
       </button>
     </div>

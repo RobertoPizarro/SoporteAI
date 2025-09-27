@@ -102,7 +102,7 @@ def obtenerTicket(req: Request, ticket: int):
     except Exception as e:
         raise HTTPException(500, f"Error interno: {e}")
 
-@analista_router.get("/analista/nivel")
+@analista_router.patch("/analista/nivel")
 def cambiarNivelTicket(ticket: int, nivel: str):
     with conectarORM() as db:
         try:

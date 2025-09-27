@@ -101,7 +101,7 @@ const transformBackendTicket = (backendTicket: BackendTicket): Ticket => {
     fechaActualizacion: formatDate(backendTicket.updated_at), // ✨ Formatear fecha
     fechaCierre: formatDate(backendTicket.closed_at), // ✨ Formatear fecha (puede ser null)
     asunto: capitalize(backendTicket.asunto), // ✨ Capitalizar asunto
-    nivel: backendTicket.nivel === "bajo" ? 1 : backendTicket.nivel === "medio" ? 2 : 3,
+    nivel: backendTicket.nivel,
     estado: formatEstado(backendTicket.estado), // ✨ Formatear estado
     diagnostico: backendTicket.diagnostico || "",
     tipo: capitalize(backendTicket.tipo), // ✨ Capitalizar tipo
@@ -165,6 +165,57 @@ export const getUserById = async (
     );
     // Fallback: buscar usuario por nombre en datos mock
     return mockUsers.find((user) => user.nombre === userId) || null;
+  }
+};
+
+// Actualizar nivel del ticket 
+export const updateTicketLevel = async (
+  ticketId: string,
+  newLevel: string
+): Promise<Ticket | null> => {
+  try {
+    console.log(`🔄 Actualizando nivel del ticket ${ticketId} a "${newLevel}"`);
+    
+    // Intentar backend primero - ajustado para compatibilidad con Python
+    const url = `${ENDPOINTS.UPDATE_TICKET_LEVEL(ticketId)}&nivel=${encodeURIComponent(newLevel)}`;
+    const response = await apiRequest(url, {
+      method: "PATCH",
+    });
+    
+    console.log("✅ Backend response:", response);
+    
+    // El backend solo devuelve un mensaje, necesitamos recargar el ticket
+    if (response && response.mensaje) {
+      console.log("📥 Recargando ticket actualizado...");
+      const updatedTicket = await getTicketById(ticketId);
+      if (updatedTicket) {
+        console.log("✅ Ticket recargado con nuevo nivel:", updatedTicket.nivel);
+        return updatedTicket;
+      }
+    }
+    
+    throw new Error("No se pudo confirmar la actualización del ticket");
+    
+  } catch (error) {
+    console.warn("Backend no disponible, usando datos locales:", error);
+    // Fallback a datos locales
+    const ticketIndex = tickets.findIndex((t) => t.id === ticketId);
+    if (ticketIndex !== -1) {
+      // Actualizar el ticket local
+      tickets[ticketIndex] = {
+        ...tickets[ticketIndex],
+        nivel: newLevel,
+        fechaActualizacion: new Date().toLocaleString("es-ES", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        }),
+      };
+      console.log("✅ Ticket actualizado localmente:", tickets[ticketIndex]);
+      return tickets[ticketIndex];
+    }
+
+    throw new Error(`Ticket con ID ${ticketId} no encontrado`);
   }
 };
 
