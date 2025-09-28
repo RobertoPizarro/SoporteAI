@@ -4,7 +4,7 @@ from backend.db.crud.crud_conversacion import guardar_conversacion
 from backend.util.util_conectar_orm import conectarORM
 from backend.util.util_formateo import formatearMensaje, formatearTicket
 from typing import List
-def make_crear_ticket_Tool(get_session_user, get_saver):
+def make_crear_ticket_Tool(obtenerSesion, obtenerSaver):
     @tool(
         "CrearTicket",
         description=(
@@ -18,8 +18,8 @@ def make_crear_ticket_Tool(get_session_user, get_saver):
         args_schema=TicketCreatePublic,
     )
     def crearTicket_Tool(asunto: str, nivel: str, tipo: str, servicio: str) -> dict:
-        user = get_session_user()
-        saver = get_saver()
+        user = obtenerSesion()
+        saver = obtenerSaver()
         if not user:
             return {"error": "Usuario no autenticado.", "type": "error"}
         try:

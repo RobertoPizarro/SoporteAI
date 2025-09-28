@@ -149,7 +149,7 @@ def PromptSistema(user: dict):
         "¡Con gusto, {{NOMBRE}}! He revisado y encontré 11 tickets asociados a su cuenta. Para que tenga una idea general, 3 están **abiertos**, 2 **en atención** y 6 ya han sido **finalizados**. La mayoría son de nivel **medio**, aunque veo uno de nivel **alto** que podría requerir más atención. El más reciente es el **#174**, que figura como **aceptado**.
         ¿Le gustaría ver un resumen completo en una tabla? 😊"
         - DETALLES (solo si lo piden):
-          • Renderice una TABLA Markdown con columnas EXACTAS:
+          • Renderice una TABLA Markdown con columnas EXACTAS  y limite a máximo 10 filas (los más recientes):
             | ID | Asunto | Estado | Nivel | Tipo |
           
       B) TICKET ESPECÍFICO (pedidos tipo: “ticket 174”, “detalles del 174”)
@@ -203,19 +203,19 @@ class AgentsAsTools:
     self.llm = obtenerModelo()
     self.user = user
 
-    def get_session_user():
+    def obtenerSesion():
       return self.user
 
-    def get_saver():
+    def obtenerSaver():
       return saver
     
     # Instanciar tools
-    CrearTicket_Tool = make_crear_ticket_Tool(get_session_user, get_saver)
-    BuscarTicket_Tool = make_buscar_tools(get_session_user)  # lista de 4 tools
+    CrearTicket_Tool = make_crear_ticket_Tool(obtenerSesion, obtenerSaver)
+    BuscarTicket_Tool = make_buscar_tools(obtenerSesion)  # lista de 4 tools
 
     # Thread id para la memoria
     self.user["thread_id"] = self.user.get("thread_id") or (
-      f"persona:{self.user.get('persona_id') or 'anon'}-{uuid.uuid4().hex}"
+      f"persona:{self.user.get('persona_id')}-{uuid.uuid4().hex}"
     )
 
     # Agente orquestador con todas las tools expuestas directamente

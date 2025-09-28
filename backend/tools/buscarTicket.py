@@ -18,7 +18,7 @@ class BuscarPorAsuntoInput(BaseModel):
 class BuscarPorIdInput(BaseModel):
     id_ticket: int = Field(..., description="ID del ticket a consultar.")
 
-def make_buscar_tools(get_session_user):
+def make_buscar_tools(obtenerSesion):
     
     @tool (
         "BuscarTicketPorAsunto",
@@ -31,7 +31,7 @@ def make_buscar_tools(get_session_user):
         args_schema=BuscarPorAsuntoInput,
     )
     def buscar_ticket_por_asunto(asunto: str):
-        user = get_session_user()
+        user = obtenerSesion()
         with conectarORM() as db:
             tickets = obtener_ticket_asunto(db, asunto, user)
             tickets_list = [formatearTickets(t) for t in tickets] if tickets else []
@@ -64,7 +64,7 @@ def make_buscar_tools(get_session_user):
         args_schema=BuscarPorIdInput,
     )
     def buscar_ticket_por_id(id_ticket: int):
-        user = get_session_user()
+        user = obtenerSesion()
         with conectarORM() as db:
             ticket = obtener_ticket_especifico(db, id_ticket, user)
             if ticket:
@@ -89,7 +89,7 @@ def make_buscar_tools(get_session_user):
         ),
     )
     def listar_tickets_abiertos():
-        user = get_session_user()
+        user = obtenerSesion()
         with conectarORM() as db:
             tickets = obtener_tickets_abiertos(db, user)
             tickets_list = [formatearTickets(t) for t in tickets] if tickets else []
@@ -114,7 +114,7 @@ def make_buscar_tools(get_session_user):
         ),
     )
     def listar_todos_los_tickets():
-        user = get_session_user()
+        user = obtenerSesion()
         try:
             with conectarORM() as db:
                 tickets = obtener_tickets(db, user)

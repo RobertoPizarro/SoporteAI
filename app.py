@@ -12,7 +12,8 @@ import uvicorn
 # Routers
 from backend.api.auth.api_auth_colaborador import auth_colab_router
 from backend.api.auth.api_auth_analista import auth_analista_router
-from backend.api.analista.api_analista import analista_router
+from backend.api.analista.api_analista_get import analista_get_router
+from backend.api.analista.api_analista_patch import analista_patch_router
 from backend.api.usuario.api_root import chat_router
 
 # Utilitario de conexión al checkpointer
@@ -62,10 +63,11 @@ app.add_middleware(
 )
 
 # Routers
-app.include_router(auth_colab_router,     prefix="/auth", tags=["auth"])
-app.include_router(auth_analista_router,  prefix="/auth", tags=["auth"])
-app.include_router(chat_router,                           tags=["chat"])
-app.include_router(analista_router,                       tags=["analista"])
+app.include_router(auth_colab_router,     prefix="/auth",       tags=["auth"])
+app.include_router(auth_analista_router,  prefix="/auth",       tags=["auth"])
+app.include_router(chat_router,                                 tags=["chat"])
+app.include_router(analista_get_router,                         tags=["analista"])
+app.include_router(analista_patch_router,                       tags=["analista"])
 
 @app.get("/")
 def home():

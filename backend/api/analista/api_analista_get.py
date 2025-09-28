@@ -2,9 +2,9 @@
 from fastapi import APIRouter, Request, HTTPException
 
 # CRUD
-from backend.db.crud.crud_ticket import obtener_tickets, obtener_ticket_especifico, actualizar_ticket_estado, escalar_ticket, actualizar_ticket_nivel
+from backend.db.crud.crud_ticket import obtener_tickets, obtener_ticket_especifico
 from backend.db.crud.crud_conversacion import traer_conversacion
-
+from backend.db.crud.crud_escalado import obtener_escalado_por_ticket
 # ORM
 from backend.util.util_conectar_orm import conectarORM
 
@@ -13,7 +13,7 @@ from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 import uuid
 
-analista_router = APIRouter()
+analista_get_router = APIRouter()
 
 class TicketRead(BaseModel):
     id_ticket: int
@@ -34,10 +34,16 @@ class TicketRead(BaseModel):
     servicio_nombre: str | None = None
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
-class TicketResponse(BaseModel):
-    tickets: list[TicketRead]
+class EscaladoRead(BaseModel):
+    id_escalado: int
+    id_ticket: int
+    id_analista_solicitante: str
+    id_analista_derivado: str
+    motivo: str
+    created_at: datetime | None = None
+    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
-@analista_router.get("/analista/tickets")
+@analista_get_router.get("/analista/tickets")
 def obtenerTickets(req: Request):
     analista = req.session.get("user")
     if not analista or analista.get("rol") != "analista":
@@ -50,34 +56,7 @@ def obtenerTickets(req: Request):
     except Exception as e:
         raise HTTPException(500, f"Error interno: {e}")
 
-
-@analista_router.patch("/analista/escalar")
-def escalarTicket(req: Request, ticket: int, motivo: str):
-    analista = req.session.get("user")
-    if not analista or analista.get("rol") != "analista":
-        raise HTTPException(401, "unauthorized")
-    try:
-        with conectarORM() as db:
-            nivel_destino = escalar_ticket(db, ticket, motivo)
-            return {"mensaje": f"Ticket {ticket} escalado correctamente a nivel {nivel_destino} por el motivo: {motivo}"}
-    except Exception as e:
-        raise HTTPException(500, f"Error interno: {e}")
-
-
-@analista_router.patch("/analista/estado")
-def cambiarEstadoTicket(ticket: int, estado: str, diagnostico: str | None = ""):
-    with conectarORM() as db:
-        try:
-            ticket_actualizado = actualizar_ticket_estado(db, ticket, estado, diagnostico)
-        except ValueError as ve:
-            raise HTTPException(400, str(ve))
-        except Exception as e:
-            raise HTTPException(500, f"Error interno: {e}")
-        if not ticket_actualizado:
-            raise HTTPException(404, f"Ticket {ticket} no encontrado")
-    return {"mensaje": f"Estado del ticket {ticket} cambiado a: {estado}"}
-
-@analista_router.get("/analista/chat")
+@analista_get_router.get("/analista/chat")
 def chatAnalista(ticket: int):
     try:
         with conectarORM() as db:
@@ -85,8 +64,8 @@ def chatAnalista(ticket: int):
             return {"chat": contenido}
     except Exception as e:
         raise HTTPException(500, f"Error interno: {e}")
-    
-@analista_router.get("/analista/ticket")
+
+@analista_get_router.get("/analista/ticket")
 def obtenerTicket(req: Request, ticket: int):
     analista = req.session.get("user")
     if not analista or analista.get("rol") != "analista":
@@ -102,15 +81,16 @@ def obtenerTicket(req: Request, ticket: int):
     except Exception as e:
         raise HTTPException(500, f"Error interno: {e}")
 
-@analista_router.patch("/analista/nivel")
-def cambiarNivelTicket(ticket: int, nivel: str):
-    with conectarORM() as db:
-        try:
-            ticket_actualizado = actualizar_ticket_nivel(db, ticket, nivel=nivel)
-        except ValueError as ve:
-            raise HTTPException(400, str(ve))
-        except Exception as e:
-            raise HTTPException(500, f"Error interno: {e}")
-        if not ticket_actualizado:
-            raise HTTPException(404, f"Ticket {ticket} no encontrado")
-    return {"mensaje": f"Nivel del ticket {ticket} cambiado a: {nivel}"}
+@analista_get_router.get("/analista/escalado")
+def obtenerEscalado(ticket: int):
+    try:
+        with conectarORM() as db:
+            escalado = obtener_escalado_por_ticket(db, ticket)
+            if not escalado:
+                raise HTTPException(404, f"No se encontró un escalado para el ticket {ticket}")
+            escalado_data = EscaladoRead.model_validate(escalado).model_dump()
+            return {"escalado": escalado_data}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, f"Error interno: {e}")

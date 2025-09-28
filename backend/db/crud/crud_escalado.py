@@ -1,7 +1,6 @@
 from backend.db.models import Escalado
-from sqlalchemy.orm import Session
 
-def crear_escalado(bd: Session, idTicket: int, id_analista_der, id_analista_soli, motivo: str) -> Escalado:
+def crear_escalado(bd, idTicket: int, id_analista_der, id_analista_soli, motivo: str) -> Escalado:
     try:
         new_escalado = Escalado(
             id_ticket = idTicket,
@@ -12,8 +11,15 @@ def crear_escalado(bd: Session, idTicket: int, id_analista_der, id_analista_soli
         
         bd.add(new_escalado)
         bd.flush()
-        print(f"Escalado creado: {new_escalado}")
-        print(f"ID asignado: {new_escalado.id_escalado}")
         return new_escalado
     except Exception as e:
         raise ValueError(f"Error al crear escalado: {str(e)}")
+
+def obtener_escalado_por_ticket(bd, idTicket: int) -> Escalado | None:
+    try:
+        escalado = bd.execute(
+            bd.select(Escalado).where(Escalado.id_ticket == idTicket)
+            ).scalar_one_or_none()
+        return escalado
+    except Exception as e:
+        raise ValueError(f"Error al obtener escalado: {str(e)}")
