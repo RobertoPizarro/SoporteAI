@@ -4,6 +4,8 @@ from backend.db.models import Ticket, Colaborador
 from backend.util.util_conectar_orm import conectarORM
 from uuid import UUID
 from sqlalchemy import select, func
+from backend.db.crud.crud_escalado import obtener_escalado_por_ticket
+
 
 user = {'email': 'nick.salcedo@unmsm.edu.pe', 'name': 'NICK EMANUEL SALCEDO ALFARO', 'persona_id': '36a06c49-d9c6-f958-5fe1-3cfa73a0905b', 'cliente_id': '3c7fc393-880f-1e80-4c17-538b57570b40', 'colaborador_id': '69b94e6e-57c4-2f05-b57f-1b55b05249fd', 'rol': 'colaborador', 'cliente_nombre': 'UNMSM', 'servicios': [{'id': 'd50bf689-bfca-809b-5a7a-7c7bd8f42d1f', 'nombre': 'DATA SCIENCE'}]}
 
@@ -96,5 +98,5 @@ with conectarORM() as db:
 #    crud_ticket.escalar_ticket(db, 20, "f36c6de9-5abd-7258-bf3f-19533740fd1b", "jajaja", "jajajaja")
 
 with conectarORM() as db :
-    conversacion = crud_ticket.traer_conversacion(db, 15)
-    print (conversacion)
+    escalado = obtener_escalado_por_ticket(db, 132)
+    print (escalado)
