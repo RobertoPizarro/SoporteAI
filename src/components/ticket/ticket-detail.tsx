@@ -150,6 +150,15 @@ const TicketDetail = ({
               
               <div>
                 <label className="text-xs font-medium text-red-500 uppercase tracking-wide block mb-1">
+                  Analista Solicitante
+                </label>
+                <p className="text-sm font-semibold text-red-800">
+                  {escalationInfo.id_analista_solicitante || "No disponible"}
+                </p>
+              </div>
+              
+              <div>
+                <label className="text-xs font-medium text-red-500 uppercase tracking-wide block mb-1">
                   Motivo de Escalamiento
                 </label>
                 <p className="text-sm font-semibold text-red-800 leading-relaxed">
