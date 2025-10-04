@@ -52,6 +52,15 @@ export type Ticket = {
   email: string;
 };
 
+export type EscalationInformation = {
+  id_escalado: number;
+  id_ticket: number;
+  id_analista_solicitante: number;
+  id_analista_derivado: number;
+  motivo: string;
+  created_at: Date;
+}
+
 export type Message = {
   id?: number;
   type: "bot" | "user" | "ticket";

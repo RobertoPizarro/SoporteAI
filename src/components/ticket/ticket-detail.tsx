@@ -1,17 +1,30 @@
-import { Ticket, Colaborador, TicketNivel } from "@/types";
+import { Ticket, TicketNivel, EscalationInformation } from "@/types";
 import React, { useEffect, useMemo } from "react";
 
 const TicketDetail = ({
   currentTicket,
+  escalationInfo
 }: {
   currentTicket: Ticket;
-  user: Colaborador | null;
+  escalationInfo: EscalationInformation | null;
 }) => {
 
-  // 🕒 Calcular tiempo de duración después de que se haga la comparación
-  const tiempoDuracion = useMemo(() => {
-    console.log("🔄 Recalculando tiempoDuracion para nivel:", currentTicket.nivel);
+  // � Debug: Mostrar información de escalación en consola
+  useEffect(() => {
+    console.log("🔍 [DEBUG] EscalationInfo recibido:", escalationInfo);
+    console.log("🔍 [DEBUG] Ticket actual:", currentTicket.id);
     
+    if (escalationInfo) {
+      console.log("✅ [DEBUG] SÍ hay información de escalación:", escalationInfo);
+    } else {
+      console.log("❌ [DEBUG] NO hay información de escalación para este ticket");
+    }
+  }, [escalationInfo, currentTicket.id]);
+
+  // �🕒 Calcular tiempo de duración después de que se haga la comparación
+  const tiempoDuracion = useMemo(() => {
+
+
     if (currentTicket.nivel === TicketNivel.BAJO) {
       return 32;
     } else if (currentTicket.nivel === TicketNivel.MEDIO) {

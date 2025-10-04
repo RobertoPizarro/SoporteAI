@@ -36,6 +36,7 @@ export const ENDPOINTS = {
   UPDATE_TICKET_STATUS: (id: string) => `/api/backend/analista/estado?ticket=${id}`,
   ESCALATE_TICKET: (id: string) => `/api/backend/analista/escalar?ticket=${id}`,
   UPDATE_TICKET_LEVEL: (id: string) => `/api/backend/analista/nivel?ticket=${id}`, 
+  ESCALATED_TICKETS: (id: string) => `/api/backend/analista/escalado?ticket=${id}`,
 
   // Usuarios
   USERS: "/users",

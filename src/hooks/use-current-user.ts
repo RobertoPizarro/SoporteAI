@@ -56,9 +56,6 @@ export function useCurrentUser(): UseCurrentUserReturn {
           body: JSON.stringify({ id_token: idToken }),
         });
 
-        // El backend devuelve datos como {ok: true, persona_id: "...", analista_id: "...", nivel: 2}
-        console.log("🔐 Backend user data:", response);
-        
         // Crear objeto userData basado en la respuesta del backend
         const backendUserData: UserData = {
           email: email,

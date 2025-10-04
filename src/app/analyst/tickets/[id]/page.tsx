@@ -20,7 +20,7 @@ const TicketDetailsPage = () => {
 
   const {
     currentTicket,
-    user,
+    escalationInfo,
     isLoading,
     showStatusModal,
     pendingStatus,
@@ -35,9 +35,26 @@ const TicketDetailsPage = () => {
     handleCancelEscalateTicket,
     handleConfirmModifyTicket,
     handleCancelModifyTicket,
+    handleGetEscalatedTickets,
   } = useTicket(params.id as string);
 
   const chatEndRef = useRef<HTMLDivElement | null>(null);
+
+  // 🔍 DEBUG: Intentar cargar información de escalación automáticamente
+  useEffect(() => {
+    const loadEscalationInfo = async () => {
+      if (currentTicket && handleGetEscalatedTickets) {
+        console.log("🔍 [DEBUG] Cargando información de escalación automáticamente para ticket:", currentTicket.id);
+        try {
+          await handleGetEscalatedTickets();
+        } catch (error) {
+          console.log("🔍 [DEBUG] Error o no hay información de escalación:", error);
+        }
+      }
+    };
+
+    loadEscalationInfo();
+  }, [currentTicket?.id]); // Solo depende del ID del ticket, no de la función
 
   // Cargar mensajes del chat cuando se carga el ticket
   useEffect(() => {
@@ -46,10 +63,8 @@ const TicketDetailsPage = () => {
       
       try {
         setIsChatLoading(true);
-        console.log("🔍 Cargando chat para ticket:", params.id);
         const messages = await getChatByTicket(params.id as string);
         setChatMessages(messages);
-        console.log("✅ Chat cargado:", messages);
       } catch (error) {
         console.error("❌ Error cargando chat:", error);
         setChatMessages([]); // Chat vacío en caso de error
@@ -99,7 +114,7 @@ const TicketDetailsPage = () => {
       <div className="flex flex-1 min-h-0 animate-fade-in-down">
         <div className="w-[32rem] bg-white/90 backdrop-blur-sm border-r border-gray-200/50 flex flex-col flex-shrink-0 overflow-y-auto">
           <div className="p-8 space-y-8">
-            <TicketDetail currentTicket={currentTicket} user={user} />
+            <TicketDetail currentTicket={currentTicket} escalationInfo={escalationInfo}/>
 
             <TicketManagement
               currentTicket={currentTicket}
@@ -107,6 +122,31 @@ const TicketDetailsPage = () => {
               onEscalateTicket={handleEscalateTicket}
               onModifyTicket={handleModifyTicket}
             />
+            
+            {/* 🔍 DEBUG: Botón temporal para probar getEscalatedTickets */}
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <h3 className="text-sm font-medium text-yellow-800 mb-2">🔍 DEBUG - Información de Escalación</h3>
+              <button
+                onClick={async () => {
+                  console.log("🔍 [DEBUG] Botón presionado - obteniendo información de escalación...");
+                  const result = await handleGetEscalatedTickets();
+                  console.log("🔍 [DEBUG] Resultado:", result);
+                }}
+                className="px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white text-xs rounded transition-colors"
+              >
+                Obtener Info Escalación
+              </button>
+              {escalationInfo && (
+                <div className="mt-2 text-xs text-yellow-700">
+                  ✅ Hay información de escalación (ver consola)
+                </div>
+              )}
+              {!escalationInfo && (
+                <div className="mt-2 text-xs text-yellow-600">
+                  ❌ No hay información de escalación
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

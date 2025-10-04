@@ -35,21 +35,13 @@ const ModifyTicketModal: React.FC<ModifyTicketModalProps> = ({
     // 🔍 DEBUG: Monitorear cambios en los estados
     useEffect(() => {
         const isDisabled = !newLevel || newLevel === currentLevel;
-        console.log("🔍 MODAL DEBUG:", {
-            newLevel: `"${newLevel}"`,
-            currentLevel: `"${currentLevel}"`,
-            isNewLevelEmpty: !newLevel,
-            isSameLevel: newLevel === currentLevel,
-            isDisabled
-        });
     }, [newLevel, currentLevel]);
 
     const handleConfirm = () => {
         if (!newLevel || newLevel === currentLevel) {
-            console.log("🚫 Validación fallida:", { newLevel, currentLevel });
             return; // No permite confirmar sin nivel válido
         }
-        console.log("✅ Confirmando cambio:", { newLevel, currentLevel });
+
         onConfirm(newLevel);
         setNewLevel(''); // Limpiar el campo después de confirmar
     };

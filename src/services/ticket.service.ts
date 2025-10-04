@@ -1,4 +1,4 @@
-import { Ticket, Colaborador } from "@/types";
+import { Ticket, Colaborador, EscalationInformation } from "@/types";
 import { apiRequest, ENDPOINTS } from "./api.config";
 import { tickets } from "@/data/tickets";
 import { mockUsers } from "@/data/users";
@@ -114,8 +114,6 @@ export const getTickets = async (): Promise<Ticket[] | null> => {
   try {
     // Intentar backend primero
     const data = await apiRequest(ENDPOINTS.TICKETS);
-    console.log("🎫 Backend response:", data);
-    console.log("🎫 Data response:", data.tickets);
     
     // El backend devuelve {tickets: [...]}
     if (data.tickets && Array.isArray(data.tickets)) {
@@ -310,3 +308,33 @@ export const escalateTicket = async (
   }
 };
 
+// Obtener información de tickets escalados por id
+export const getEscalatedTickets = async (
+  ticketId: string
+): Promise<EscalationInformation | null> => {
+  try {
+    const response = await apiRequest(ENDPOINTS.ESCALATED_TICKETS(ticketId), {
+      method: "GET",
+    });
+    
+    console.log("🔍 Respuesta completa del backend:", response);
+    
+    if (response && response.escalado) {
+      console.log("✅ Información de escalación encontrada:", response.escalado);
+      return response.escalado;
+    }
+    
+    console.log("❌ No se encontró información de escalación en la respuesta");
+    return null;
+  } catch (error) {
+    console.warn("❌ Error obteniendo tickets escalados:", error);
+    
+    // Si es un error 404, significa que no hay escalación para este ticket
+    if (error instanceof Error && (error.message.includes('404') || error.message.includes('status: 404'))) {
+      console.log("📝 El ticket no tiene información de escalación (404)");
+      return null;
+    }
+    
+    throw error;
+  }
+};

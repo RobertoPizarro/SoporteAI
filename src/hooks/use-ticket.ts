@@ -1,22 +1,49 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Ticket, Colaborador } from "@/types";
-import { getTicketById, getUserById, updateTicketStatus, escalateTicket, updateTicketLevel } from "@/services/ticket.service";
+import { Ticket, EscalationInformation } from "@/types";
+import { getTicketById, updateTicketStatus, escalateTicket, updateTicketLevel, getEscalatedTickets } from "@/services/ticket.service";
 
 export default function useTicket(id: string) {
   const router = useRouter();
   const [currentTicket, setCurrentTicket] = useState<Ticket | null>(null);
-  const [user, setUser] = useState<Colaborador | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<string | null>(null);
   const [showEscalateModal, setShowEscalateModal] = useState(false);
   const [showModifyModal, setShowModifyModal] = useState(false);
+  const [escalationInfo, setEscalationInfo] = useState<EscalationInformation | null>(null);
+  const [isLoadingEscalation, setIsLoadingEscalation] = useState(false);
 
-  async function handleFindUser(userId: string): Promise<Colaborador | null> {
-    const user = await getUserById(userId);
-    return user;
-  }
+  const handleGetEscalatedTickets = async (): Promise<EscalationInformation | null> => {
+    if (!currentTicket) {
+      console.error("No hay ticket para obtener información de escalación");
+      return null;
+    }
+
+    try {
+      setIsLoadingEscalation(true);
+      console.log(`Obteniendo información de escalación para ticket ${currentTicket.id}`);
+      
+      const escalationData = await getEscalatedTickets(currentTicket.id);
+      
+      if (escalationData) {
+        console.log("✅ Información de escalación obtenida:", escalationData);
+        setEscalationInfo(escalationData);
+        return escalationData;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error("Error al obtener información de escalación:", error);
+      
+      // Solo loggeamos el error, sin mostrar alert molesto
+      // Si es necesario mostrar al usuario, se puede hacer en el componente que llama esta función
+      
+      return null;
+    } finally {
+      setIsLoadingEscalation(false);
+    }
+  };
 
   const handleStatusChange = (newStatus: string) => {
     if (currentTicket && newStatus !== currentTicket.estado) {
@@ -160,19 +187,13 @@ export default function useTicket(id: string) {
     setShowEscalateModal(false);
   };
 
-  // Lógica para cargar el ticket y el usuario asociado, habría que reemplazar por llamada a un service o aun endpoint
+  // Lógica para cargar el ticket
   useEffect(() => {
     const loadTicketData = async () => {
       if (id) {
         // Usar service en lugar de datos locales directos
         const foundTicket = await getTicketById(id);
         setCurrentTicket(foundTicket);
-
-        if (foundTicket) {
-          const userData = await handleFindUser(foundTicket.usuario);
-          setUser(userData);
-        } 
-
         setIsLoading(false);
       }
     };
@@ -182,12 +203,13 @@ export default function useTicket(id: string) {
 
   return {
     currentTicket,
-    user,
     isLoading,
     showStatusModal,
     pendingStatus,
     showEscalateModal,
     showModifyModal,
+    escalationInfo,
+    isLoadingEscalation,
     handleStatusChange,
     handleModifyTicket,
     handleConfirmStatusChange,
@@ -196,6 +218,7 @@ export default function useTicket(id: string) {
     handleConfirmEscalateTicket,
     handleCancelEscalateTicket,
     handleConfirmModifyTicket,
-    handleCancelModifyTicket
+    handleCancelModifyTicket,
+    handleGetEscalatedTickets
   };
 }
