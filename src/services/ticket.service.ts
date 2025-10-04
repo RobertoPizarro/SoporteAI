@@ -308,11 +308,26 @@ export const escalateTicket = async (
   }
 };
 
+// Función para transformar la respuesta del backend al formato del frontend
+const transformEscalationInfo = (backendEscalation: any): EscalationInformation => {
+  return {
+    id_escalado: backendEscalation.id_escalado,
+    id_ticket: backendEscalation.id_ticket,
+    id_analista_solicitante: backendEscalation.id_analista_solicitante?.toString() || "",
+    id_analista_derivado: backendEscalation.id_analista_derivado?.toString() || "",
+    motivo: backendEscalation.motivo || "",
+    created_at: backendEscalation.created_at || "",
+  };
+};
+
 // Obtener información de tickets escalados por id
 export const getEscalatedTickets = async (
   ticketId: string
 ): Promise<EscalationInformation | null> => {
   try {
+    console.log(`🔍 Solicitando información de escalación para ticket: ${ticketId}`);
+    console.log(`🔍 URL del endpoint: ${ENDPOINTS.ESCALATED_TICKETS(ticketId)}`);
+    
     const response = await apiRequest(ENDPOINTS.ESCALATED_TICKETS(ticketId), {
       method: "GET",
     });
@@ -321,7 +336,12 @@ export const getEscalatedTickets = async (
     
     if (response && response.escalado) {
       console.log("✅ Información de escalación encontrada:", response.escalado);
-      return response.escalado;
+      
+      // Transformar la respuesta del backend al formato del frontend
+      const transformedEscalation = transformEscalationInfo(response.escalado);
+      console.log("✅ Información transformada:", transformedEscalation);
+      
+      return transformedEscalation;
     }
     
     console.log("❌ No se encontró información de escalación en la respuesta");
@@ -332,6 +352,12 @@ export const getEscalatedTickets = async (
     // Si es un error 404, significa que no hay escalación para este ticket
     if (error instanceof Error && (error.message.includes('404') || error.message.includes('status: 404'))) {
       console.log("📝 El ticket no tiene información de escalación (404)");
+      return null;
+    }
+    
+    // Si es un error 500, puede ser por datos inconsistentes, también manejarlo
+    if (error instanceof Error && (error.message.includes('500') || error.message.includes('status: 500'))) {
+      console.log("🔥 Error interno del servidor (500) - posible problema de tipos en backend");
       return null;
     }
     

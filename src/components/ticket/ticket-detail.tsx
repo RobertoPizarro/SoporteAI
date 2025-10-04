@@ -9,21 +9,28 @@ const TicketDetail = ({
   escalationInfo: EscalationInformation | null;
 }) => {
 
-  // � Debug: Mostrar información de escalación en consola
-  useEffect(() => {
-    console.log("🔍 [DEBUG] EscalationInfo recibido:", escalationInfo);
-    console.log("🔍 [DEBUG] Ticket actual:", currentTicket.id);
+  // Función para formatear fecha ISO a formato legible
+  const formatDate = (isoDate: string): string => {
+    if (!isoDate) return "No disponible";
     
-    if (escalationInfo) {
-      console.log("✅ [DEBUG] SÍ hay información de escalación:", escalationInfo);
-    } else {
-      console.log("❌ [DEBUG] NO hay información de escalación para este ticket");
+    try {
+      const date = new Date(isoDate);
+      if (isNaN(date.getTime())) return "Fecha inválida";
+      
+      return date.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'America/Lima'
+      });
+    } catch (error) {
+      return "Error al formatear fecha";
     }
-  }, [escalationInfo, currentTicket.id]);
+  };
 
-  // �🕒 Calcular tiempo de duración después de que se haga la comparación
   const tiempoDuracion = useMemo(() => {
-
 
     if (currentTicket.nivel === TicketNivel.BAJO) {
       return 32;
@@ -118,6 +125,40 @@ const TicketDetail = ({
             {currentTicket.email}
           </p>
         </div>
+
+        {/* 🔼 Información de Escalamiento */}
+        {escalationInfo && (
+          <div className="bg-red-50/70 rounded-2xl p-4 border border-red-200/50">
+            <div className="mb-3">
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                <label className="text-xs font-medium text-red-600 uppercase tracking-wide">
+                  Ticket Escalado
+                </label>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-medium text-red-500 uppercase tracking-wide block mb-1">
+                  Fecha de Escalamiento
+                </label>
+                <p className="text-sm font-semibold text-red-800">
+                  {formatDate(escalationInfo.created_at)}
+                </p>
+              </div>
+              
+              <div>
+                <label className="text-xs font-medium text-red-500 uppercase tracking-wide block mb-1">
+                  Motivo de Escalamiento
+                </label>
+                <p className="text-sm font-semibold text-red-800 leading-relaxed">
+                  {escalationInfo.motivo}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

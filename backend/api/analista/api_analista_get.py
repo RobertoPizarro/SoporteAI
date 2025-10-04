@@ -37,8 +37,8 @@ class TicketRead(BaseModel):
 class EscaladoRead(BaseModel):
     id_escalado: int
     id_ticket: int
-    id_analista_solicitante: str
-    id_analista_derivado: str
+    id_analista_solicitante: uuid.UUID  # Cambiar de str a uuid.UUID
+    id_analista_derivado: uuid.UUID     # Cambiar de str a uuid.UUID
     motivo: str
     created_at: datetime | None = None
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)

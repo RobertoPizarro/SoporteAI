@@ -55,10 +55,10 @@ export type Ticket = {
 export type EscalationInformation = {
   id_escalado: number;
   id_ticket: number;
-  id_analista_solicitante: number;
-  id_analista_derivado: number;
+  id_analista_solicitante: string;  // UUID del backend viene como string
+  id_analista_derivado: string;     // UUID del backend viene como string
   motivo: string;
-  created_at: Date;
+  created_at: string;               // Fecha del backend viene como string ISO
 }
 
 export type Message = {
