@@ -41,6 +41,7 @@ class EscaladoRead(BaseModel):
     id_analista_derivado: uuid.UUID     # Cambiar de str a uuid.UUID
     motivo: str
     created_at: datetime | None = None
+    analista_solicitante_nombre: str | None = None
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
 @analista_get_router.get("/analista/tickets")
