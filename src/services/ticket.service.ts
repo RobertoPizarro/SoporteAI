@@ -22,24 +22,24 @@ const capitalize = (text: string): string => {
 // Función utilitaria para formatear fechas ISO a formato legible
 const formatDate = (isoDate: string | null): string => {
   if (!isoDate) return "";
-  
+
   try {
     const date = new Date(isoDate);
-    
+
     // Verificar si la fecha es válida
     if (isNaN(date.getTime())) return "";
-    
+
     // Formato: "20 Sep 2025, 18:00"
-    return date.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZone: 'America/Lima' // Ajusta según tu zona horaria
+    return date.toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "America/Lima", // Ajusta según tu zona horaria
     });
   } catch (error) {
-    console.warn('Error formateando fecha:', isoDate, error);
+    console.warn("Error formateando fecha:", isoDate, error);
     return "";
   }
 };
@@ -47,24 +47,24 @@ const formatDate = (isoDate: string | null): string => {
 // Función utilitaria para formatear estado del backend al frontend
 const formatEstado = (estado: string): string => {
   const estadoMap: { [key: string]: string } = {
-    'aceptado': 'Nuevo',
-    'en atención': 'En Progreso', 
-    'finalizado': 'Finalizado',
-    'cancelado': 'Rechazado'
+    aceptado: "Nuevo",
+    "en atención": "En Progreso",
+    finalizado: "Finalizado",
+    cancelado: "Rechazado",
   };
-  
+
   return estadoMap[estado] || capitalize(estado);
 };
 
 // Función utilitaria para convertir estado del frontend al backend
 const formatEstadoToBackend = (estado: string): string => {
   const estadoMap: { [key: string]: string } = {
-    'Nuevo': 'aceptado',
-    'En Progreso': 'en atención',
-    'Finalizado': 'finalizado', 
-    'Rechazado': 'cancelado'
+    Nuevo: "aceptado",
+    "En Progreso": "en atención",
+    Finalizado: "finalizado",
+    Rechazado: "cancelado",
   };
-  
+
   return estadoMap[estado] || estado.toLowerCase();
 };
 
@@ -76,7 +76,7 @@ interface BackendTicket {
   nivel: string;
   tipo: string;
   id_colaborador: string;
-  colaborador_nombre: string
+  colaborador_nombre: string;
   id_analista: string | null;
   id_cliente_servicio: string;
   servicio: string;
@@ -114,12 +114,12 @@ export const getTickets = async (): Promise<Ticket[] | null> => {
   try {
     // Intentar backend primero
     const data = await apiRequest(ENDPOINTS.TICKETS);
-    
+
     // El backend devuelve {tickets: [...]}
     if (data.tickets && Array.isArray(data.tickets)) {
       return data.tickets.map(transformBackendTicket);
     }
-    
+
     return [];
   } catch (error) {
     console.warn("Backend no disponible, usando datos locales:", error);
@@ -133,13 +133,12 @@ export const getTicketById = async (id: string): Promise<Ticket | null> => {
   try {
     // Intentar backend primero
     const data = await apiRequest(ENDPOINTS.TICKET_BY_ID(id));
-    console.log("🎫 Single ticket response:", data);
-    
+
     // El backend devuelve {ticket: {...}}
     if (data.ticket) {
       return transformBackendTicket(data.ticket);
     }
-    
+
     return null;
   } catch (error) {
     console.warn("Backend no disponible, usando datos locales:", error);
@@ -166,34 +165,38 @@ export const getUserById = async (
   }
 };
 
-// Actualizar nivel del ticket 
+// Actualizar nivel del ticket
 export const updateTicketLevel = async (
   ticketId: string,
   newLevel: string
 ): Promise<Ticket | null> => {
   try {
     console.log(`🔄 Actualizando nivel del ticket ${ticketId} a "${newLevel}"`);
-    
+
     // Intentar backend primero - ajustado para compatibilidad con Python
-    const url = `${ENDPOINTS.UPDATE_TICKET_LEVEL(ticketId)}&nivel=${encodeURIComponent(newLevel)}`;
+    const url = `${ENDPOINTS.UPDATE_TICKET_LEVEL(
+      ticketId
+    )}&nivel=${encodeURIComponent(newLevel)}`;
     const response = await apiRequest(url, {
       method: "PATCH",
     });
-    
+
     console.log("✅ Backend response:", response);
-    
+
     // El backend solo devuelve un mensaje, necesitamos recargar el ticket
     if (response && response.mensaje) {
       console.log("📥 Recargando ticket actualizado...");
       const updatedTicket = await getTicketById(ticketId);
       if (updatedTicket) {
-        console.log("✅ Ticket recargado con nuevo nivel:", updatedTicket.nivel);
+        console.log(
+          "✅ Ticket recargado con nuevo nivel:",
+          updatedTicket.nivel
+        );
         return updatedTicket;
       }
     }
-    
+
     throw new Error("No se pudo confirmar la actualización del ticket");
-    
   } catch (error) {
     console.warn("Backend no disponible, usando datos locales:", error);
     // Fallback a datos locales
@@ -238,7 +241,7 @@ export const updateTicketStatus = async (
   try {
     // Convertir estado del frontend al formato del backend
     const backendEstado = formatEstadoToBackend(newStatus);
-    
+
     // Construir URL con parámetros de query para PATCH
     const baseUrl = ENDPOINTS.UPDATE_TICKET_STATUS(ticketId);
     const params = new URLSearchParams({
@@ -309,14 +312,20 @@ export const escalateTicket = async (
 };
 
 // Función para transformar la respuesta del backend al formato del frontend
-const transformEscalationInfo = (backendEscalation: any): EscalationInformation => {
+const transformEscalationInfo = (
+  backendEscalation: any
+): EscalationInformation => {
   return {
     id_escalado: backendEscalation.id_escalado,
     id_ticket: backendEscalation.id_ticket,
-    id_analista_solicitante: backendEscalation.id_analista_solicitante?.toString() || "",
-    id_analista_derivado: backendEscalation.id_analista_derivado?.toString() || "",
+    id_analista_solicitante:
+      backendEscalation.id_analista_solicitante?.toString() || "",
+    id_analista_derivado:
+      backendEscalation.id_analista_derivado?.toString() || "",
     motivo: backendEscalation.motivo || "",
     created_at: backendEscalation.created_at || "",
+    analista_solicitante_nombre:
+      backendEscalation.analista_solicitante_nombre || null,
   };
 };
 
@@ -325,42 +334,35 @@ export const getEscalatedTickets = async (
   ticketId: string
 ): Promise<EscalationInformation | null> => {
   try {
-    console.log(`🔍 Solicitando información de escalación para ticket: ${ticketId}`);
-    console.log(`🔍 URL del endpoint: ${ENDPOINTS.ESCALATED_TICKETS(ticketId)}`);
-    
     const response = await apiRequest(ENDPOINTS.ESCALATED_TICKETS(ticketId), {
       method: "GET",
     });
-    
-    console.log("🔍 Respuesta completa del backend:", response);
-    
+
     if (response && response.escalado) {
-      console.log("✅ Información de escalación encontrada:", response.escalado);
-      
       // Transformar la respuesta del backend al formato del frontend
       const transformedEscalation = transformEscalationInfo(response.escalado);
-      console.log("✅ Información transformada:", transformedEscalation);
-      
+
       return transformedEscalation;
     }
-    
-    console.log("❌ No se encontró información de escalación en la respuesta");
+
     return null;
   } catch (error) {
-    console.warn("❌ Error obteniendo tickets escalados:", error);
-    
     // Si es un error 404, significa que no hay escalación para este ticket
-    if (error instanceof Error && (error.message.includes('404') || error.message.includes('status: 404'))) {
-      console.log("📝 El ticket no tiene información de escalación (404)");
+    if (
+      error instanceof Error &&
+      (error.message.includes("404") || error.message.includes("status: 404"))
+    ) {
       return null;
     }
-    
+
     // Si es un error 500, puede ser por datos inconsistentes, también manejarlo
-    if (error instanceof Error && (error.message.includes('500') || error.message.includes('status: 500'))) {
-      console.log("🔥 Error interno del servidor (500) - posible problema de tipos en backend");
+    if (
+      error instanceof Error &&
+      (error.message.includes("500") || error.message.includes("status: 500"))
+    ) {
       return null;
     }
-    
+
     throw error;
   }
 };

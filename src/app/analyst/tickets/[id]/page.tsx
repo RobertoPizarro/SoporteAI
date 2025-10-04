@@ -44,11 +44,9 @@ const TicketDetailsPage = () => {
   useEffect(() => {
     const loadEscalationInfo = async () => {
       if (currentTicket && handleGetEscalatedTickets) {
-        console.log("🔍 [DEBUG] Cargando información de escalación automáticamente para ticket:", currentTicket.id);
         try {
           await handleGetEscalatedTickets();
         } catch (error) {
-          console.log("🔍 [DEBUG] Error o no hay información de escalación:", error);
         }
       }
     };

@@ -153,7 +153,7 @@ const TicketDetail = ({
                   Analista Solicitante
                 </label>
                 <p className="text-sm font-semibold text-red-800">
-                  {escalationInfo.id_analista_solicitante || "No disponible"}
+                  {escalationInfo.analista_solicitante_nombre || "No disponible"}
                 </p>
               </div>
               

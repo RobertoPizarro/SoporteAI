@@ -22,12 +22,9 @@ export default function useTicket(id: string) {
 
     try {
       setIsLoadingEscalation(true);
-      console.log(`Obteniendo información de escalación para ticket ${currentTicket.id}`);
-      
       const escalationData = await getEscalatedTickets(currentTicket.id);
       
       if (escalationData) {
-        console.log("✅ Información de escalación obtenida:", escalationData);
         setEscalationInfo(escalationData);
         return escalationData;
       }

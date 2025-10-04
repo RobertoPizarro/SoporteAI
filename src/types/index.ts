@@ -59,6 +59,7 @@ export type EscalationInformation = {
   id_analista_derivado: string;     // UUID del backend viene como string
   motivo: string;
   created_at: string;               // Fecha del backend viene como string ISO
+  analista_solicitante_nombre: string;
 }
 
 export type Message = {
