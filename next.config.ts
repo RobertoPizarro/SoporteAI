@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/backend/:path*',
-        destination: 'http://localhost:5000/:path*', // tu backend FastAPI
+        destination: 'http://localhost:8000/:path*', // tu backend FastAPI
       },
     ];
   },
