@@ -12,11 +12,13 @@ import {
 } from "lucide-react";
 import { Ticket } from "@/types";
 import { getTickets } from "@/services/ticket.service";
+import { useCurrentUser } from "@/hooks/use-current-user";
 import ChatHeader from "@/components/chat/chat-header";
 import PageAnimations from "@/components/ui/page-animations";
 import TicketList from "@/components/ticket/ticket-list";
 
 const AnalystDashboard = () => {
+  const { name, isLoading: userLoading } = useCurrentUser();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("Todos");
@@ -56,14 +58,14 @@ const AnalystDashboard = () => {
   });
 
   // Loading state
-  if (isLoading) {
+  if (isLoading || userLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
         <ChatHeader role="analyst" />
         <div className="flex items-center justify-center pt-20">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent mx-auto mb-4"></div>
-            <h2 className="text-xl font-semibold text-slate-700">Cargando tickets...</h2>
+            <h2 className="text-xl font-semibold text-slate-700">Cargando...</h2>
             <p className="text-slate-500">Un momento por favor</p>
           </div>
         </div>
@@ -79,7 +81,7 @@ const AnalystDashboard = () => {
       <main className="px-6 py-8 max-w-7xl mx-auto animate-fade-in-down">
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-slate-800 mb-2">
-            Bienvenido, Juan 👋
+            Bienvenido, {name || "Analista"} 👋
           </h2>
           <p className="text-slate-600">
             Aquí tienes un resumen de tus tickets asignados hoy
