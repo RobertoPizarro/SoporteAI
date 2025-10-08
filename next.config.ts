@@ -3,10 +3,10 @@ import type {NextConfig} from 'next';
 const nextConfig: NextConfig = {
   /* config options here */
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false, // Cambiar a false para producción
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false, // Cambiar a false para producción
   },
   images: {
     remotePatterns: [
@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/backend/:path*',
-        destination: 'http://localhost:8000/:path*', // tu backend FastAPI
+        destination: process.env.NEXT_PUBLIC_BACKEND_URL + '/:path*', // URL del backend en producción
       },
     ];
   },
