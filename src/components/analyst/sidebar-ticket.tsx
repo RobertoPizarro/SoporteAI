@@ -1,10 +1,16 @@
 import React from "react";
 import { Ticket } from "@/types";
+import { getStatusIcon, getStatusColor } from "@/lib/colorUtils";
+
+interface SidebarTicketProps {
+  currentTicket: Ticket;
+  handleStatusChange: (ticketId: string, status: string) => void;
+}
 
 const SidebarTicket = ({
   currentTicket,
   handleStatusChange,
-}) => {
+}: SidebarTicketProps) => {
   return (
     <div className="w-[32rem] bg-white/90 backdrop-blur-sm border-r border-gray-200/50 flex flex-col flex-shrink-0 overflow-y-auto">
       <div className="p-8 space-y-8">
@@ -30,7 +36,7 @@ const SidebarTicket = ({
                 </div>
                 <div className="text-xs text-slate-500">
                   <div className="bg-slate-100 px-3 py-2 rounded-lg">
-                    Última actualización: {currentTicket.actualizacion}
+                    Última actualización: {currentTicket.fechaActualizacion}
                   </div>
                 </div>
               </div>
@@ -67,7 +73,7 @@ const SidebarTicket = ({
                 (status) => (
                   <button
                     key={status}
-                    onClick={() => handleStatusChange(status)}
+                    onClick={() => handleStatusChange(currentTicket.id, status)}
                     className={`flex items-center justify-center space-x-2 py-3 px-4 rounded-xl font-medium text-sm transition-all duration-300 transform hover:scale-105 ${
                       currentTicket.estado === status
                         ? getStatusColor(status) + " shadow-md"
