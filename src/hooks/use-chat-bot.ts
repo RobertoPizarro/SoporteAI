@@ -80,10 +80,6 @@ export default function useChatBot() {
                     const ticketPatterns = [
                         /he generado el ticket/i,
                         /ticket.*creado/i,
-                        /creado.*ticket/i,
-                        /ticket #?(\d+)/i,
-                        /generado.*ticket/i,
-                        /nuevo ticket/i
                     ];
                     
                     for (const pattern of ticketPatterns) {
