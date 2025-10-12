@@ -12,28 +12,6 @@ const handler = NextAuth({
     async signIn({ account, profile }) {
       const email = profile?.email || "";
 
-      // --- 1) Whitelist rápida en NextAuth ---
-      const allowedDomains = process.env.ALLOWED_EMAIL_DOMAINS?.split(",")
-        .map((d) => d.trim())
-        .filter(Boolean);
-      const allowedEmails = process.env.ALLOWED_EMAILS?.split(",")
-        .map((e) => e.trim())
-        .filter(Boolean);
-
-      const emailAllowed =
-        (allowedEmails && allowedEmails.includes(email)) ||
-        (allowedDomains &&
-          allowedDomains.some((domain) => email.endsWith("@" + domain)));
-
-      if (!emailAllowed) {
-        return false;
-      }
-
-      // opcional: exigir email verificado si Google lo envía
-      // @ts-ignore
-      if (profile?.email_verified === false) {
-        return false;
-      }
 
       // --- 2) Delegar al backend (upsert + verificación dura) ---
       const idToken = account?.id_token;
