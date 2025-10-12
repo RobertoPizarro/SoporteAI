@@ -61,7 +61,7 @@ export function useCurrentUser(): UseCurrentUserReturn {
           email: email,
           name: session?.user?.name || "",
           persona_id: response.persona_id,
-          ...(email.endsWith("@gmail.com") 
+          ...(email.endsWith("@dominio.com") 
             ? {
                 rol: "analista" as const,
                 analista_id: response.analista_id,
