@@ -48,7 +48,7 @@ const ChatHeader = ({ role }: { role: "client" | "analyst" }) => {
 
   return (
     <div className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200/50 flex-shrink-0">
-      <div className="px-6 py-4 flex items-center justify-between">
+      <div className="px-6 py-4 flex items-center justify-end">
         {role === "client" ? (
           <div className="flex items-center gap-3 bg-slate-100/50 backdrop-blur-sm border border-slate-200/50 rounded-xl px-3 py-2">
             <MessageCircle className="w-6 h-6 text-blue-600" />
