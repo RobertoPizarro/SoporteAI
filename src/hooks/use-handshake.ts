@@ -9,25 +9,31 @@ export function useBackendHandshake() {
     const run = async () => {
       if (status !== "authenticated" || done.current) return;
       const idToken = (session as any)?.idToken;
-      const email = session?.user?.email || "";
       if (!idToken) return;
 
-      const endpoint = email.endsWith("@gmail.com")
-        ? ENDPOINTS.AUTH_GOOGLE_ANALISTA
-        : ENDPOINTS.AUTH_GOOGLE_COLABORADOR;
-
-      const res = await apiRequest(endpoint, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id_token: idToken }),
-      });
-
-      if (!res.ok) {
-        console.error("backend handshake failed", await res.text());
-        return;
+      // Determinar el rol seleccionado desde los botones
+      let role: "analista" | "colaborador" = "colaborador";
+      if (typeof window !== "undefined") {
+        const stored = localStorage.getItem("loginRole");
+        if (stored === "analista" || stored === "colaborador") role = stored;
       }
-      done.current = true; // no repetir
+
+      const endpoint =
+        role === "analista"
+          ? ENDPOINTS.AUTH_GOOGLE_ANALISTA
+          : ENDPOINTS.AUTH_GOOGLE_COLABORADOR;
+
+      try {
+        await apiRequest(endpoint, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id_token: idToken }),
+        });
+        done.current = true; // no repetir
+      } catch (e) {
+        console.error("backend handshake failed", e);
+      }
     };
     run();
   }, [status, session]);

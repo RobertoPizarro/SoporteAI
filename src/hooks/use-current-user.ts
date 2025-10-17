@@ -39,13 +39,18 @@ export function useCurrentUser(): UseCurrentUserReturn {
       if (status !== "authenticated" || backendDataLoaded) return;
       
       const idToken = (session as any)?.idToken;
-      const email = session?.user?.email || "";
       
       if (!idToken) return;
 
       try {
-        // Determinar endpoint basado en el email (lógica del useBackendHandshake)
-        const endpoint = email.endsWith("@gmail.com")
+        // Determinar endpoint basado en el rol elegido en los botones
+        let role: "analista" | "colaborador" = "colaborador";
+        if (typeof window !== "undefined") {
+          const stored = localStorage.getItem("loginRole");
+          if (stored === "analista" || stored === "colaborador") role = stored;
+        }
+
+        const endpoint = role === "analista"
           ? ENDPOINTS.AUTH_GOOGLE_ANALISTA
           : ENDPOINTS.AUTH_GOOGLE_COLABORADOR;
 
@@ -58,21 +63,20 @@ export function useCurrentUser(): UseCurrentUserReturn {
 
         // Crear objeto userData basado en la respuesta del backend
         const backendUserData: UserData = {
-          email: email,
+          email: session?.user?.email || "",
           name: session?.user?.name || "",
-          persona_id: response.persona_id,
-          ...(email.endsWith("@dominio.com") 
-            ? {
+          persona_id: response?.persona_id,
+          ...(role === "analista"
+            ? ({
                 rol: "analista" as const,
-                analista_id: response.analista_id,
-                nivel: response.nivel
-              }
-            : {
+                analista_id: response?.analista_id,
+                nivel: response?.nivel ?? null,
+              })
+            : ({
                 rol: "colaborador" as const,
-                colaborador_id: response.colaborador_id,
-                cliente_id: response.cliente_id
-              }
-          )
+                colaborador_id: response?.colaborador_id,
+                cliente_id: response?.cliente_id,
+              }))
         };
 
         setUserData(backendUserData);
@@ -107,8 +111,8 @@ export function useCurrentUser(): UseCurrentUserReturn {
     name: session?.user?.name || null,
     
     // Datos específicos del analista
-    analistaId: isAnalista ? (userData as any)?.analista_id || null : null,
-    nivel: isAnalista ? (userData as any)?.nivel || null : null,
+  analistaId: isAnalista ? (userData as any)?.analista_id || null : null,
+  nivel: isAnalista ? ((userData as any)?.nivel ?? null) : null,
     
     // Utilidades
     isAnalista,

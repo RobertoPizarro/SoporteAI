@@ -15,6 +15,10 @@ export function LoginForm() {
     const handleGoogleLogin = async () => {
         setIsLoading(true);
         try {
+            // Marcar intención de rol antes de redirigir a Google
+            if (typeof window !== "undefined") {
+                localStorage.setItem("loginRole", "colaborador");
+            }
             await signIn("google", { prompt: "select_account", callbackUrl: "/user/dashboard" });
         } catch (error) {
             console.error("Error al iniciar sesión con Google:", error);
