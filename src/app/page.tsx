@@ -8,9 +8,9 @@ import { Badge } from '@/components/ui/badge';
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4 sm:p-8 overflow-hidden">
-      <div className="text-center mb-14 animate-fade-in-down">
-        <h1 className="font-headline text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-blue-500">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4 sm:p-8">
+      <div className="text-center mb-16 pb-4 animate-fade-in-down">
+        <h1 className="font-headline text-5xl md:text-7xl font-bold text-transparent mb-4 bg-clip-text bg-gradient-to-r from-purple-500 to-blue-500 pb-2">
           Servicios de Agente Soporte IA
         </h1>
         <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
