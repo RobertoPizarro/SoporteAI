@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { UserData } from "@/types";
-import { apiRequest, ENDPOINTS } from "@/services/api.config";
+import { ensureHandshake } from "@/lib/handshakeClient";
 
 interface UseCurrentUserReturn {
   // Datos básicos de NextAuth
@@ -43,41 +43,32 @@ export function useCurrentUser(): UseCurrentUserReturn {
       if (!idToken) return;
 
       try {
-        // Determinar endpoint basado en el rol elegido en los botones
-        let role: "analista" | "colaborador" = "colaborador";
-        if (typeof window !== "undefined") {
-          const stored = localStorage.getItem("loginRole");
-          if (stored === "analista" || stored === "colaborador") role = stored;
-        }
-
-        const endpoint = role === "analista"
-          ? ENDPOINTS.AUTH_GOOGLE_ANALISTA
-          : ENDPOINTS.AUTH_GOOGLE_COLABORADOR;
-
-        const response = await apiRequest(endpoint, {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id_token: idToken }),
-        });
+        // Ejecuta (o reutiliza) el handshake único
+        const response = await ensureHandshake({ idToken });
 
         // Crear objeto userData basado en la respuesta del backend
-        const backendUserData: UserData = {
-          email: session?.user?.email || "",
-          name: session?.user?.name || "",
-          persona_id: response?.persona_id,
-          ...(role === "analista"
-            ? ({
-                rol: "analista" as const,
-                analista_id: response?.analista_id,
-                nivel: response?.nivel ?? null,
-              })
-            : ({
-                rol: "colaborador" as const,
-                colaborador_id: response?.colaborador_id,
-                cliente_id: response?.cliente_id,
-              }))
-        };
+        // Inferir rol según los campos recibidos.
+        const isAnalista = typeof response?.analista_id === "string" && response.analista_id.length > 0;
+        let backendUserData: UserData;
+        if (isAnalista) {
+          backendUserData = {
+            email: session?.user?.email || "",
+            name: session?.user?.name || "",
+            persona_id: response?.persona_id || "",
+            rol: "analista",
+            analista_id: response.analista_id as string,
+            nivel: response?.nivel ?? undefined,
+          };
+        } else {
+          backendUserData = {
+            email: session?.user?.email || "",
+            name: session?.user?.name || "",
+            persona_id: response?.persona_id || "",
+            rol: "colaborador",
+            colaborador_id: response?.colaborador_id ?? "",
+            cliente_id: response?.cliente_id,
+          } as UserData;
+        }
 
         setUserData(backendUserData);
         setBackendDataLoaded(true);
