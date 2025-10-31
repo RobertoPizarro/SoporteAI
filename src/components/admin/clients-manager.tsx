@@ -1,48 +1,45 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Users, Plus, Edit, Trash2, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-interface Client {
-  id: string;
-  name: string;
-  email: string;
-}
+import { getClients, createClient, updateClient, deleteClient, type Client } from "@/services/clients.service";
 
 const ClientsManager = () => {
-  const [clients, setClients] = useState<Client[]>([
-    { id: "1", name: "Entel", email: "contacto@entel.com" },
-    { id: "2", name: "Claro", email: "soporte@claro.com" },
-    { id: "3", name: "BCP", email: "analytics@bcp.com.pe" },
-    { id: "4", name: "Movistar", email: "datos@movistar.com" },
-  ]);
+  const [clients, setClients] = useState<Client[]>([]);
+  useEffect(() => {
+    loadClients();
+  }, []);
+
+  const loadClients = async () => {
+    const data = await getClients();
+    setClients(data);
+  };
   const [newClient, setNewClient] = useState({ name: "", email: "" });
   const [editingClient, setEditingClient] = useState<string | null>(null);
 
-  const addClient = () => {
+  const addClient = async () => {
     if (newClient.name && newClient.email) {
-      const client: Client = {
-        id: Date.now().toString(),
+      const createdClient = await createClient({
         name: newClient.name,
         email: newClient.email,
-      };
-      setClients([...clients, client]);
+      });
+      setClients(prev => [...prev, createdClient]);
       setNewClient({ name: "", email: "" });
     }
   };
 
-  const deleteClient = (id: string) => {
-    setClients(clients.filter(c => c.id !== id));
+  const handleDeleteClient = async (id: string) => {
+    await deleteClient(id);
+    setClients(prev => prev.filter(c => c.id !== id));
   };
 
-  const updateClient = (id: string, name: string, email: string) => {
-    setClients(clients.map(c => 
-      c.id === id ? { ...c, name, email } : c
-    ));
+  const handleUpdateClient = async (id: string, name: string, email: string) => {
+    const updatedClient = await updateClient(id, { name, email });
+    setClients(prev => prev.map(c => c.id === id ? updatedClient : c));
     setEditingClient(null);
   };
 
@@ -117,7 +114,7 @@ const ClientsManager = () => {
                     </div>
                     <div className="flex space-x-2">
                       <Button
-                        onClick={() => updateClient(client.id, client.name, client.email)}
+                        onClick={() => handleUpdateClient(client.id, client.name, client.email)}
                         size="sm"
                         className="bg-green-600 hover:bg-green-700"
                       >
@@ -150,7 +147,7 @@ const ClientsManager = () => {
                         <Edit className="w-4 h-4" />
                       </Button>
                       <Button
-                        onClick={() => deleteClient(client.id)}
+                        onClick={() => handleDeleteClient(client.id)}
                         size="sm"
                         variant="outline"
                         className="border-red-300 text-red-600 hover:bg-red-50"

@@ -20,10 +20,9 @@ const AdminDashboard = () => {
 
   const tabs = [
     { id: "prompt", label: "Configurar Prompt", icon: MessageSquare },
+      { id: "analysts", label: "Gestionar Analistas", icon: UserCog },
     { id: "clients", label: "Gestionar Clientes", icon: Users },
     { id: "services", label: "Gestionar Servicios", icon: Building2 },
-
-    { id: "analysts", label: "Gestionar Analistas", icon: UserCog },
   ];
 
   const renderContent = () => {
