@@ -11,7 +11,7 @@ import {
 import { signOut } from "next-auth/react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 
-const ChatHeader = ({ role }: { role: "client" | "analyst" }) => {
+const ChatHeader = ({ role }: { role: "client" | "analyst" | "admin" }) => {
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   
   // 🔥 Usar el hook para obtener datos reales del usuario
@@ -46,6 +46,19 @@ const ChatHeader = ({ role }: { role: "client" | "analyst" }) => {
     }
   };
 
+  // Función para cerrar sesión (diferente para admin vs otros roles)
+  const handleLogout = () => {
+    if (role === "admin") {
+      // Logout para admin (limpiar localStorage)
+      localStorage.removeItem("adminAuth");
+      localStorage.removeItem("adminEmail");
+      window.location.href = "/admin/login";
+    } else {
+      // Logout para otros roles (NextAuth)
+      signOut({ callbackUrl: "/analyst/login" });
+    }
+  };
+
   return (
     <div className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200/50 flex-shrink-0">
       <div className="px-6 py-4 flex items-center justify-end">
@@ -73,14 +86,20 @@ const ChatHeader = ({ role }: { role: "client" | "analyst" }) => {
               <div className="text-right">
                 {/* 🔥 Mostrar nombre real del usuario o loading */}
                 <p className="text-sm font-semibold text-slate-700">
-                  {isLoading ? "Cargando..." : name || "Usuario"}
+                  {role === "admin" 
+                    ? "Administrador" 
+                    : (isLoading ? "Cargando..." : name || "Usuario")
+                  }
                 </p>
-                {/* 🔥 Mostrar título basado en el nivel del analista */}
+                {/* 🔥 Mostrar título basado en el rol */}
                 <p className="text-xs text-slate-500">
-                  {isLoading ? "..." : isAnalista ? getAnalistaTitle(nivel) : "Colaborador"}
+                  {role === "admin" 
+                    ? "Panel de Administración" 
+                    : (isLoading ? "..." : isAnalista ? getAnalistaTitle(nivel) : "Colaborador")
+                  }
                 </p>
               </div>
-              <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow duration-300">
+              <div className={`w-10 h-10 bg-gradient-to-br ${role === "admin" ? "from-orange-400 to-red-500" : "from-emerald-400 to-teal-500"} rounded-full flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow duration-300`}>
                 {/* 🔥 Mostrar iniciales reales del usuario */}
                 {isLoading ? (
                   <div className="animate-pulse w-5 h-5 bg-white/30 rounded"></div>
@@ -115,7 +134,7 @@ const ChatHeader = ({ role }: { role: "client" | "analyst" }) => {
                 </a>
                 <hr className="my-2 border-slate-200" />
                 <button
-                  onClick={() => signOut({ callbackUrl: "/analyst/login" })}
+                  onClick={handleLogout}
                   className="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-100 transition-colors rounded-lg mx-2 w-full text-left"
                 >
                   <LogOut className="w-4 h-4 mr-3" />

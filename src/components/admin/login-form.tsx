@@ -15,10 +15,35 @@ export function LoginForm() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+
+    // 🔒 Credenciales hardcodeadas para administrador
+    const ADMIN_EMAIL = "admin@soporteai.com";
+    const ADMIN_PASSWORD = "AdminSuporte2024!";
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        router.push("/admin/dashboard");
+        setError("");
+        setIsLoading(true);
+
+        // Validar credenciales hardcodeadas
+        if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+            // Guardar sesión de admin
+            localStorage.setItem("adminAuth", "true");
+            localStorage.setItem("adminEmail", email);
+            
+            setTimeout(() => {
+                setIsLoading(false);
+                router.push("/admin/dashboard");
+            }, 1000);
+        } else {
+            setTimeout(() => {
+                setIsLoading(false);
+                setError("Credenciales inválidas. Verifica tu email y contraseña.");
+            }, 1000);
+        }
     }
 
     const handleGoogleLogin = async () => {
@@ -49,6 +74,7 @@ export function LoginForm() {
                 </div>
                 
                 <CardContent className="p-8 space-y-6">
+                
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="email" className="text-sm font-medium text-slate-700">
@@ -59,8 +85,10 @@ export function LoginForm() {
                                     id="email"
                                     name="email"
                                     type="email"
-                                    placeholder="admin@empresa.com"
+                                    placeholder="admin@soporteai.com"
                                     className="pl-4 pr-10 py-3 border-slate-300 focus:border-orange-400 focus:ring-orange-400 rounded-xl"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     required
                                 />
                             </div>
@@ -75,8 +103,10 @@ export function LoginForm() {
                                     id="password"
                                     name="password"
                                     type={showPassword ? "text" : "password"}
-                                    placeholder="••••••••"
+                                    placeholder="AdminSuporte2024!"
                                     className="pl-4 pr-10 py-3 border-slate-300 focus:border-orange-400 focus:ring-orange-400 rounded-xl"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     required
                                 />
                                 <button
@@ -89,12 +119,28 @@ export function LoginForm() {
                             </div>
                         </div>
 
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+                                {error}
+                            </div>
+                        )}
+
                         <Button
                             type="submit"
-                            className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
+                            disabled={isLoading}
+                            className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Iniciar Sesión
-                            <ArrowRight className="ml-2 h-4 w-4" />
+                            {isLoading ? (
+                                <div className="flex items-center justify-center">
+                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                    Validando...
+                                </div>
+                            ) : (
+                                <>
+                                    Iniciar Sesión
+                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                </>
+                            )}
                         </Button>
                     </form>
 

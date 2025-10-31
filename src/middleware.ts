@@ -17,9 +17,9 @@ export default withAuth(
 // Especifica qué rutas proteger
 export const config = {
   matcher: [
-    // Solo proteger los dashboards específicos, no las páginas de login
+    // Solo proteger los dashboards de NextAuth (user y analyst)
+    // Las rutas de admin usan su propia autenticación hardcodeada
     "/user/dashboard/:path*",
-    "/analyst/dashboard/:path*", 
-    "/admin/dashboard/:path*",
+    "/analyst/dashboard/:path*",
   ],
 };
