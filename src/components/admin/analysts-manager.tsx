@@ -1,64 +1,142 @@
 "use client";
 
-import React, { useState } from "react";
-import { UserCog, Plus, Edit, Trash2, Save, X } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { UserCog, Plus, Edit, Trash2, Save, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-interface Analyst {
-  id: string;
-  name: string;
-  email: string;
-  level: number;
-}
+import { 
+  getAnalysts, 
+  createAnalyst, 
+  updateAnalyst, 
+  deleteAnalyst, 
+  type Analyst 
+} from "@/services/analysts.service";
 
 const AnalystsManager = () => {
-  const [analysts, setAnalysts] = useState<Analyst[]>([
-    { id: "1", name: "Juan Pérez", email: "juan.perez@analytics.com", level: 2 },
-    { id: "2", name: "María García", email: "maria.garcia@analytics.com", level: 3 },
-    { id: "3", name: "Carlos López", email: "carlos.lopez@analytics.com", level: 1 },
-  ]);
+  const [analysts, setAnalysts] = useState<Analyst[]>([]);
   const [newAnalyst, setNewAnalyst] = useState({ name: "", email: "", level: 1 });
   const [editingAnalyst, setEditingAnalyst] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const addAnalyst = () => {
-    if (newAnalyst.name && newAnalyst.email) {
-      const analyst: Analyst = {
-        id: Date.now().toString(),
-        name: newAnalyst.name,
-        email: newAnalyst.email,
-        level: newAnalyst.level,
-      };
-      setAnalysts([...analysts, analyst]);
-      setNewAnalyst({ name: "", email: "", level: 1 });
+  function getLevels(): { value: number; label: string }[] {
+  return [
+    { value: 1, label: "1 - Junior" },
+    { value: 2, label: "2 - Senior" },
+    { value: 3, label: "3 - Expert" },
+    { value: 4, label: "4 - Master" }
+  ];
+}
+
+  // Cargar analistas al montar el componente
+  useEffect(() => {
+    loadAnalysts();
+  }, []);
+
+  const loadAnalysts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getAnalysts();
+      setAnalysts(data);
+    } catch (err) {
+      setError('Error al cargar los analistas');
+      console.error('Error loading analysts:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const deleteAnalyst = (id: string) => {
-    setAnalysts(analysts.filter(a => a.id !== id));
+  const addAnalyst = async () => {
+    if (newAnalyst.name && newAnalyst.email) {
+      try {
+        setActionLoading('create');
+        const createdAnalyst = await createAnalyst({
+          name: newAnalyst.name,
+          email: newAnalyst.email,
+          level: newAnalyst.level,
+        });
+        
+        setAnalysts(prev => [...prev, createdAnalyst]);
+        setNewAnalyst({ name: "", email: "", level: 1 });
+      } catch (err) {
+        setError('Error al crear el analista');
+        console.error('Error creating analyst:', err);
+      } finally {
+        setActionLoading(null);
+      }
+    }
   };
 
-  const updateAnalyst = (id: string, name: string, email: string, level: number) => {
-    setAnalysts(analysts.map(a => 
-      a.id === id ? { ...a, name, email, level } : a
-    ));
-    setEditingAnalyst(null);
+  const handleDeleteAnalyst = async (id: string) => {
+    try {
+      setActionLoading(id);
+      await deleteAnalyst(id);
+      setAnalysts(prev => prev.filter(a => a.id !== id));
+    } catch (err) {
+      setError('Error al eliminar el analista');
+      console.error('Error deleting analyst:', err);
+    } finally {
+      setActionLoading(null);
+    }
   };
 
-  const getLevelName = (level: number) => {
-    const levels = {
-      1: "Junior",
-      2: "Senior", 
-      3: "Expert",
-      4: "Master"
-    };
-    return levels[level as keyof typeof levels] || "Junior";
+  const handleUpdateAnalyst = async (id: string, name: string, email: string, level: number) => {
+    try {
+      setActionLoading(id);
+      const updatedAnalyst = await updateAnalyst(id, {
+        name,
+        email,
+        level,
+      });
+      
+      setAnalysts(prev => prev.map(a => 
+        a.id === id ? updatedAnalyst : a
+      ));
+      setEditingAnalyst(null);
+    } catch (err) {
+      setError('Error al actualizar el analista');
+      console.error('Error updating analyst:', err);
+    } finally {
+      setActionLoading(null);
+    }
   };
+
+  // Estado de loading inicial
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-orange-600 mx-auto mb-4" />
+          <p className="text-slate-600">Cargando analistas...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
+      {/* Error state */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 bg-red-500 rounded-full"></div>
+              <span className="text-red-700 font-medium">{error}</span>
+            </div>
+            <button
+              onClick={() => setError(null)}
+              className="text-red-500 hover:text-red-700"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Agregar nuevo analista */}
       <Card className="bg-white/80 backdrop-blur-sm border border-white/50 shadow-lg">
         <CardHeader>
@@ -106,10 +184,19 @@ const AnalystsManager = () => {
           <Button
             onClick={addAnalyst}
             className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700"
-            disabled={!newAnalyst.name || !newAnalyst.email}
+            disabled={!newAnalyst.name || !newAnalyst.email || actionLoading === 'create'}
           >
-            <Plus className="w-4 h-4 mr-2" />
-            Crear Analista
+            {actionLoading === 'create' ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Creando...
+              </>
+            ) : (
+              <>
+                <Plus className="w-4 h-4 mr-2" />
+                Crear Analista
+              </>
+            )}
           </Button>
         </CardContent>
       </Card>
@@ -152,17 +239,28 @@ const AnalystsManager = () => {
                     </div>
                     <div className="flex space-x-2">
                       <Button
-                        onClick={() => updateAnalyst(analyst.id, analyst.name, analyst.email, analyst.level)}
+                        onClick={() => handleUpdateAnalyst(analyst.id, analyst.name, analyst.email, analyst.level)}
                         size="sm"
                         className="bg-green-600 hover:bg-green-700"
+                        disabled={actionLoading === analyst.id}
                       >
-                        <Save className="w-4 h-4 mr-1" />
-                        Guardar
+                        {actionLoading === analyst.id ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                            Guardando...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="w-4 h-4 mr-1" />
+                            Guardar
+                          </>
+                        )}
                       </Button>
                       <Button
                         onClick={() => setEditingAnalyst(null)}
                         size="sm"
                         variant="outline"
+                        disabled={actionLoading === analyst.id}
                       >
                         <X className="w-4 h-4 mr-1" />
                         Cancelar
@@ -183,7 +281,11 @@ const AnalystsManager = () => {
                           analyst.level === 3 ? 'bg-purple-100 text-purple-700' :
                           'bg-orange-100 text-orange-700'
                         }`}>
-                          Nivel {analyst.level} - {getLevelName(analyst.level)}
+                          {(() => {
+                            const levels = getLevels();
+                            const levelObj = levels.find((l: { value: number; label: string }) => l.value === analyst.level);
+                            return levelObj ? levelObj.label : `Nivel ${analyst.level}`;
+                          })()}
                         </div>
                       </div>
                     </div>
@@ -193,16 +295,22 @@ const AnalystsManager = () => {
                         size="sm"
                         variant="outline"
                         className="border-orange-300 text-orange-600 hover:bg-orange-50"
+                        disabled={actionLoading === analyst.id}
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
                       <Button
-                        onClick={() => deleteAnalyst(analyst.id)}
+                        onClick={() => handleDeleteAnalyst(analyst.id)}
                         size="sm"
                         variant="outline"
                         className="border-red-300 text-red-600 hover:bg-red-50"
+                        disabled={actionLoading === analyst.id}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        {actionLoading === analyst.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
                       </Button>
                     </div>
                   </div>

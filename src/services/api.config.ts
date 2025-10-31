@@ -41,6 +41,10 @@ export const ENDPOINTS = {
   // Usuarios
   USERS: "/users",
   USER_BY_ID: (id: string) => `/users/${id}`,
+
+  // Admin - Analistas
+  ADMIN_ANALYSTS: "/api/backend/admin/analysts",
+  ADMIN_ANALYST_BY_ID: (id: string) => `/api/backend/admin/analysts/${id}`,
   
 } as const;
 
