@@ -17,9 +17,9 @@ export default withAuth(
 // Especifica qué rutas proteger
 export const config = {
   matcher: [
-    "/user/:path*",
-    "/analyst/:path*",
-    // Excluye las páginas de login
-    "/((?!api|_next/static|_next/image|favicon.ico|analyst/login|user/login|$).*)",
+    // Solo proteger los dashboards específicos, no las páginas de login
+    "/user/dashboard/:path*",
+    "/analyst/dashboard/:path*", 
+    "/admin/dashboard/:path*",
   ],
 };
