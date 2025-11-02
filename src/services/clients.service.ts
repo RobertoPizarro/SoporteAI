@@ -187,3 +187,56 @@ export async function deleteClient(id: string): Promise<boolean> {
     throw error;
   }
 }
+
+// Obtener los servicios asociados a un cliente
+export async function getClientServices(clientId: string): Promise<string[]> {
+  try {
+    const data = await apiRequest(ENDPOINTS.CLIENT_SERVICES(clientId), {
+      method: "GET",
+    });
+
+    console.log("📥 Servicios del cliente recibidos:", data);
+
+    // El backend devuelve {servicios_clientes: [{id_cliente_servicio: "...", nombre: "..."}, ...]}
+    // Como no devuelve id_servicio, vamos a devolver los nombres para comparar
+    if (data && data.servicios_clientes && Array.isArray(data.servicios_clientes)) {
+      const serviceNames = data.servicios_clientes.map((s: any) => {
+        console.log("🔄 Procesando servicio del cliente:", s);
+        return s.nombre;
+      });
+      console.log("✅ Nombres de servicios del cliente:", serviceNames);
+      return serviceNames;
+    }
+
+    return [];
+  } catch (error) {
+    console.error("Error loading client services:", error);
+    return [];
+  }
+}
+
+/**
+ * Actualizar los servicios asociados a un cliente
+ * @param clientId ID del cliente
+ * @param serviceNames Array de nombres de servicios a asociar
+ */
+export async function updateClientServices(
+  clientId: string,
+  serviceNames: string[]
+): Promise<void> {
+  try {
+    console.log("🔄 Actualizando servicios del cliente:", { clientId, serviceNames });
+    
+    // Construir la URL con query params según el patrón establecido
+    const url = `${ENDPOINTS.UPDATE_CLIENT_SERVICES}?id_cliente=${clientId}&servicios=${serviceNames.join(",")}`;
+    
+    const response = await apiRequest(url, {
+      method: "PATCH",
+    });
+
+    console.log("✅ Servicios del cliente actualizados:", response);
+  } catch (error) {
+    console.error("Error updating client services:", error);
+    throw error;
+  }
+}

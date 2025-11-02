@@ -11,8 +11,11 @@ import {
   createClient,
   updateClient,
   deleteClient,
+  getClientServices,
+  updateClientServices,
   type Client,
 } from "@/services/clients.service";
+import { getServices, type Service } from "@/services/services.service";
 
 const ClientsManager = () => {
   const [clients, setClients] = useState<Client[]>([]);
@@ -22,10 +25,21 @@ const ClientsManager = () => {
     name: string;
     domain: string;
   }>({ name: "", domain: "" });
+  
+  // Estados para servicios
+  const [allServices, setAllServices] = useState<Service[]>([]);
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [loadingServices, setLoadingServices] = useState(false);
 
   useEffect(() => {
     loadClients();
+    loadAllServices();
   }, []);
+
+  const loadAllServices = async () => {
+    const services = await getServices();
+    setAllServices(services);
+  };
 
   const loadClients = async () => {
     const data = await getClients();
@@ -71,23 +85,55 @@ const ClientsManager = () => {
   };
 
   const handleUpdateClient = async (id: string) => {
-    const updatedClient = await updateClient(id, {
-      name: editValues.name,
-      domain: editValues.domain,
-    });
-    setClients((prev) => prev.map((c) => (c.id === id ? updatedClient : c)));
-    setEditingClient(null);
-    setEditValues({ name: "", domain: "" });
+    try {
+      // Actualizar datos básicos del cliente
+      const updatedClient = await updateClient(id, {
+        name: editValues.name,
+        domain: editValues.domain,
+      });
+      
+      // Actualizar servicios asociados
+      await updateClientServices(id, selectedServices);
+      
+      setClients((prev) => prev.map((c) => (c.id === id ? updatedClient : c)));
+      setEditingClient(null);
+      setEditValues({ name: "", domain: "" });
+      setSelectedServices([]);
+    } catch (error) {
+      console.error("Error al actualizar cliente:", error);
+    }
   };
 
-  const startEditing = (client: Client) => {
+  const startEditing = async (client: Client) => {
     setEditingClient(client.id);
     setEditValues({ name: client.name, domain: client.domain });
+    
+    // Cargar los servicios del cliente (nombres)
+    setLoadingServices(true);
+    try {
+      const clientServiceNames = await getClientServices(client.id);
+      setSelectedServices(clientServiceNames);
+      console.log("📋 Nombres de servicios del cliente cargados:", clientServiceNames);
+    } catch (error) {
+      console.error("Error al cargar servicios del cliente:", error);
+      setSelectedServices([]);
+    } finally {
+      setLoadingServices(false);
+    }
   };
 
   const cancelEditing = () => {
     setEditingClient(null);
     setEditValues({ name: "", domain: "" });
+    setSelectedServices([]);
+  };
+  
+  const toggleService = (serviceName: string) => {
+    setSelectedServices(prev => 
+      prev.includes(serviceName)
+        ? prev.filter(name => name !== serviceName)
+        : [...prev, serviceName]
+    );
   };
 
   return (
@@ -192,6 +238,36 @@ const ClientsManager = () => {
                           />
                         </div>
                       </div>
+                      
+                      {/* Selector de servicios */}
+                      <div className="space-y-2">
+                        <Label>Servicios Asignados</Label>
+                        {loadingServices ? (
+                          <p className="text-sm text-slate-500">Cargando servicios...</p>
+                        ) : (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 bg-slate-50 rounded-lg border border-slate-200">
+                            {allServices.length === 0 ? (
+                              <p className="text-sm text-slate-500 col-span-2">No hay servicios disponibles</p>
+                            ) : (
+                              allServices.map((service) => (
+                                <label
+                                  key={service.id}
+                                  className="flex items-center space-x-2 cursor-pointer hover:bg-slate-100 p-2 rounded"
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedServices.includes(service.name)}
+                                    onChange={() => toggleService(service.name)}
+                                    className="w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"
+                                  />
+                                  <span className="text-sm text-slate-700">{service.name}</span>
+                                </label>
+                              ))
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      
                       <div className="flex space-x-2">
                         <Button
                           onClick={() => handleUpdateClient(client.id)}
