@@ -18,6 +18,7 @@ const AnalystsManager = () => {
   const [analysts, setAnalysts] = useState<Analyst[]>([]);
   const [newAnalyst, setNewAnalyst] = useState({ name: "", email: "", level: 1 });
   const [editingAnalyst, setEditingAnalyst] = useState<string | null>(null);
+  const [editingData, setEditingData] = useState<{ name: string; email: string; level: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -84,19 +85,32 @@ const AnalystsManager = () => {
     }
   };
 
-  const handleUpdateAnalyst = async (id: string, name: string, email: string, level: number) => {
+  const startEditing = (analyst: Analyst) => {
+    setEditingAnalyst(analyst.id);
+    setEditingData({
+      name: analyst.name,
+      email: analyst.email,
+      level: analyst.level
+    });
+  };
+
+  const cancelEditing = () => {
+    setEditingAnalyst(null);
+    setEditingData(null);
+  };
+
+  const handleUpdateAnalyst = async (id: string) => {
+    if (!editingData) return;
+    
     try {
       setActionLoading(id);
-      const updatedAnalyst = await updateAnalyst(id, {
-        name,
-        email,
-        level,
-      });
+      const updatedAnalyst = await updateAnalyst(id, editingData);
       
       setAnalysts(prev => prev.map(a => 
         a.id === id ? updatedAnalyst : a
       ));
       setEditingAnalyst(null);
+      setEditingData(null);
     } catch (err) {
       setError('Error al actualizar el analista');
       console.error('Error updating analyst:', err);
@@ -137,7 +151,7 @@ const AnalystsManager = () => {
         </div>
       )}
 
-      {/* Agregar nuevo analista */}
+      {/* Agregar nuevo analista 
       <Card className="bg-white/80 backdrop-blur-sm border border-white/50 shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
@@ -199,7 +213,7 @@ const AnalystsManager = () => {
             )}
           </Button>
         </CardContent>
-      </Card>
+      </Card>*/}
 
       {/* Lista de analistas */}
       <Card className="bg-white/80 backdrop-blur-sm border border-white/50 shadow-lg">
@@ -213,22 +227,22 @@ const AnalystsManager = () => {
           <div className="space-y-4">
             {analysts.map((analyst) => (
               <div key={analyst.id} className="p-4 border border-slate-200 rounded-xl bg-slate-50">
-                {editingAnalyst === analyst.id ? (
+                {editingAnalyst === analyst.id && editingData ? (
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <Input
-                        defaultValue={analyst.name}
-                        onChange={(e) => analyst.name = e.target.value}
+                        value={editingData.name}
+                        onChange={(e) => setEditingData({ ...editingData, name: e.target.value })}
                         placeholder="Nombre completo"
                       />
                       <Input
-                        defaultValue={analyst.email}
-                        onChange={(e) => analyst.email = e.target.value}
+                        value={editingData.email}
+                        onChange={(e) => setEditingData({ ...editingData, email: e.target.value })}
                         placeholder="Email"
                       />
                       <select
-                        defaultValue={analyst.level}
-                        onChange={(e) => analyst.level = parseInt(e.target.value)}
+                        value={editingData.level}
+                        onChange={(e) => setEditingData({ ...editingData, level: parseInt(e.target.value) })}
                         className="p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400"
                       >
                         <option value={1}>1 - Junior</option>
@@ -239,7 +253,7 @@ const AnalystsManager = () => {
                     </div>
                     <div className="flex space-x-2">
                       <Button
-                        onClick={() => handleUpdateAnalyst(analyst.id, analyst.name, analyst.email, analyst.level)}
+                        onClick={() => handleUpdateAnalyst(analyst.id)}
                         size="sm"
                         className="bg-green-600 hover:bg-green-700"
                         disabled={actionLoading === analyst.id}
@@ -257,10 +271,9 @@ const AnalystsManager = () => {
                         )}
                       </Button>
                       <Button
-                        onClick={() => setEditingAnalyst(null)}
+                        onClick={cancelEditing}
                         size="sm"
                         variant="outline"
-                        disabled={actionLoading === analyst.id}
                       >
                         <X className="w-4 h-4 mr-1" />
                         Cancelar
@@ -291,11 +304,10 @@ const AnalystsManager = () => {
                     </div>
                     <div className="flex space-x-2">
                       <Button
-                        onClick={() => setEditingAnalyst(analyst.id)}
+                        onClick={() => startEditing(analyst)}
                         size="sm"
                         variant="outline"
                         className="border-orange-300 text-orange-600 hover:bg-orange-50"
-                        disabled={actionLoading === analyst.id}
                       >
                         <Edit className="w-4 h-4" />
                       </Button>

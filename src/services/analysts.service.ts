@@ -1,5 +1,3 @@
-"use server";
-
 import { apiRequest, ENDPOINTS } from "./api.config";
 
 export interface Analyst {
@@ -9,137 +7,177 @@ export interface Analyst {
   level: number;
 }
 
-// Datos de fallback cuando no existe el endpoint
-const FALLBACK_ANALYSTS: Analyst[] = [
-  { id: "1", name: "Juan Pérez", email: "juan.perez@analytics.com", level: 2 },
-  { id: "2", name: "María García", email: "maria.garcia@analytics.com", level: 3 },
-  { id: "3", name: "Carlos López", email: "carlos.lopez@analytics.com", level: 1 },
-];
+// Interface para el analista que viene del backend
+interface BackendAnalyst {
+  id: any; // Puede ser string, objeto UUID, o number
+  nombre: string;
+  email: string;
+  nivel: number;
+}
 
-// Clave para almacenamiento local temporal
-const STORAGE_KEY = 'admin_analysts';
+// Función para transformar analista del backend al formato del frontend
+const transformBackendAnalyst = (backendAnalyst: BackendAnalyst): Analyst => {
+  // Manejar diferentes formatos de ID (UUID object, string, number)
+  let id: string;
+  if (typeof backendAnalyst.id === "object" && backendAnalyst.id !== null) {
+    // Si es un objeto UUID, convertirlo a string
+    id = String(backendAnalyst.id);
+  } else {
+    id = String(backendAnalyst.id);
+  }
+
+  return {
+    id,
+    name: backendAnalyst.nombre,
+    email: backendAnalyst.email,
+    level: backendAnalyst.nivel,
+  };
+};
+
+// Función para transformar analista del frontend al formato del backend
+const transformAnalystToBackend = (analyst: Omit<Analyst, "id">) => {
+  return {
+    nombre: analyst.name,
+    email: analyst.email,
+    nivel: analyst.level,
+  };
+};
+
+// Niveles disponibles
+export const getLevels = () => [
+  { value: 1, label: "Nivel 1" },
+  { value: 2, label: "Nivel 2" },
+  { value: 3, label: "Nivel 3" },
+  { value: 4, label: "Nivel 4" },
+];
 
 // Obtener todos los analistas
 export async function getAnalysts(): Promise<Analyst[]> {
   try {
-    // TODO: Implementar cuando el endpoint esté disponible
-    // const data = await apiRequest(ENDPOINTS.ADMIN_ANALYSTS, {
-    //   method: "GET",
-    //   credentials: "include"
-    // });
-    // return data;
+    const data = await apiRequest(ENDPOINTS.ADMIN_ANALYSTS, {
+      method: "GET",
+    });
 
-    // Fallback: usar localStorage con datos por defecto
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        return JSON.parse(stored);
+    console.log("📥 Datos recibidos del backend:", data);
+    console.log("📥 Tipo de datos:", typeof data);
+    console.log("📥 Es array?:", Array.isArray(data));
+    console.log("📥 Claves del objeto:", data ? Object.keys(data) : "null");
+
+    // Si data es un objeto con una propiedad que contiene el array
+    let analistas = data;
+
+    // Verificar si data tiene una propiedad 'analistas' o similar
+    if (data && typeof data === "object" && !Array.isArray(data)) {
+      console.log("🔍 data es un objeto, buscando array dentro...");
+      // Buscar una propiedad que contenga el array
+      if (Array.isArray(data.analistas)) {
+        analistas = data.analistas;
+        console.log("✅ Encontrado array en data.analistas");
+      } else if (Array.isArray(data.data)) {
+        analistas = data.data;
+        console.log("✅ Encontrado array en data.data");
+      } else {
+        // Tomar el primer valor que sea un array
+        const arrayProp = Object.values(data).find((val) => Array.isArray(val));
+        if (arrayProp) {
+          analistas = arrayProp;
+          console.log("✅ Encontrado array en propiedad del objeto");
+        }
       }
-      
-      // Si no hay datos guardados, usar el fallback
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(FALLBACK_ANALYSTS));
     }
-    
-    return FALLBACK_ANALYSTS;
-    
+
+    if (!Array.isArray(analistas)) {
+      console.error("❌ La respuesta no es un array:", analistas);
+      return [];
+    }
+
+    console.log("✅ Array con", analistas.length, "elementos");
+
+    const transformed = analistas.map(transformBackendAnalyst);
+    console.log("✅ Analistas transformados:", transformed);
+
+    return transformed;
   } catch (error) {
-    console.warn('Error loading analysts, using fallback:', error);
-    return FALLBACK_ANALYSTS;
+    console.error("Error loading analysts:", error);
+    return [];
   }
 }
 
 // Crear un nuevo analista
-export async function createAnalyst(analyst: Omit<Analyst, 'id'>): Promise<Analyst> {
+export async function createAnalyst(
+  analyst: Omit<Analyst, "id">
+): Promise<Analyst> {
   try {
-    // TODO: Implementar cuando el endpoint esté disponible
-    // const data = await apiRequest(ENDPOINTS.ADMIN_ANALYSTS, {
-    //   method: "POST",
-    //   credentials: "include",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(analyst)
-    // });
-    // return data;
+    const data = await apiRequest(ENDPOINTS.ADMIN_ANALYSTS, {
+      method: "POST",
+      body: JSON.stringify(transformAnalystToBackend(analyst)),
+    });
 
-    // Fallback: usar localStorage
-    const analysts = await getAnalysts();
-    const newAnalyst: Analyst = {
-      id: Date.now().toString(),
-      ...analyst
-    };
-    
-    const updatedAnalysts = [...analysts, newAnalyst];
-    
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedAnalysts));
-    }
-    
-    return newAnalyst;
-    
+    return transformBackendAnalyst(data);
   } catch (error) {
-    console.error('Error creating analyst:', error);
-    throw new Error('Error al crear el analista');
+    console.error("Error creating analyst:", error);
+    throw new Error("Error al crear el analista");
   }
 }
 
-// Actualizar un analista existente
-export async function updateAnalyst(id: string, updates: Partial<Omit<Analyst, 'id'>>): Promise<Analyst> {
+// Actualizar un analista existente (solo nivel por ahora)
+export async function updateAnalyst(
+  id: string,
+  updates: Partial<Omit<Analyst, "id">>
+): Promise<Analyst> {
   try {
-    // TODO: Implementar cuando el endpoint esté disponible
-    // const data = await apiRequest(`${ENDPOINTS.ADMIN_ANALYSTS}/${id}`, {
-    //   method: "PATCH",
-    //   credentials: "include",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(updates)
-    // });
-    // return data;
+    // El backend solo acepta actualizar el nivel
+    if (updates.level === undefined) {
+      throw new Error("El nivel es requerido para actualizar un analista");
+    }
 
-    // Fallback: usar localStorage
-    const analysts = await getAnalysts();
-    const updatedAnalysts = analysts.map(analyst => 
-      analyst.id === id ? { ...analyst, ...updates } : analyst
-    );
+    // Construir URL con query params según el backend
+    const url = `${ENDPOINTS.UPDATE_ADMIN_ANALYST}?id_analista=${encodeURIComponent(id)}&nivel=${updates.level}`;
     
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedAnalysts));
+    const data = await apiRequest(url, {
+      method: "PATCH",
+    });
+
+    console.log("✅ Respuesta de actualización:", data);
+
+    // El backend devuelve {ok: true, mensaje: "..."}, no el analista actualizado
+    // Devolver el analista con todos los datos proporcionados
+    if (data.ok) {
+      return {
+        id,
+        name: updates.name || "",
+        email: updates.email || "",
+        level: updates.level,
+      };
     }
-    
-    const updatedAnalyst = updatedAnalysts.find(a => a.id === id);
-    if (!updatedAnalyst) {
-      throw new Error('Analista no encontrado después de la actualización');
-    }
-    
-    return updatedAnalyst;
-    
+
+    throw new Error(data.mensaje || "No se pudo actualizar el analista");
   } catch (error) {
-    console.error('Error updating analyst:', error);
-    throw new Error('Error al actualizar el analista');
+    console.error("Error updating analyst:", error);
+    throw error;
   }
 }
 
 // Eliminar un analista
 export async function deleteAnalyst(id: string): Promise<boolean> {
   try {
-    // TODO: Implementar cuando el endpoint esté disponible
-    // await apiRequest(`${ENDPOINTS.ADMIN_ANALYSTS}/${id}`, {
-    //   method: "DELETE",
-    //   credentials: "include"
-    // });
-    // return true;
+    // Construir URL con query params según el backend
+    const url = `${ENDPOINTS.DELETE_ADMIN_ANALYST}?id_analista=${encodeURIComponent(id)}`;
+    
+    const data = await apiRequest(url, {
+      method: "PATCH", // Tu backend usa PATCH, no DELETE
+    });
 
-    // Fallback: usar localStorage
-    const analysts = await getAnalysts();
-    const updatedAnalysts = analysts.filter(analyst => analyst.id !== id);
-    
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedAnalysts));
+    console.log("✅ Respuesta de eliminación:", data);
+
+    // El backend devuelve {ok: true, mensaje: "..."}
+    if (data.ok) {
+      return true;
     }
-    
-    return true;
-    
+
+    throw new Error(data.mensaje || "No se pudo eliminar el analista");
   } catch (error) {
-    console.error('Error deleting analyst:', error);
-    throw new Error('Error al eliminar el analista');
+    console.error("Error deleting analyst:", error);
+    throw error;
   }
 }
-
-

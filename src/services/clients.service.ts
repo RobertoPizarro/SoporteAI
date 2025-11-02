@@ -3,15 +3,35 @@
 export interface Client {
   id: string;
   name: string;
-  email: string;
+}
+
+// Interface para el backend
+interface ClientBackend {
+  id_cliente: string;
+  nombre: string;
+}
+
+// Transformación backend -> frontend
+function transformClient(backendClient: ClientBackend): Client {
+  return {
+    id: backendClient.id_cliente,
+    name: backendClient.nombre
+  };
+}
+
+// Transformación frontend -> backend
+function transformClientToBackend(client: Omit<Client, 'id'>): Omit<ClientBackend, 'id_cliente'> {
+  return {
+    nombre: client.name
+  };
 }
 
 const STORAGE_KEY = 'admin_clients';
 const FALLBACK_CLIENTS: Client[] = [
-  { id: "1", name: "Entel", email: "contacto@entel.com" },
-  { id: "2", name: "Claro", email: "soporte@claro.com" },
-  { id: "3", name: "BCP", email: "analytics@bcp.com.pe" },
-  { id: "4", name: "Movistar", email: "datos@movistar.com" },
+  { id: "1", name: "Entel" },
+  { id: "2", name: "Claro" },
+  { id: "3", name: "BCP" },
+  { id: "4", name: "Movistar" },
 ];
 
 export async function getClients(): Promise<Client[]> {

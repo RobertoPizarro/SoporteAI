@@ -18,17 +18,16 @@ const ClientsManager = () => {
     const data = await getClients();
     setClients(data);
   };
-  const [newClient, setNewClient] = useState({ name: "", email: "" });
+  const [newClient, setNewClient] = useState({ name: "" });
   const [editingClient, setEditingClient] = useState<string | null>(null);
 
   const addClient = async () => {
-    if (newClient.name && newClient.email) {
+    if (newClient.name) {
       const createdClient = await createClient({
         name: newClient.name,
-        email: newClient.email,
       });
       setClients(prev => [...prev, createdClient]);
-      setNewClient({ name: "", email: "" });
+      setNewClient({ name: "" });
     }
   };
 
@@ -37,8 +36,8 @@ const ClientsManager = () => {
     setClients(prev => prev.filter(c => c.id !== id));
   };
 
-  const handleUpdateClient = async (id: string, name: string, email: string) => {
-    const updatedClient = await updateClient(id, { name, email });
+  const handleUpdateClient = async (id: string, name: string) => {
+    const updatedClient = await updateClient(id, { name });
     setClients(prev => prev.map(c => c.id === id ? updatedClient : c));
     setEditingClient(null);
   };
@@ -54,31 +53,19 @@ const ClientsManager = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="client-name">Nombre del Cliente</Label>
-              <Input
-                id="client-name"
-                value={newClient.name}
-                onChange={(e) => setNewClient({ ...newClient, name: e.target.value })}
-                placeholder="Ej: Empresa ABC"
-              />
-            </div>
-            <div>
-              <Label htmlFor="client-email">Email de Contacto</Label>
-              <Input
-                id="client-email"
-                type="email"
-                value={newClient.email}
-                onChange={(e) => setNewClient({ ...newClient, email: e.target.value })}
-                placeholder="contacto@empresa.com"
-              />
-            </div>
+          <div>
+            <Label htmlFor="client-name">Nombre del Cliente</Label>
+            <Input
+              id="client-name"
+              value={newClient.name}
+              onChange={(e) => setNewClient({ name: e.target.value })}
+              placeholder="Ej: Empresa ABC"
+            />
           </div>
           <Button
             onClick={addClient}
             className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700"
-            disabled={!newClient.name || !newClient.email}
+            disabled={!newClient.name}
           >
             <Plus className="w-4 h-4 mr-2" />
             Agregar Cliente
@@ -106,15 +93,10 @@ const ClientsManager = () => {
                         onChange={(e) => client.name = e.target.value}
                         placeholder="Nombre del cliente"
                       />
-                      <Input
-                        defaultValue={client.email}
-                        onChange={(e) => client.email = e.target.value}
-                        placeholder="Email"
-                      />
                     </div>
                     <div className="flex space-x-2">
                       <Button
-                        onClick={() => handleUpdateClient(client.id, client.name, client.email)}
+                        onClick={() => handleUpdateClient(client.id, client.name)}
                         size="sm"
                         className="bg-green-600 hover:bg-green-700"
                       >
@@ -135,7 +117,6 @@ const ClientsManager = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-semibold text-slate-800">{client.name}</h4>
-                      <p className="text-sm text-slate-600">{client.email}</p>
                     </div>
                     <div className="flex space-x-2">
                       <Button

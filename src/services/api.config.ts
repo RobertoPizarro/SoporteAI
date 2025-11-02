@@ -2,21 +2,27 @@
  * Configuración central de la API
  */
 
-// URLs base para diferentes entornos
-const API_BASE_URL = "";
+// Detectar entorno y configurar URL base
+const getBaseUrl = (): string => {
+  // En el navegador, usar el origin actual
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  
+  // En servidor (SSR/SSG), usar variable de entorno o localhost
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+};
+
+const API_BASE_URL = getBaseUrl();
 
 // Configuración de headers por defecto
 const DEFAULT_HEADERS = {
   "Content-Type": "application/json",
 } as const;
 
-// Configuración de timeouts
-const DEFAULT_TIMEOUT = 10000; // 10 segundos
-
 // Configuración de endpoints
 export const API_CONFIG = {
   BASE_URL: API_BASE_URL,
-  TIMEOUT: DEFAULT_TIMEOUT,
   HEADERS: DEFAULT_HEADERS,
 } as const;
 
@@ -25,6 +31,7 @@ export const ENDPOINTS = {
   // Authentication
   AUTH_GOOGLE_COLABORADOR: "/api/backend/auth/google/colaborador",
   AUTH_GOOGLE_ANALISTA: "/api/backend/auth/google/analista",
+  
   // Chat
   CHAT_MESSAGE: "/api/backend/user/chat",
   CHAT_RESET: "/api/backend/user/reset",
@@ -43,8 +50,10 @@ export const ENDPOINTS = {
   USER_BY_ID: (id: string) => `/users/${id}`,
 
   // Admin - Analistas
-  ADMIN_ANALYSTS: "/api/backend/admin/analysts",
-  ADMIN_ANALYST_BY_ID: (id: string) => `/api/backend/admin/analysts/${id}`,
+  ADMIN_ANALYSTS: "/api/backend/administrador/analistas",
+  UPDATE_ADMIN_ANALYST: "/api/backend/administrador/analista/actualizar",
+  DELETE_ADMIN_ANALYST: "/api/backend/administrador/analista/eliminar",
+  ADMIN_ANALYST_BY_ID: (id: string) => `/api/backend/administrador/analistas/${id}`,
   
 } as const;
 
@@ -52,6 +61,17 @@ export const ENDPOINTS = {
  * Función helper para construir URLs completas
  */
 export const buildUrl = (endpoint: string): string => {
+  // Si el endpoint ya es una URL completa, devolverla tal cual
+  if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
+    return endpoint;
+  }
+  
+  // Si no hay base URL o el endpoint ya es relativo, usar directamente
+  if (!API_CONFIG.BASE_URL || API_CONFIG.BASE_URL === '') {
+    return endpoint;
+  }
+  
+  // Construir URL completa
   return `${API_CONFIG.BASE_URL}${endpoint}`;
 };
 
@@ -73,12 +93,36 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
     const response = await fetch(url, config);
     
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      // Capturar el error detallado del servidor
+      let errorMessage = `HTTP error! status: ${response.status}`;
+      let errorDetails = null;
+      
+      try {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          errorDetails = await response.json();
+          console.error('❌ Server error response:', errorDetails);
+          errorMessage = errorDetails.message || errorDetails.error || errorDetails.detail || errorMessage;
+        } else {
+          const textError = await response.text();
+          console.error('❌ Server error (text):', textError);
+          errorMessage = textError || errorMessage;
+        }
+      } catch (parseError) {
+        console.error('⚠️ Could not parse error response:', parseError);
+      }
+      
+      const error = new Error(errorMessage);
+      (error as any).status = response.status;
+      (error as any).details = errorDetails;
+      throw error;
     }
     
     return await response.json();
   } catch (error) {
-    console.error(`API Error en ${endpoint}:`, error);
+    if (error instanceof Error) {
+      console.error(`🔴 API Error en ${endpoint}:`, error.message);
+    }
     throw error;
   }
 };
