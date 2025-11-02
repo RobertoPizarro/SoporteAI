@@ -165,7 +165,7 @@ export async function deleteAnalyst(id: string): Promise<boolean> {
     const url = `${ENDPOINTS.DELETE_ADMIN_ANALYST}?id_analista=${encodeURIComponent(id)}`;
     
     const data = await apiRequest(url, {
-      method: "PATCH", // Tu backend usa PATCH, no DELETE
+      method: "DELETE", // Tu backend usa DELETE, no PATCH
     });
 
     console.log("✅ Respuesta de eliminación:", data);

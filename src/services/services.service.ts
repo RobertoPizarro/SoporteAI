@@ -85,7 +85,7 @@ export async function createService(
 ): Promise<Service> {
   try {
     const data = await apiRequest(ENDPOINTS.CREATE_ADMIN_SERVICE, {
-      method: "PATCH",
+      method: "POST",
       body: JSON.stringify({
         nombre: service.name,
       }),
@@ -170,7 +170,7 @@ export async function deleteService(id: string): Promise<boolean> {
     const url = `${ENDPOINTS.DELETE_ADMIN_SERVICE}?id_servicio=${encodeURIComponent(id)}`;
     
     const data = await apiRequest(url, {
-      method: "PATCH",
+      method: "DELETE",
     });
 
     console.log("✅ Respuesta de eliminación:", data);

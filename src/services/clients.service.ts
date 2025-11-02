@@ -112,7 +112,7 @@ export async function createClient(
     const url = `${ENDPOINTS.CREATE_ADMIN_CLIENT}?nombre=${encodeURIComponent(client.name)}&dominio=${encodeURIComponent(client.domain)}`;
     
     const data = await apiRequest(url, {
-      method: "PATCH",
+      method: "POST",
     });
 
     console.log("✅ Respuesta de creación:", data);
@@ -171,7 +171,7 @@ export async function deleteClient(id: string): Promise<boolean> {
     const url = `${ENDPOINTS.DELETE_ADMIN_CLIENT}?id_cliente=${encodeURIComponent(id)}`;
     
     const data = await apiRequest(url, {
-      method: "PATCH", // El backend usa PATCH, no DELETE
+      method: "DELETE", // El backend usa DELETE, no PATCH
     });
 
     console.log("✅ Respuesta de eliminación:", data);
