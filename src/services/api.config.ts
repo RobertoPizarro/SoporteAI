@@ -54,6 +54,12 @@ export const ENDPOINTS = {
   UPDATE_ADMIN_ANALYST: "/api/backend/administrador/analista/actualizar",
   DELETE_ADMIN_ANALYST: "/api/backend/administrador/analista/eliminar",
   ADMIN_ANALYST_BY_ID: (id: string) => `/api/backend/administrador/analistas/${id}`,
+
+  // Admin - Clientes
+  ADMIN_CLIENTS: "/api/backend/administrador/clientes",
+  CREATE_ADMIN_CLIENT: "/api/backend/administrador/cliente/crear",
+  UPDATE_ADMIN_CLIENT: "/api/backend/administrador/cliente/actualizar",
+  DELETE_ADMIN_CLIENT: "/api/backend/administrador/cliente/eliminar",
   
 } as const;
 
