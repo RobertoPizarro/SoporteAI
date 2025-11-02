@@ -1,49 +1,74 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Building2, Plus, Edit, Trash2, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-interface Service {
-  id: string;
-  name: string;
-  description: string;
-}
+import { getServices, createService, updateService, deleteService, type Service } from "@/services/services.service";
 
 const ServicesManager = () => {
-  const [services, setServices] = useState<Service[]>([
-    { id: "1", name: "Data Science", description: "Análisis avanzado de datos y machine learning" },
-    { id: "2", name: "Big Data", description: "Procesamiento de grandes volúmenes de datos" },
-    { id: "3", name: "Geo Solutions", description: "Análisis geoespacial y mapeo" },
-    { id: "4", name: "Cloud+Apps", description: "Soluciones en la nube y aplicaciones" },
-  ]);
-  const [newService, setNewService] = useState({ name: "", description: "" });
+  const [services, setServices] = useState<Service[]>([]);
+  const [newService, setNewService] = useState({ name: "" });
   const [editingService, setEditingService] = useState<string | null>(null);
+  const [editValues, setEditValues] = useState<{ name: string }>({ name: "" });
 
-  const addService = () => {
-    if (newService.name && newService.description) {
-      const service: Service = {
-        id: Date.now().toString(),
-        name: newService.name,
-        description: newService.description,
-      };
-      setServices([...services, service]);
-      setNewService({ name: "", description: "" });
+  useEffect(() => {
+    loadServices();
+  }, []);
+
+  const loadServices = async () => {
+    const data = await getServices();
+    console.log("📋 Servicios cargados en componente:", data);
+    setServices(data);
+  };
+
+  const addService = async () => {
+    if (newService.name) {
+      try {
+        await createService({
+          name: newService.name,
+        });
+        await loadServices();
+        setNewService({ name: "" });
+      } catch (error) {
+        console.error("Error al crear servicio:", error);
+      }
     }
   };
 
-  const deleteService = (id: string) => {
-    setServices(services.filter(s => s.id !== id));
+  const handleDeleteService = async (id: string) => {
+    console.log("🗑️ Intentando eliminar servicio con ID:", id);
+    
+    if (!id || id === 'undefined') {
+      console.error("❌ ID inválido para eliminar:", id);
+      return;
+    }
+    
+    await deleteService(id);
+    setServices(prev => prev.filter(s => s.id !== id));
   };
 
-  const updateService = (id: string, name: string, description: string) => {
-    setServices(services.map(s => 
-      s.id === id ? { ...s, name, description } : s
-    ));
+  const handleUpdateService = async (id: string) => {
+    try {
+      await updateService(id, { name: editValues.name });
+      await loadServices();
+      setEditingService(null);
+      setEditValues({ name: "" });
+    } catch (error) {
+      console.error("Error al actualizar servicio:", error);
+    }
+  };
+
+  const startEditing = (service: Service) => {
+    setEditingService(service.id);
+    setEditValues({ name: service.name });
+  };
+
+  const cancelEditing = () => {
     setEditingService(null);
+    setEditValues({ name: "" });
   };
 
   return (
@@ -57,30 +82,19 @@ const ServicesManager = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="service-name">Nombre del Servicio</Label>
-              <Input
-                id="service-name"
-                value={newService.name}
-                onChange={(e) => setNewService({ ...newService, name: e.target.value })}
-                placeholder="Ej: Data Analytics"
-              />
-            </div>
-            <div>
-              <Label htmlFor="service-desc">Descripción</Label>
-              <Input
-                id="service-desc"
-                value={newService.description}
-                onChange={(e) => setNewService({ ...newService, description: e.target.value })}
-                placeholder="Descripción del servicio"
-              />
-            </div>
+          <div>
+            <Label htmlFor="service-name">Nombre del Servicio</Label>
+            <Input
+              id="service-name"
+              value={newService.name}
+              onChange={(e) => setNewService({ name: e.target.value })}
+              placeholder="Ej: Data Analytics"
+            />
           </div>
           <Button
             onClick={addService}
             className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700"
-            disabled={!newService.name || !newService.description}
+            disabled={!newService.name}
           >
             <Plus className="w-4 h-4 mr-2" />
             Agregar Servicio
@@ -98,69 +112,72 @@ const ServicesManager = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {services.map((service) => (
-              <div key={service.id} className="p-4 border border-slate-200 rounded-xl bg-slate-50">
-                {editingService === service.id ? (
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Input
-                        defaultValue={service.name}
-                        onChange={(e) => service.name = e.target.value}
-                        placeholder="Nombre del servicio"
-                      />
-                      <Input
-                        defaultValue={service.description}
-                        onChange={(e) => service.description = e.target.value}
-                        placeholder="Descripción"
-                      />
+            {services.length === 0 ? (
+              <p className="text-center text-slate-500 py-8">No hay servicios registrados</p>
+            ) : (
+              services.map((service, index) => (
+                <div 
+                  key={service.id || `service-${index}`} 
+                  className="p-4 border border-slate-200 rounded-xl bg-slate-50"
+                >
+                  {editingService === service.id ? (
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor={`edit-name-${service.id}`}>Nombre</Label>
+                        <Input
+                          id={`edit-name-${service.id}`}
+                          value={editValues.name}
+                          onChange={(e) => setEditValues({ name: e.target.value })}
+                          placeholder="Nombre del servicio"
+                        />
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          onClick={() => handleUpdateService(service.id)}
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          <Save className="w-4 h-4 mr-1" />
+                          Guardar
+                        </Button>
+                        <Button
+                          onClick={cancelEditing}
+                          size="sm"
+                          variant="outline"
+                        >
+                          <X className="w-4 h-4 mr-1" />
+                          Cancelar
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex space-x-2">
-                      <Button
-                        onClick={() => updateService(service.id, service.name, service.description)}
-                        size="sm"
-                        className="bg-green-600 hover:bg-green-700"
-                      >
-                        <Save className="w-4 h-4 mr-1" />
-                        Guardar
-                      </Button>
-                      <Button
-                        onClick={() => setEditingService(null)}
-                        size="sm"
-                        variant="outline"
-                      >
-                        <X className="w-4 h-4 mr-1" />
-                        Cancelar
-                      </Button>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-semibold text-slate-800">{service.name}</h4>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          onClick={() => startEditing(service)}
+                          size="sm"
+                          variant="outline"
+                          className="border-orange-300 text-orange-600 hover:bg-orange-50"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          onClick={() => handleDeleteService(service.id)}
+                          size="sm"
+                          variant="outline"
+                          className="border-red-300 text-red-600 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-semibold text-slate-800">{service.name}</h4>
-                      <p className="text-sm text-slate-600">{service.description}</p>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button
-                        onClick={() => setEditingService(service.id)}
-                        size="sm"
-                        variant="outline"
-                        className="border-orange-300 text-orange-600 hover:bg-orange-50"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        onClick={() => deleteService(service.id)}
-                        size="sm"
-                        variant="outline"
-                        className="border-red-300 text-red-600 hover:bg-red-50"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
+                  )}
+                </div>
+              ))
+            )}
           </div>
         </CardContent>
       </Card>
