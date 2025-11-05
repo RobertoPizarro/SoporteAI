@@ -21,18 +21,14 @@ const FALLBACK_PROMPT: PromptContent = {
 
 // Obtener el prompt actual
 export async function getPrompt(): Promise<PromptContent> {
-  console.log("🔄 getPrompt() llamado");
-  console.log("🔄 Endpoint:", ENDPOINTS.ADMIN_PROMPT);
+ 
   
   try {
     const data = await apiRequest(ENDPOINTS.ADMIN_PROMPT, {
       method: "GET",
     });
 
-    console.log("📥 Datos de prompt recibidos del backend:", data);
-    console.log("📥 Tipo de datos recibidos:", typeof data);
-    console.log("📥 Es null/undefined?:", data === null || data === undefined);
-    console.log("📥 Claves del objeto:", data ? Object.keys(data) : "N/A");
+    
 
     // El backend devuelve directamente el diccionario con las secciones
     if (!data || typeof data !== 'object') {
@@ -43,20 +39,9 @@ export async function getPrompt(): Promise<PromptContent> {
     // Si el backend devuelve {ok: true, overrides: {...}}, extraer overrides
     let promptData = data;
     if (data.overrides) {
-      console.log("🔍 Encontrado objeto overrides, extrayendo...");
       promptData = data.overrides;
     }
 
-    // Retornar directamente los datos del backend
-    console.log("✅ Prompt recibido:", promptData);
-    console.log("✅ Prompt como PromptContent tiene:", {
-      identidadObjetivos: promptData.identidadObjetivos,
-      reglasComunicacion: promptData.reglasComunicacion,
-      flujoTrabajo: promptData.flujoTrabajo,
-      formatoBusquedas: promptData.formatoBusquedas,
-      formatoTickets: promptData.formatoTickets,
-      plantillaRespuesta: promptData.plantillaRespuesta,
-    });
 
     return promptData as PromptContent;
   } catch (error) {
@@ -68,24 +53,21 @@ export async function getPrompt(): Promise<PromptContent> {
 // Actualizar el prompt
 export async function updatePrompt(updates: Partial<PromptContent>): Promise<PromptContent> {
   try {
-    console.log("🔄 Actualizando prompt con:", updates);
     
     const data = await apiRequest(ENDPOINTS.UPDATE_ADMIN_PROMPT, {
       method: "PATCH",
       body: JSON.stringify(updates),
     });
 
-    console.log("✅ Respuesta de actualización:", data);
 
     // El backend devuelve {ok: true, overrides: {...}}
     if (data && data.ok && data.overrides) {
-      console.log("✅ Prompt actualizado exitosamente, extrayendo overrides");
+
       return data.overrides as PromptContent;
     }
 
     // Si solo tiene ok: true sin overrides
     if (!data || data.ok === true || data.ok === "true") {
-      console.log("✅ Actualización confirmada, retornando updates");
       return updates as PromptContent;
     }
 

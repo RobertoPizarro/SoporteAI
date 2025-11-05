@@ -44,10 +44,6 @@ const ClientsManager = () => {
   const loadClients = async () => {
     const data = await getClients();
     console.log("📋 Clientes cargados en componente:", data);
-    console.log(
-      "📋 Cada cliente tiene ID?:",
-      data.map((c) => ({ name: c.name, id: c.id, hasId: !!c.id }))
-    );
     setClients(data);
   };
 
@@ -111,9 +107,26 @@ const ClientsManager = () => {
     // Cargar los servicios del cliente (nombres)
     setLoadingServices(true);
     try {
-      const clientServiceNames = await getClientServices(client.id);
-      setSelectedServices(clientServiceNames);
-      console.log("📋 Nombres de servicios del cliente cargados:", clientServiceNames);
+      const rawKeys = await getClientServices(client.id);
+      // Asegurarse de tener la lista completa de servicios para mapear nombre->id
+      const servicesList = allServices.length ? allServices : await getServices();
+
+      const normalizedIds = rawKeys
+        .map((k) => {
+          // Si el valor ya es un id que coincide con algún servicio, usarlo
+          const byId = servicesList.find((s) => s.id === k);
+          if (byId) return byId.id;
+          // Si no, intentar emparejar por nombre
+          const byName = servicesList.find((s) => s.name === k);
+          if (byName) return byName.id;
+          // No se pudo normalizar
+          return null;
+        })
+        .filter(Boolean) as string[];
+
+      console.log("📋 Keys crudas de servicios del cliente:", rawKeys);
+      console.log("📋 IDs normalizados de servicios del cliente:", normalizedIds);
+      setSelectedServices(normalizedIds);
     } catch (error) {
       console.error("Error al cargar servicios del cliente:", error);
       setSelectedServices([]);
@@ -128,11 +141,9 @@ const ClientsManager = () => {
     setSelectedServices([]);
   };
   
-  const toggleService = (serviceName: string) => {
-    setSelectedServices(prev => 
-      prev.includes(serviceName)
-        ? prev.filter(name => name !== serviceName)
-        : [...prev, serviceName]
+  const toggleService = (serviceId: string) => {
+    setSelectedServices((prev) =>
+      prev.includes(serviceId) ? prev.filter((id) => id !== serviceId) : [...prev, serviceId]
     );
   };
 
@@ -256,8 +267,8 @@ const ClientsManager = () => {
                                 >
                                   <input
                                     type="checkbox"
-                                    checked={selectedServices.includes(service.name)}
-                                    onChange={() => toggleService(service.name)}
+                                    checked={selectedServices.includes(service.id)}
+                                    onChange={() => toggleService(service.id)}
                                     className="w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"
                                   />
                                   <span className="text-sm text-slate-700">{service.name}</span>

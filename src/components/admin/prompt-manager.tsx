@@ -5,15 +5,43 @@ import { MessageSquare, Edit, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getPrompt, updatePrompt, type PromptContent } from "@/services/prompt.service";
+import {
+  getPrompt,
+  updatePrompt,
+  type PromptContent,
+} from "@/services/prompt.service";
 
 const SECTIONS = [
-  { key: 'identidadObjetivos', label: 'Identidad y Objetivos', placeholder: 'Define la identidad y objetivos del asistente...' },
-  { key: 'reglasComunicacion', label: 'Reglas de Comunicación', placeholder: 'Establece las reglas de comunicación...' },
-  { key: 'flujoTrabajo', label: 'Flujo de Trabajo', placeholder: 'Describe el flujo de trabajo...' },
-  { key: 'formatoBusquedas', label: 'Formato de Búsquedas', placeholder: 'Define cómo realizar búsquedas...' },
-  { key: 'formatoTickets', label: 'Formato de Tickets', placeholder: 'Especifica el formato de tickets...' },
-  { key: 'plantillaRespuesta', label: 'Plantilla de Respuesta', placeholder: 'Define la plantilla de respuestas...' },
+  {
+    key: "identidadObjetivos",
+    label: "Identidad y Objetivos",
+    placeholder: "Define la identidad y objetivos del asistente...",
+  },
+  {
+    key: "reglasComunicacion",
+    label: "Reglas de Comunicación",
+    placeholder: "Establece las reglas de comunicación...",
+  },
+  {
+    key: "flujoTrabajo",
+    label: "Flujo de Trabajo",
+    placeholder: "Describe el flujo de trabajo...",
+  },
+  {
+    key: "formatoBusquedas",
+    label: "Formato de Búsquedas",
+    placeholder: "Define cómo realizar búsquedas...",
+  },
+  {
+    key: "formatoTickets",
+    label: "Formato de Tickets",
+    placeholder: "Especifica el formato de tickets...",
+  },
+  {
+    key: "plantillaRespuesta",
+    label: "Plantilla de Respuesta",
+    placeholder: "Define la plantilla de respuestas...",
+  },
 ] as const;
 
 const PromptManager = () => {
@@ -32,16 +60,7 @@ const PromptManager = () => {
     setIsLoading(true);
     try {
       const data = await getPrompt();
-      console.log("📋 Prompt cargado en componente:", data);
-      console.log("📋 Claves del prompt:", Object.keys(data));
-      console.log("📋 Valores del prompt:", {
-        identidadObjetivos: data.identidadObjetivos?.substring(0, 50) + "...",
-        reglasComunicacion: data.reglasComunicacion?.substring(0, 50) + "...",
-        flujoTrabajo: data.flujoTrabajo?.substring(0, 50) + "...",
-        formatoBusquedas: data.formatoBusquedas?.substring(0, 50) + "...",
-        formatoTickets: data.formatoTickets?.substring(0, 50) + "...",
-        plantillaRespuesta: data.plantillaRespuesta?.substring(0, 50) + "...",
-      });
+
       setPromptData(data);
       setEditedContent(data);
     } catch (error) {
@@ -81,7 +100,7 @@ const PromptManager = () => {
   };
 
   const updateSection = (key: keyof PromptContent, value: string) => {
-    setEditedContent(prev => ({
+    setEditedContent((prev) => ({
       ...prev,
       [key]: value || undefined,
     }));
@@ -112,12 +131,15 @@ const PromptManager = () => {
           <div className="space-y-6">
             {SECTIONS.map((section) => (
               <div key={section.key} className="space-y-2">
-                <Label htmlFor={section.key} className="text-sm font-medium text-slate-700">
+                <Label
+                  htmlFor={section.key}
+                  className="text-sm font-medium text-slate-700"
+                >
                   {section.label}
                 </Label>
                 <textarea
                   id={section.key}
-                  value={editedContent[section.key] || ''}
+                  value={editedContent[section.key] || ""}
                   onChange={(e) => updateSection(section.key, e.target.value)}
                   className="w-full h-24 p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 transition-all duration-200"
                   placeholder={section.placeholder}
@@ -151,15 +173,7 @@ const PromptManager = () => {
               const hasKey = promptData && section.key in promptData;
               const value = promptData?.[section.key];
               const isUndefined = value === undefined;
-              
-              console.log(`📋 Sección ${section.key}:`, {
-                hasKey,
-                value,
-                isUndefined,
-                valueType: typeof value,
-                valueLength: typeof value === 'string' ? value.length : 'N/A'
-              });
-              
+
               return (
                 <div key={section.key} className="space-y-2">
                   <Label className="text-sm font-medium text-slate-700">
@@ -167,10 +181,13 @@ const PromptManager = () => {
                   </Label>
                   <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 min-h-[80px]">
                     <p className="text-slate-700 whitespace-pre-wrap">
-                      {hasKey && !isUndefined
-                        ? value
-                        : <span className="text-slate-400 italic">No configurado</span>
-                      }
+                      {hasKey && !isUndefined ? (
+                        value
+                      ) : (
+                        <span className="text-slate-400 italic">
+                          No configurado
+                        </span>
+                      )}
                     </p>
                   </div>
                 </div>

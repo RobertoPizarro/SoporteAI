@@ -61,6 +61,7 @@ export const ENDPOINTS = {
   UPDATE_ADMIN_CLIENT: "/api/backend/administrador/cliente/actualizar",
   DELETE_ADMIN_CLIENT: "/api/backend/administrador/cliente/eliminar",
   CLIENT_SERVICES: (clientId: string) => `/api/backend/administrador/servicios_clientes?id_cliente=${clientId}`,
+  // NOTE: backend route includes a trailing slash and may redirect if missing.
   UPDATE_CLIENT_SERVICES: "/api/backend/administrador/servicios_clientes/actualizar",
   
   // Admin - Servicios
