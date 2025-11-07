@@ -36,7 +36,7 @@ export default function Home() {
                   <ArrowRight className="h-6 w-6 text-muted-foreground group-hover:text-primary transition-transform duration-300 group-hover:translate-x-1" />
                 </div>
                 <p className="mb-6 text-muted-foreground text-sm">
-                  Interactúa con nuestro chatbot para reportar incidencias o solicitar requerimientos en los servicios de analytics.
+                  Interactúa con nuestro Agente de Soporte IA para reportar incidencias o solicitar requerimientos de las aplicaciones que usas.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-8">
                   <Badge variant="outline" className="bg-blue-100/50 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200 border-blue-200/80 dark:border-blue-500/30">Data Science</Badge>

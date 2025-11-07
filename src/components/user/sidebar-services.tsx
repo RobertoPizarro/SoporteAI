@@ -24,7 +24,7 @@ const SidebarServices = ({ handleNewChat }: SidebarServicesProps) => {
 
                 <div className="space-y-3">
                     <h4 className="text-sm font-semibold text-gray-800">
-                        Servicios de Analytics:
+                        Servicios de Soporte IA:
                     </h4>
                     <div className="space-y-2">
                         <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
